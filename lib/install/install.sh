@@ -128,7 +128,7 @@ bpkg_install () {
     if [ ! -z "${build}" ]; then
       (
         ## go to tmp dir
-        cd $( $TMPDIR && echo $TMPDIR || echo /tmp) &&
+        cd $( [ ! -z $TMPDIR ] && echo $TMPDIR || echo /tmp) &&
         ## prune existing
         rm -rf ${name}-${version} &&
         ## shallow clone
