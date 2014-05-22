@@ -115,7 +115,7 @@ bpkg_install () {
   }
 
   ## get package name from `package.json'
-  name="$(echo -n ${json} | bpkg-json -b | grep 'name' | awk '{ print $2 }' | tr -d '"')"
+  name="$(echo -n ${json} | bpkg-json -b | grep 'name' | awk '{ print $2 }' | tr -d '\"')"
 
   if [ "${#scripts[@]}" -gt "0" ]; then
     ## make `deps/' directory if possible
