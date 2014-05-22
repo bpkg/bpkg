@@ -5,5 +5,7 @@
   "global": true,
   "scripts": [ "bpkg.sh" ],
   "bin": { "bpkg": "bpkg.sh" },
-  "dependencies": { }
+  "dependencies": {
+    "jwerle/term.sh": "*"
+  }
 }

@@ -37,7 +37,7 @@ bpkg_package () {
     ## show value for a specific property
     ## in `package.json'
     {
-      cat "${pkg}" | bpkg-json -b | grep "${prop}" | awk '{ printf $2 }'
+      cat "${pkg}" | bpkg-json -b | grep "${prop}" | awk '{ $1=""; printf $0 }'
       echo
     }
   fi

@@ -6,8 +6,8 @@ BPKG_USER="${BPKG_USER:-"bpkg"}"
 ## outut usage
 usage () {
   echo "usage: bpkg-install [-h|--help]"
-  echo "   or: bpkg-install <package>"
-  echo "   or: bpkg-install <user>/<package>"
+  echo "   or: bpkg-install [-g|--global] <package>"
+  echo "   or: bpkg-install [-g|--global] <user>/<package>"
 }
 
 ## Install a bash package
@@ -21,6 +21,7 @@ bpkg_install () {
   local version=""
   local status=""
   local json=""
+  local let needs_global=0
   declare -a local parts=()
   declare -a local scripts=()
 
@@ -28,6 +29,12 @@ bpkg_install () {
     -h|--help)
       usage
       return 0
+      ;;
+
+    -g|--global)
+      shift
+      needs_global=1
+      pkg="${1}"
       ;;
   esac
 
@@ -117,9 +124,14 @@ bpkg_install () {
   ## get package name from `package.json'
   name="$(echo -n ${json} | bpkg-json -b | grep 'name' | awk '{ print $2 }' | tr -d '\"')"
 
-  if [ "${#scripts[@]}" -gt "0" ]; then
+  if [ "1" = "${needs_global}" ]; then
+    ## install bin if needed
+    echo 
+  elif [ "${#scripts[@]}" -gt "0" ]; then
     ## make `deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
+    ## copy package.json over
+    curl -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
     ## grab each script and place in deps directory
     for (( i = 0; i < ${#scripts[@]} ; ++i )); do
       (
