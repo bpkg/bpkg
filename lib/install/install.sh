@@ -121,17 +121,37 @@ bpkg_install () {
     IFS="${OLDIFS}"
   }
 
-  ## get package name from `package.json'
-  name="$(echo -n ${json} | bpkg-json -b | grep 'name' | awk '{ print $2 }' | tr -d '\"')"
 
   if [ "1" = "${needs_global}" ]; then
     ## install bin if needed
-    echo 
+    build="$(echo -n ${json} | bpkg-json -b | grep 'install' | awk '{ print $2 }' | tr -d '\"')"
+    if [ ! -z "${build}" ]; then
+      (
+        ## go to tmp dir
+        cd $( $TMPDIR && echo $TMPDIR || echo /tmp) &&
+        ## prune existing
+        rm -rf ${name}-${version} &&
+        ## shallow clone
+        git clone --depth=1 https://github.com/${user}/${name}.git ${name}-${version} &&
+        ## move into directory
+        cd ${name}-${version} &&
+        ## build
+        ( "${build}" ) &&
+        ## clean up
+        rm -rf ${name}-${version}
+      )
+    fi
+
   elif [ "${#scripts[@]}" -gt "0" ]; then
+    ## get package name from `package.json'
+    name="$(echo -n ${json} | bpkg-json -b | grep 'name' | awk '{ print $2 }' | tr -d '\"')"
+
     ## make `deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
+
     ## copy package.json over
     curl -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
+
     ## grab each script and place in deps directory
     for (( i = 0; i < ${#scripts[@]} ; ++i )); do
       (
