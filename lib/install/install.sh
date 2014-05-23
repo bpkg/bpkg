@@ -1,5 +1,6 @@
 #!/bin/bash
 
+BPKG_GIT_REMOTE="${BPKG_GIT_REMOTE:-"https://github.com"}"
 BPKG_REMOTE="${BPKG_REMOTE:-"https://raw.githubusercontent.com"}"
 BPKG_USER="${BPKG_USER:-"bpkg"}"
 
@@ -40,6 +41,7 @@ bpkg_install () {
 
   ## ensure there is a package to install
   if [ -z "${pkg}" ]; then
+    usage
     return 1
   fi
 
@@ -47,6 +49,7 @@ bpkg_install () {
   {
     curl -s "${BPKG_REMOTE}"
     if [ "0" != "$?" ]; then
+      echo >&2 "error: Remote unreachable"
       return 1
     fi
   }
@@ -61,6 +64,7 @@ bpkg_install () {
 
   if [ "1" = "${#parts[@]}" ]; then
     version="master"
+    echo >&2 "Using latest (master)"
   elif [ "2" = "${#parts[@]}" ]; then
     name="${parts[0]}"
     version="${parts[1]}"
@@ -88,8 +92,10 @@ bpkg_install () {
     return 1
   fi
 
-  ## clean up name of weird trailing versions
+  ## clean up name of weird trailing
+  ## versions and slashes
   name=${name/@*//}
+  name=${name////}
 
   ## build uri portion
   uri="/${user}/${name}/${version}"
@@ -126,20 +132,20 @@ bpkg_install () {
     ## install bin if needed
     build="$(echo -n ${json} | bpkg-json -b | grep 'install' | awk '{ print $2 }' | tr -d '\"')"
     if [ ! -z "${build}" ]; then
-      (
+      {(
         ## go to tmp dir
         cd $( [ ! -z $TMPDIR ] && echo $TMPDIR || echo /tmp) &&
         ## prune existing
         rm -rf ${name}-${version} &&
         ## shallow clone
-        git clone --depth=1 https://github.com/${user}/${name}.git ${name}-${version} &&
+        git clone --depth=1 ${BPKG_GIT_REMOTE}/${user}/${name}.git ${name}-${version} &&
         ## move into directory
         cd ${name}-${version} &&
         ## build
         ( "${build}" ) &&
         ## clean up
         rm -rf ${name}-${version}
-      )
+      )}
     fi
 
   elif [ "${#scripts[@]}" -gt "0" ]; then

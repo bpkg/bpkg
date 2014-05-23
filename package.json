@@ -4,8 +4,5 @@
   "description": "Lightweight bash package manager",
   "global": true,
   "scripts": [ "bpkg.sh" ],
-  "bin": { "bpkg": "bpkg.sh" },
-  "dependencies": {
-    "jwerle/term.sh": "*"
-  }
+  "install": "make install"
 }
