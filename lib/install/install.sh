@@ -11,6 +11,57 @@ usage () {
   echo "   or: bpkg-install [-g|--global] <user>/<package>"
 }
 
+message () {
+  if type -f bpkg-term > /dev/null 2>&1; then
+    term color "${1}"
+  fi
+
+  shift
+  printf "    ${1}"
+  shift
+
+  if type -f bpkg-term > /dev/null 2>&1; then
+    term reset
+  fi
+
+  printf ": "
+
+  if type -f bpkg-term > /dev/null 2>&1; then
+    term reset
+    term bright
+  fi
+
+  printf "%s\n" "${@}"
+
+  if type -f bpkg-term > /dev/null 2>&1; then
+    term reset
+  fi
+}
+
+## output error
+error () {
+  {
+    message "red" "error" "${@}"
+  } >&2
+}
+
+## output warning
+warn () {
+  {
+    message "yellow" "warn" "${@}"
+  } >&2
+}
+
+## output info
+info () {
+  local title="info"
+  if (( "${#}" > 1 )); then
+    title="${1}"
+    shift
+  fi
+  message "cyan" "${title}" "${@}"
+}
+
 ## Install a bash package
 bpkg_install () {
   local pkg="${1}"
@@ -45,11 +96,13 @@ bpkg_install () {
     return 1
   fi
 
+  echo
+
   ## ensure remote is reachable
   {
     curl -s "${BPKG_REMOTE}"
     if [ "0" != "$?" ]; then
-      echo >&2 "error: Remote unreachable"
+      error "Remote unreachable"
       return 1
     fi
   }
@@ -64,12 +117,12 @@ bpkg_install () {
 
   if [ "1" = "${#parts[@]}" ]; then
     version="master"
-    echo >&2 "Using latest (master)"
+    info "Using latest (master)"
   elif [ "2" = "${#parts[@]}" ]; then
     name="${parts[0]}"
     version="${parts[1]}"
   else
-    echo >&2 "error: Error parsing package version"
+     error "Error parsing package version"
     return 1
   fi
 
@@ -88,7 +141,7 @@ bpkg_install () {
     user="${parts[0]}"
     name="${parts[1]}"
   else
-    echo >&2 "error: Unable to determine package name"
+    error "Unable to determine package name"
     return 1
   fi
 
@@ -110,7 +163,7 @@ bpkg_install () {
   {
     status=$(curl -sL "${url}/package.json" -w '%{http_code}' -o /dev/null)
     if [ "0" != "$?" ] || (( status >= 400 )); then
-      echo >&2 "error: Package doesn't exist"
+      error "Package doesn't exist"
       return 1
     fi
   }
@@ -127,11 +180,13 @@ bpkg_install () {
     IFS="${OLDIFS}"
   }
 
-
+  ## build global if needed
   if [ "1" = "${needs_global}" ]; then
     ## install bin if needed
-    build="$(echo -n ${json} | bpkg-json -b | grep 'install' | awk '{ print $2 }' | tr -d '\"')"
+    build="$(echo -n ${json} | bpkg-json -b | grep 'install' | awk '{$1=""; print $0 }' | tr -d '\"')"
+    build="$(echo -n ${build} | sed -e 's/^ *//' -e 's/ *$//')"
     if [ ! -z "${build}" ]; then
+      info "install: \`${build}'"
       {(
         ## go to tmp dir
         cd $( [ ! -z $TMPDIR ] && echo $TMPDIR || echo /tmp) &&
@@ -139,13 +194,17 @@ bpkg_install () {
         rm -rf ${name}-${version} &&
         ## shallow clone
         git clone --depth=1 ${BPKG_GIT_REMOTE}/${user}/${name}.git ${name}-${version} > /dev/null 2>&1 &&
-        ## move into directory
-        cd ${name}-${version} &&
-        ## build
-        ( "${build}" ) &&
+        (
+          ## move into directory
+          cd ${name}-${version} &&
+          ## build
+          eval "${build}"
+        ) &&
         ## clean up
         rm -rf ${name}-${version}
       )}
+    else
+      warn "Mssing build script"
     fi
 
   elif [ "${#scripts[@]}" -gt "0" ]; then

@@ -14,16 +14,23 @@ usage () {
 
 ## feature tests
 features () {
-  if ! type bpkg-json > /dev/null 2>&1; then
-    error "Missing json parser dependency"
-    exit 1
-  fi
+  declare -a local features=(bpkg-json)
+  for ((i = 0; i < ${#features[@]}; ++i)); do
+    local f="${features[$i]}"
+    if ! type "${f}"  > /dev/null 2>&1; then
+      error "Missing "${f}" dependency"
+      return 1
+    fi
+  done
 }
 
 bpkg () {
   local arg="$1"
   local cmd=""
   shift
+
+  ## test for required features
+  features || return $?
 
   case "${arg}" in
 
@@ -49,9 +56,7 @@ bpkg () {
   esac
 }
 
-## test for required features
-features
-
+## export or run
 if [[ ${BASH_SOURCE[0]} != $0 ]]; then
   export -f bpkg
 else
