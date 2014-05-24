@@ -171,6 +171,11 @@ bpkg_install () {
   ## read package.json
   json=$(curl -sL "${url}/package.json")
 
+  ## check if forced global
+  if $(echo -n $json | bpkg-json -b | grep 'global' | awk '{ print $2 }' | tr -d '"'); then
+    needs_global=1
+  fi
+
   ## construct scripts array
   {
     scripts=$(echo -n $json | bpkg-json -b | grep 'scripts' | awk '{ print $2 }' | tr -d '"')
