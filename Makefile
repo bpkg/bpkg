@@ -1,7 +1,7 @@
 
 BIN ?= bpkg
 PREFIX ?= /usr/local
-CMDS = json install package
+CMDS = json install package term
 
 install: uninstall
 	install $(BIN) $(PREFIX)/bin
