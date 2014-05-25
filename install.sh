@@ -17,7 +17,7 @@ ftest () {
 ## feature tests
 features () {
   for f in "${@}"; do
-    ftest "${f}" && {
+    ftest "${f}" || {
       echo >&2 "  error: Missing \`${f}'"
       return 1
     }
@@ -28,7 +28,7 @@ features () {
 ## main setup
 setup () {
   ## test for require features
-  features git && return $?
+  features git || return $?
 
   ## build
   {
