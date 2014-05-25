@@ -1,0 +1,7 @@
+{
+  "name": "suggest",
+  "version": "0.0.2",
+  "description": "Suggest a command based on a query found in $PATH",
+  "scripts": [ "suggest.sh" ],
+  "install": "make install"
+}
