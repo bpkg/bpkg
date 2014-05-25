@@ -196,11 +196,16 @@ bpkg_install () {
 
   ## construct scripts array
   {
-    scripts=$(echo -n $json | bpkg-json -b | grep 'scripts' | awk '{ print $2 }' | tr -d '"')
+    scripts=$(echo -n $json | bpkg-json -b | grep 'scripts' | awk '{$1=""; print $0 }' | tr -d '"')
     OLDIFS="${IFS}"
+
+    ## comma to space
     IFS=','
-    scripts=($(echo ${scripts}))
+    scripts=($(echo ${scripts[@]}))
     IFS="${OLDIFS}"
+
+    ## account for existing space
+    scripts=($(echo ${scripts[@]}))
   }
 
   ## build global if needed
@@ -231,7 +236,14 @@ bpkg_install () {
     fi
   elif [ "${#scripts[@]}" -gt "0" ]; then
     ## get package name from `package.json'
-    name="$(echo -n ${json} | bpkg-json -b | grep 'name' | awk '{ print $2 }' | tr -d '\"')"
+    name="$(
+      echo -n ${json} |
+      bpkg-json -b |
+      grep 'name' |
+      awk '{ $1=""; print $0 }' |
+      tr -d '\"' |
+      tr -d ' '
+    )"
 
     ## make `deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
