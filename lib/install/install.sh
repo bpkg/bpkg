@@ -64,7 +64,7 @@ info () {
 
 ## Install a bash package
 bpkg_install () {
-  local pkg="${1}"
+  local pkg=""
   local cwd="`pwd`"
   local user=""
   local name=""
@@ -76,19 +76,37 @@ bpkg_install () {
   local let needs_global=0
   declare -a local parts=()
   declare -a local scripts=()
+  declare -a args=( "${@}" )
 
-  case "${pkg}" in
-    -h|--help)
-      usage
-      return 0
-      ;;
+  for opt in "${@}"; do
+    if [ "-" = "${opt:0:1}" ]; then
+      continue
+    fi
+    pkg="${opt}"
+    break
+  done
 
-    -g|--global)
-      shift
-      needs_global=1
-      pkg="${1}"
-      ;;
-  esac
+  for opt in "${@}"; do
+    case "${opt}" in
+      -h|--help)
+        usage
+        return 0
+        ;;
+
+      -g|--global)
+        shift
+        needs_global=1
+        ;;
+
+      *)
+        if [ "-" = "${opt:0:1}" ]; then
+          echo 2>&1 "error: Unknwon argument \`${1}'"
+          usage
+          return 1
+        fi
+        ;;
+    esac
+  done
 
   ## ensure there is a package to install
   if [ -z "${pkg}" ]; then
@@ -172,7 +190,7 @@ bpkg_install () {
   json=$(curl -sL "${url}/package.json")
 
   ## check if forced global
-  if $(echo -n $json | bpkg-json -b | grep 'global' | awk '{ print $2 }' | tr -d '"'); then
+  if [ ! -z $(echo -n $json | bpkg-json -b | grep 'global' | awk '{ print $2 }' | tr -d '"') ]; then
     needs_global=1
   fi
 
@@ -211,7 +229,6 @@ bpkg_install () {
     else
       warn "Mssing build script"
     fi
-
   elif [ "${#scripts[@]}" -gt "0" ]; then
     ## get package name from `package.json'
     name="$(echo -n ${json} | bpkg-json -b | grep 'name' | awk '{ print $2 }' | tr -d '\"')"
