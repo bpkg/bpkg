@@ -1,12 +1,13 @@
 #!/bin/bash
 
+VERSION="0.0.1"
 REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
 TMPDIR=${TMPDIR:-/tmp}
 DEST=${DEST:-${TMPDIR}/bpkg-master}
 
 ## test if command exists
 ftest () {
-  if type -f "${1}" > /dev/null 2>&1; then
+  if ! type -f "${1}" > /dev/null 2>&1; then
     return 1
   else
     return 0
@@ -16,8 +17,8 @@ ftest () {
 ## feature tests
 features () {
   for f in "${@}"; do
-    ftest "${f}" || {
-      echo &>2 "  error: Missing \`${f}'"
+    ftest "${f}" && {
+      echo >&2 "  error: Missing \`${f}'"
       return 1
     }
   done
@@ -27,9 +28,10 @@ features () {
 ## main setup
 setup () {
   ## test for require features
-  features git
+  features git && return $?
 
-  ({
+  ## build
+  {
     echo
     cd ${TMPDIR}
     echo "  info: pruning..."
@@ -41,9 +43,11 @@ setup () {
     echo "  info: installing..."
     echo
     make install
-  }) >&2
+  } >&2
   return $?
 }
 
+## go
 setup
 exit $?
+
