@@ -4,5 +4,12 @@
   "description": "Lightweight bash package manager",
   "global": true,
   "scripts": [ "bpkg.sh" ],
-  "install": "make install"
+  "install": "make install",
+  "bin": {
+    "bpkg": "bpkg",
+    "bpkg-install": "bpkg-install",
+    "bpkg-json": "bpkg-json",
+    "bpkg-package": "bpkg-package",
+    "bpkg-term": "bpkg-term"
+  }
 }
