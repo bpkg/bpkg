@@ -179,7 +179,7 @@ bpkg_install () {
 
   ## determine if `package.json' exists at url
   {
-    status=$(curl -sL "${url}/package.json" -w '%{http_code}' -o /dev/null)
+    status=$(curl -sL "${url}/package.json?`date +%s`" -w '%{http_code}' -o /dev/null)
     if [ "0" != "$?" ] || (( status >= 400 )); then
       error "Package doesn't exist"
       return 1
@@ -187,7 +187,7 @@ bpkg_install () {
   }
 
   ## read package.json
-  json=$(curl -sL "${url}/package.json")
+  json=$(curl -sL "${url}/package.json?`date +%s`")
 
   ## check if forced global
   if [ ! -z $(echo -n $json | bpkg-json -b | grep 'global' | awk '{ print $2 }' | tr -d '"') ]; then
