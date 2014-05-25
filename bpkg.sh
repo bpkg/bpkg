@@ -9,7 +9,9 @@ error () {
 
 ## output usage
 usage () {
-  echo "usage: bpkg [-hV] <command> [args]"
+  echo ""
+  echo "  usage: bpkg [-hV] <command> [args]"
+  echo ""
 }
 
 ## feature tests
@@ -54,6 +56,7 @@ bpkg () {
       ;;
 
   esac
+  usage
 }
 
 ## export or run
