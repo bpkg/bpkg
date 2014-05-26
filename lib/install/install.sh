@@ -13,7 +13,7 @@ usage () {
 
 message () {
   if type -f bpkg-term > /dev/null 2>&1; then
-    term color "${1}"
+    bpkg-term color "${1}"
   fi
 
   shift
@@ -21,20 +21,20 @@ message () {
   shift
 
   if type -f bpkg-term > /dev/null 2>&1; then
-    term reset
+    bpkg-term reset
   fi
 
   printf ": "
 
   if type -f bpkg-term > /dev/null 2>&1; then
-    term reset
-    term bright
+    bpkg-term reset
+    bpkg-term bright
   fi
 
   printf "%s\n" "${@}"
 
   if type -f bpkg-term > /dev/null 2>&1; then
-    term reset
+    bpkg-term reset
   fi
 }
 
