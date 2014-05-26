@@ -19,10 +19,10 @@ commands () {
   {
     declare -a local cmds=( $(
       bpkg-suggest 'bpkg-' |
-      tail -n+2 |
-      xargs basename |
-      sort -u |
-      sed 's/bpkg-//g' |
+      tail -n+2            |
+      xargs basename       |
+      sort -u              |
+      sed 's/bpkg-//g'     |
       tr '\n' ' '
     ) )
 
@@ -82,19 +82,15 @@ bpkg () {
       else
         echo >&2 "error: \`${arg}' is not a bpkg command."
         {
-          declare -a local res=($(
-            bpkg-suggest "${cmd}" |
-            tail -n+2 |
-            xargs basename |
-            sort -u |
-            tr '\n' ' '
-          ))
+          declare -a local res=($(commands))
 
           if [ ! -z "${res}" ]; then
             echo
             echo  >&2 "Did you mean one of these?"
-            for r in ${res}; do
-              echo "     ${r}"
+            for r in ${res[@]}; do
+              if [[ "$r" == *"${arg}"* ]]; then
+                echo "     $ bpkg ${r}"
+              fi
             done
             return 1
           else
@@ -107,6 +103,7 @@ bpkg () {
 
   esac
   usage
+  return 1
 }
 
 ## export or run

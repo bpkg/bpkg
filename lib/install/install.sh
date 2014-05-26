@@ -254,7 +254,9 @@ bpkg_install () {
     ## grab each script and place in deps directory
     for (( i = 0; i < ${#scripts[@]} ; ++i )); do
       (
-        local script=${scripts[$i]}
+        local script="$(echo ${scripts[$i]} | xargs basename )"
+        info "fetch" "${url}/${script}"
+        info "write" "${cwd}/deps/${name}/${script}"
         curl -sL "${url}/${script}" -o "${cwd}/deps/${name}/${script}"
       )
     done
