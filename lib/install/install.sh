@@ -74,6 +74,7 @@ bpkg_install () {
   local status=""
   local json=""
   local let needs_global=0
+  local let has_pkg_json=1
   declare -a local parts=()
   declare -a local scripts=()
   declare -a args=( "${@}" )
@@ -181,59 +182,66 @@ bpkg_install () {
   {
     status=$(curl -sL "${url}/package.json?`date +%s`" -w '%{http_code}' -o /dev/null)
     if [ "0" != "$?" ] || (( status >= 400 )); then
-      error "Package doesn't exist"
-      return 1
+      warn "Package doesn't exist"
+      has_pkg_json=0
     fi
   }
 
   ## read package.json
   json=$(curl -sL "${url}/package.json?`date +%s`")
 
-  ## check if forced global
-  if [ ! -z $(echo -n $json | bpkg-json -b | grep 'global' | awk '{ print $2 }' | tr -d '"') ]; then
-    needs_global=1
+  if (( 1 == $has_pkg_json )); then
+    ## check if forced global
+    if [ ! -z $(echo -n $json | bpkg-json -b | grep 'global' | awk '{ print $2 }' | tr -d '"') ]; then
+      needs_global=1
+    fi
+
+    ## construct scripts array
+    {
+      scripts=$(echo -n $json | bpkg-json -b | grep 'scripts' | awk '{$1=""; print $0 }' | tr -d '"')
+      OLDIFS="${IFS}"
+
+      ## comma to space
+      IFS=','
+      scripts=($(echo ${scripts[@]}))
+      IFS="${OLDIFS}"
+
+      ## account for existing space
+      scripts=($(echo ${scripts[@]}))
+    }
   fi
-
-  ## construct scripts array
-  {
-    scripts=$(echo -n $json | bpkg-json -b | grep 'scripts' | awk '{$1=""; print $0 }' | tr -d '"')
-    OLDIFS="${IFS}"
-
-    ## comma to space
-    IFS=','
-    scripts=($(echo ${scripts[@]}))
-    IFS="${OLDIFS}"
-
-    ## account for existing space
-    scripts=($(echo ${scripts[@]}))
-  }
 
   ## build global if needed
   if [ "1" = "${needs_global}" ]; then
-    ## install bin if needed
-    build="$(echo -n ${json} | bpkg-json -b | grep 'install' | awk '{$1=""; print $0 }' | tr -d '\"')"
-    build="$(echo -n ${build} | sed -e 's/^ *//' -e 's/ *$//')"
-    if [ ! -z "${build}" ]; then
-      info "install: \`${build}'"
-      {(
-        ## go to tmp dir
-        cd $( [ ! -z $TMPDIR ] && echo $TMPDIR || echo /tmp) &&
-        ## prune existing
-        rm -rf ${name}-${version} &&
-        ## shallow clone
-        git clone --depth=1 ${BPKG_GIT_REMOTE}/${user}/${name}.git ${name}-${version} > /dev/null 2>&1 &&
-        (
-          ## move into directory
-          cd ${name}-${version} &&
-          ## build
-          eval "${build}"
-        ) &&
-        ## clean up
-        rm -rf ${name}-${version}
-      )}
-    else
-      warn "Mssing build script"
+    if (( 1 == $has_pkg_json )); then
+      ## install bin if needed
+      build="$(echo -n ${json} | bpkg-json -b | grep 'install' | awk '{$1=""; print $0 }' | tr -d '\"')"
+      build="$(echo -n ${build} | sed -e 's/^ *//' -e 's/ *$//')"
     fi
+
+    if [ -z "${build}" ]; then
+      warn "Mssing build script"
+      warn "Trying \`make install'..."
+      build="make install"
+    fi
+
+    info "install: \`${build}'"
+    {(
+      ## go to tmp dir
+      cd $( [ ! -z $TMPDIR ] && echo $TMPDIR || echo /tmp) &&
+        ## prune existing
+      rm -rf ${name}-${version} &&
+        ## shallow clone
+      git clone --depth=1 ${BPKG_GIT_REMOTE}/${user}/${name}.git ${name}-${version} > /dev/null 2>&1 &&
+        (
+      ## move into directory
+      cd ${name}-${version} &&
+        ## build
+      eval "${build}"
+      ) &&
+        ## clean up
+      rm -rf ${name}-${version}
+    )}
   elif [ "${#scripts[@]}" -gt "0" ]; then
     ## get package name from `package.json'
     name="$(
