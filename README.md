@@ -49,6 +49,28 @@ $ bpkg install jwerle/suggest.sh@0.0.1 -g
 
 **note:** Versioned packages must be tagged releases by the author.
 
+*installing packages without a `package.json`:*
+
+As long as there is a `Makefile` in the repository it will try to invoke
+`make install` so long as the `-g` or `--global` flags are set when
+invoking `bpkg install`.
+
+One could install
+[git-standup](https://github.com/stephenmathieson/git-standup) with an
+omitted `package.json` because of the `Makefile` and the `install`
+target found in it.
+
+```sh
+$ bpkg install stephenmathieson/git-standup -g
+
+    info: Using latest (master)
+    warn: Package doesn't exist
+    warn: Mssing build script
+    warn: Trying `make install'...
+    info: install: `make install'
+cp -f git-standup /usr/local/bin
+```
+
 ### package info
 
 From the root of a package directory:
