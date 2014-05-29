@@ -1,6 +1,13 @@
 #!/bin/bash
 
-VERSION="0.1.0"
+## prevent sourcing
+if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+  echo >&2 "error: \`bpkg' cannot be sourced"
+  return 1
+fi
+
+## bpkg version
+VERSION="0.2.0"
 
 ## output error to stderr
 error () {
@@ -106,10 +113,5 @@ bpkg () {
   return 1
 }
 
-## export or run
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
-  export -f bpkg
-else
-  bpkg "${@}"
-  exit $?
-fi
+bpkg "${@}"
+exit $?
