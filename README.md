@@ -1,23 +1,36 @@
-bpkg
-====
+# bpkg
 
-Lightweight bash package manager
+_JavaScript has npm, Ruby has Gems, Python has pip and now Shell has bpkg!_
 
-## install
+`bpkg` is a lightweight bash package manager. It takes care of fetching the shell scripts, installing them appropriately, setting the execution permission and more.
 
-**Install script:**
+You can install shell scripts globally (on `/usr/local/bin`) or use them on a _per-project basis_ (on `./deps/`), as a lazy-man "copy and paste".
+
+## Install
+
+You can install `bpkg` from three distinct ways:
+
+### 1. Install script
+
+Our install script is the simplest way. It takes care of everything for you, placing `bpkg` and related scripts on `/usr/local/bin`.
+
+Paste the following on your shell and you're good to go:
 
 ```sh
-$ curl -Lo- https://raw.githubusercontent.com/bpkg/bpkg/master/install.sh | bash
+$ curl -Lo- http://get.bpkg.io| bash
 ```
 
-**[clib](https://github.com/clibs/clib):**
+### 2. clib
+
+[clib][clib] is a package manager for C projects. If you already have it, installing `bpkg` is a simple matter of:
 
 ```sh
 $ clib install bpkg/bpkg
 ```
 
-**source:**
+### 3. Source Code
+
+To directly install `bpkg` from it's source code you have to clone it's repository and install with `make`:
 
 ```sh
 $ git clone https://github.com/bpkg/bpkg.git
@@ -25,40 +38,40 @@ $ cd bpkg
 $ make install
 ```
 
-## usage
+## Usage
 
-### installing package
+You use `bpkg` by simply sending commands, pretty much like `npm` or `pip`.
 
-*global:*
+### Installing packages
+
+Packages can either be global (on `/usr/local/bin`) or local (under `./deps`).
+
+For example, here's a **global install** of the [term package][term]:
 
 ```sh
 $ bpkg install term -g
+$ term
 ```
 
-*project:* (installs into `deps/`)
+And the same package as a **local install**:
 
 ```sh
 $ bpkg install term
+$ ./deps/term/term.sh
 ```
 
-*versioned:*
+As a bonus, you can specify a **specific version**:
 
 ```sh
 $ bpkg install jwerle/suggest.sh@0.0.1 -g
 ```
 
-**note:** Versioned packages must be tagged releases by the author.
+**Note:** to do that the packages **must be tagged releases** on the repository.
 
-*installing packages without a `package.json`:*
+You can also *installing packages without a `package.json`*.
+As long as there is a `Makefile` in the repository it will try to invoke `make install` so long as the `-g` or `--global` flags are set when invoking `bpkg install`.
 
-As long as there is a `Makefile` in the repository it will try to invoke
-`make install` so long as the `-g` or `--global` flags are set when
-invoking `bpkg install`.
-
-One could install
-[git-standup](https://github.com/stephenmathieson/git-standup) with an
-omitted `package.json` because of the `Makefile` and the `install`
-target found in it.
+For example you could install [git-standup](https://github.com/stephenmathieson/git-standup) with an omitted `package.json` because of the `Makefile` and the `install` target found in it.
 
 ```sh
 $ bpkg install stephenmathieson/git-standup -g
@@ -71,21 +84,19 @@ $ bpkg install stephenmathieson/git-standup -g
 cp -f git-standup /usr/local/bin
 ```
 
-### package info
+### Retrieving package info
 
-From the root of a package directory:
+After installing a package, you can obtain info from it using `bpkg`.
+
+Supposing you're on the root of a package directory, the following commands show that package metadata:
 
 ```sh
+# Asking for single information
 $ bpkg package name
  "bpkg"
-```
-
-```sh
 $ bpkg package version
  "0.0.5"
-```
-
-```sh
+# Dumping all the metadata
 $ bpkg package
 ["name"]        "bpkg"
 ["version"]     "0.0.5"
@@ -94,21 +105,40 @@ $ bpkg package
 ["install"]     "make install"
 ```
 
+## Package details
+
+Here we lay down some info on the structure of a package.
+
 ## package.json
+
+Every package must have a file called `package.json`; it specifies package metadata on the [JSON format][json].
+
+Here's an example of a well-formed `package.json`:
+
+```json
+{
+  "name": "term",
+  "version": "0.0.1",
+  "description": "Terminal utility functions",
+  "scripts": [ "term.sh" ],
+  "install": "make install"
+}
+```
+
+All fields are mandatory except when noted.
+Here's a detailed explanation on all fields:
 
 ### name
 
-The `name` attribute is required as it is used to tell `bpkg` where to
-put it in the `deps/` directory in you project.
+The `name` attribute is required as it is used to tell `bpkg` where to put it in the `deps/` directory in you project.
 
 ```json
   "name": "my-script"
 ```
 
-### version
+### version (optional)
 
-The `version` attribute is not required but can be useful. It should
-correspond to the version that is associated with the installed package.
+The `version` attribute is not required but can be useful. It should correspond to the version that is associated with the installed package.
 
 ```json
   "version": "0.0.1"
@@ -116,8 +146,7 @@ correspond to the version that is associated with the installed package.
 
 ### description
 
-A human readable description of what the package offers for
-functionality.
+A human readable description of what the package offers for functionality.
 
 ```json
   "description": "This script makes monkeys jump out of your keyboard"
@@ -125,9 +154,7 @@ functionality.
 
 ### global
 
-Indicates that the package is only intended to be install as a script.
-This allows the ommition of the `-g` or `--global` flag during
-installation.
+Indicates that the package is only intended to be install as a script. This allows the ommition of the `-g` or `--global` flag during installation.
 
 ```json
   "global": "true"
@@ -135,9 +162,7 @@ installation.
 
 ### install
 
-Shell script used to invoke in the install script. This is required if
-the `global` attribute is set to `true` or if the `-g` or `--global`
-flags are provided.
+Shell script used to invoke in the install script. This is required if the `global` attribute is set to `true` or if the `-g` or `--global` flags are provided.
 
 ```json
   "install": "make install"
@@ -151,13 +176,13 @@ This is an array of scripts that will be installed into a project.
   "scripts": ["script.sh"]
 ```
 
-## best practices
+## Packaging best practices
 
-### package exports
+These are guidelines that we strongly encourage developers to follow.
 
-Its nice to have a bash package that can be used in the terminal and
-also be invoked as a command line function. To achieve this the
-exporting of your functionality *should* follow this pattern:
+### Package exports
+
+It's nice to have a bash package that can be used in the terminal and also be invoked as a command line function. To achieve this the exporting of your functionality *should* follow this pattern:
 
 ```sh
 if [[ ${BASH_SOURCE[0]} != $0 ]]; then
@@ -171,16 +196,20 @@ fi
 This allows a user to `source` your script or invoke as a script.
 
 ```sh
+# Running as a script
 $ ./my_script.sh some args --blah
-```
-
-or
-
-```sh
+# Sourcing the script
 $ source my_script.sh
 $ my_script some more args --blah
 ```
 
-## license
+## License
 
-MIT
+`bpkg` is released under the **MIT license**.
+
+See file `LICENSE` for a more detailed description of it's terms.
+
+
+[clib]: https://github.com/clibs/clib
+[term]: https://github.com/bpkg/term
+[json]: http://json.org/example
