@@ -6,9 +6,7 @@ BPKG_USER="${BPKG_USER:-"bpkg"}"
 
 ## outut usage
 usage () {
-  echo "usage: bpkg-install [-h|--help]"
-  echo "   or: bpkg-install [-g|--global] <package>"
-  echo "   or: bpkg-install [-g|--global] <user>/<package>"
+  cat usage-install.txt
 }
 
 message () {

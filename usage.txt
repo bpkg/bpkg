@@ -1,0 +1,13 @@
+
+  Usage: bpkg [-hV] <command> [args]
+
+  Commands:
+
+    bpkg install <package>      Install a bpkg package from <package>
+    bpkg package                Show your current package information
+
+  Options:
+
+    -V, --version               Output current version of n
+    -g, --global                Enable global mode
+

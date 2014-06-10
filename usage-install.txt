@@ -1,0 +1,8 @@
+
+  usage: 
+
+    bpkg-install [-h|--help]
+    bpkg-install [-g|--global] <package>
+    bpkg-install [-g|--global] <user>/<package>
+
+ 
