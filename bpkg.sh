@@ -16,9 +16,7 @@ error () {
 
 ## output usage
 usage () {
-  echo ""
-  echo "  usage: bpkg [-hV] <command> [args]"
-  echo ""
+  cat usage.txt
 }
 
 ## commands
