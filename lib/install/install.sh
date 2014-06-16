@@ -220,7 +220,7 @@ bpkg_install () {
     fi
 
     if [ -z "${build}" ]; then
-      warn "Mssing build script"
+      warn "Missing build script"
       warn "Trying \`make install'..."
       build="make install"
     fi
