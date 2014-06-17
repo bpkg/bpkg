@@ -1,6 +1,5 @@
 #!/bin/bash
 
-VERSION="0.0.1"
 REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
 TMPDIR=${TMPDIR:-/tmp}
 DEST=${DEST:-${TMPDIR}/bpkg-master}
