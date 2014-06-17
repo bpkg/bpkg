@@ -1,18 +1,24 @@
+# bpkg Makefile
 
-BIN ?= bpkg
+BIN    ?= bpkg
 PREFIX ?= /usr/local
+
+# All 'bpkg' supported commands
 CMDS = json install package term suggest init
 
 install: uninstall
-	install $(BIN) $(PREFIX)/bin
-	for cmd in $(CMDS); do cp $(BIN)-$${cmd} $(PREFIX)/bin; done
+	@echo "  info: Installing $(PREFIX)/$(BIN)..."
+	@install $(BIN) $(PREFIX)/bin
+	@for cmd in $(CMDS); do cp $(BIN)-$${cmd} $(PREFIX)/bin; done
 
 uninstall:
-	rm -f $(PREFIX)/bin/$(BIN)
-	for cmd in $(CMDS); do rm -f $(PREFIX)/bin/$(BIN)-$${cmd}; done
+	@echo "  info: Uninstalling $(PREFIX)/$(BIN)..."
+	@rm -f $(PREFIX)/bin/$(BIN)
+	@for cmd in $(CMDS); do rm -f $(PREFIX)/bin/$(BIN)-$${cmd}; done
 
 link: uninstall
-	ln -s $(BIN) $(PREFIX)/bin/$(BIN)
-	for cmd in $(CMDS); do ln -s $(BIN)-$${cmd} $(PREFIX)/bin; done
+	@ln -s $(BIN) $(PREFIX)/bin/$(BIN)
+	@for cmd in $(CMDS); do ln -s $(BIN)-$${cmd} $(PREFIX)/bin; done
 
 unlink: uninstall
+
