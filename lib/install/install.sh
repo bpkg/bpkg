@@ -232,7 +232,7 @@ bpkg_install () {
         ## prune existing
       rm -rf ${name}-${version} &&
         ## shallow clone
-      git clone --depth=1 ${BPKG_GIT_REMOTE}/${user}/${name}.git ${name}-${version} > /dev/null 2>&1 &&
+      git clone ${BPKG_GIT_REMOTE}/${user}/${name}.git ${name}-${version} > /dev/null 2>&1 &&
         (
       ## move into directory
       cd ${name}-${version} &&
