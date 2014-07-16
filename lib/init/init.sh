@@ -19,7 +19,7 @@ prompt () {
 
   {
     trap "exit -1" SIGINT SIGTERM
-    read -r value;
+    read -re value;
     value="${value//\"/\'}";
   } > /dev/null 2>&1
   if [ ! -z "${value}" ]; then
