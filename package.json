@@ -1,6 +1,6 @@
 {
   "name": "bpkg",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Lightweight bash package manager",
   "global": true,
   "install": "make install"
