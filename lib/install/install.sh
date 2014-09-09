@@ -192,13 +192,13 @@ bpkg_install () {
 
   if (( 1 == $has_pkg_json )); then
     ## check if forced global
-    if [ ! -z $(echo -n $json | bpkg-json -b | grep 'global' | awk '{ print $2 }' | tr -d '"') ]; then
+    if [ ! -z $(echo -n $json | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"') ]; then
       needs_global=1
     fi
 
     ## construct scripts array
     {
-      scripts=$(echo -n $json | bpkg-json -b | grep 'scripts' | awk '{$1=""; print $0 }' | tr -d '"')
+      scripts=$(echo -n $json | bpkg-json -b | grep '\["scripts"\]' | awk '{$1=""; print $0 }' | tr -d '"')
       OLDIFS="${IFS}"
 
       ## comma to space
@@ -215,7 +215,7 @@ bpkg_install () {
   if [ "1" = "${needs_global}" ]; then
     if (( 1 == $has_pkg_json )); then
       ## install bin if needed
-      build="$(echo -n ${json} | bpkg-json -b | grep 'install' | awk '{$1=""; print $0 }' | tr -d '\"')"
+      build="$(echo -n ${json} | bpkg-json -b | grep '\["install"\]' | awk '{$1=""; print $0 }' | tr -d '\"')"
       build="$(echo -n ${build} | sed -e 's/^ *//' -e 's/ *$//')"
     fi
 
