@@ -198,7 +198,7 @@ bpkg_install () {
 
     ## construct scripts array
     {
-      scripts=$(echo -n $json | bpkg-json -b | grep '\["scripts"\]' | awk '{$1=""; print $0 }' | tr -d '"')
+      scripts=$(echo -n $json | bpkg-json -b | grep '\["scripts' | awk '{$1=""; print $0 }' | tr -d '"')
       OLDIFS="${IFS}"
 
       ## comma to space
