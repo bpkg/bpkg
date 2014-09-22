@@ -73,7 +73,7 @@ As long as there is a `Makefile` in the repository it will try to invoke `make i
 
 For example you could install [git-standup](https://github.com/stephenmathieson/git-standup) with an omitted `package.json` because of the `Makefile` and the `install` target found in it.
 
-```sh
+```
 $ bpkg install stephenmathieson/git-standup -g
 
     info: Using latest (master)
@@ -90,7 +90,7 @@ After installing a package, you can obtain info from it using `bpkg`.
 
 Supposing you're on the root of a package directory, the following commands show that package metadata:
 
-```sh
+```
 # Asking for single information
 $ bpkg package name
  "bpkg"
@@ -132,49 +132,37 @@ Here's a detailed explanation on all fields:
 
 The `name` attribute is required as it is used to tell `bpkg` where to put it in the `deps/` directory in you project.
 
-```json
-  "name": "my-script"
-```
+    "name": "my-script"
 
 ### version (optional)
 
 The `version` attribute is not required but can be useful. It should correspond to the version that is associated with the installed package.
 
-```json
-  "version": "0.0.1"
-```
+    "version": "0.0.1"
 
 ### description
 
 A human readable description of what the package offers for functionality.
 
-```json
-  "description": "This script makes monkeys jump out of your keyboard"
-```
+    "description": "This script makes monkeys jump out of your keyboard"
 
 ### global
 
 Indicates that the package is only intended to be install as a script. This allows the ommition of the `-g` or `--global` flag during installation.
 
-```json
-  "global": "true"
-```
+    "global": "true"
 
 ### install
 
 Shell script used to invoke in the install script. This is required if the `global` attribute is set to `true` or if the `-g` or `--global` flags are provided.
 
-```json
-  "install": "make install"
-```
+    "install": "make install"
 
 ### scripts
 
 This is an array of scripts that will be installed into a project.
 
-```json
-  "scripts": ["script.sh"]
-```
+    "scripts": ["script.sh"]
 
 ## Packaging best practices
 
