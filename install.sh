@@ -53,7 +53,7 @@ setup () {
     echo "  info: Installing..."
     echo
     make install
-	echo "  info: Done!"
+    echo "  info: Done!"
   } >&2
   return $?
 }
