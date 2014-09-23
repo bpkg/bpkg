@@ -7,12 +7,12 @@ PREFIX ?= /usr/local
 CMDS = json install package term suggest init
 
 install: uninstall
-	@echo "  info: Installing $(PREFIX)/$(BIN)..."
+	@echo "  info: Installing $(PREFIX)/bin/$(BIN)..."
 	@install $(BIN) $(PREFIX)/bin
 	@for cmd in $(CMDS); do cp $(BIN)-$${cmd} $(PREFIX)/bin; done
 
 uninstall:
-	@echo "  info: Uninstalling $(PREFIX)/$(BIN)..."
+	@echo "  info: Uninstalling $(PREFIX)/bin/$(BIN)..."
 	@rm -f $(PREFIX)/bin/$(BIN)
 	@for cmd in $(CMDS); do rm -f $(PREFIX)/bin/$(BIN)-$${cmd}; done
 
