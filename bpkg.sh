@@ -94,11 +94,18 @@ bpkg () {
           if [ ! -z "${res}" ]; then
             echo
             echo  >&2 "Did you mean one of these?"
-            for r in ${res[@]}; do
+            found=0
+            for r in "${res[@]}"; do
               if [[ "$r" == *"${arg}"* ]]; then
                 echo "     $ bpkg ${r}"
+                found=1
               fi
             done
+            if [ "$found" == "0" ]; then
+              for r in "${res[@]}"; do
+                echo "     $ bpkg ${r}"
+              done
+            fi
             return 1
           else
             usage
