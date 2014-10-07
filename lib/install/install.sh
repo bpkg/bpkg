@@ -6,16 +6,17 @@ CONFIG_FILE="$HOME/.bpkgrc"
 
 ## set defaults
 if [ ${#BPKG_REMOTES[@]} -eq 0 ]; then
-  BPKG_REMOTES=("${BPKG_REMOTE-https://raw.githubusercontent.com}")
-  BPKG_GIT_REMOTES=("${BPKG_GIT_REMOTE-https://github.com}")
+  BPKG_REMOTES[0]=${BPKG_REMOTE-https://raw.githubusercontent.com}
+  BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
 fi
 BPKG_USER="${BPKG_USER:-"bpkg"}"
 
 ## check parameter consistency
 validate_parameters () {
   if [ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]; then
-    mesg=`printf "BPKG_GIT_REMOTES differs in size from BPKG_REMOTES array (%d vs %d elements)\n" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}"`
-    error "$mesg"
+    mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
+    fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
+    error "$fmesg"
     return 1
   fi
   return 0
