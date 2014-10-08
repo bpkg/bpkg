@@ -361,5 +361,8 @@ if [[ ${BASH_SOURCE[0]} != $0 ]]; then
   export -f bpkg_install
 elif validate_parameters; then
   bpkg_install "${@}"
+  exit $?
+else
+  #param validation failed
+  exit $?
 fi
-exit $?
