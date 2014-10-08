@@ -12,7 +12,7 @@ bpkg_initrc() {
     BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
   fi
   BPKG_USER="${BPKG_USER:-"bpkg"}"
-  BPKG_INDEX=${BPKG_INDEX-"$HOME/.bpkg/index"}
+  BPKG_INDEX=${BPKG_INDEX:-"$HOME/.bpkg/index"}
 }
 
 ## check parameter consistency
@@ -102,7 +102,7 @@ bpkg_select_remote () {
     if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${BPKG_OAUTH_TOKEN}* ]]; then
       git_remote=${git_remote/https:\/\//https:\/\/$BPKG_OAUTH_TOKEN:x-oauth-basic@}
     fi
-  else 
+  else
     BPKG_REMOTE=$remote
   fi
   BPKG_GIT_REMOTE=$git_remote
