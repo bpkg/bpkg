@@ -4,7 +4,7 @@ BIN    ?= bpkg
 PREFIX ?= /usr/local
 
 # All 'bpkg' supported commands
-CMDS = json install package term suggest init
+CMDS = json install package term suggest init utils update list
 
 install: uninstall
 	@echo "  info: Installing $(PREFIX)/bin/$(BIN)..."
