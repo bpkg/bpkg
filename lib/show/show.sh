@@ -17,16 +17,21 @@ usage () {
     echo "$mesg"
     echo
   fi
-  echo "bpkg-show [-Vh] [sources|readme] <user/package_name>"
+  echo "bpkg-show [-Vh]"
+  echo "bpkg-show <user/package_name>"
+  echo "bpkg-show readme <user/package_name>"
+  echo "bpkg-show sources <user/package_name>"
   echo
   echo "Show bash package details.  You must first run \`bpkg update' to sync the repo locally."
+  echo
+  echo "Commands:"
+  echo "  readme        Print package README.md file, if available, suppressing other output"
+  echo "  sources       Print all sources listed in package.json scripts, in order. This"
+  echo "                option suppresses other output and prints executable bash."
   echo
   echo "Options:"
   echo "  --help|-h     Print this help dialogue"
   echo "  --version|-V  Print version and exit"
-  echo "  readme        Print package README.md file, if available, suppressing other output"
-  echo "  sources       Print all sources listed in package.json scripts, in order. This"
-  echo "                option suppresses other output and prints executable bash."
 }
 
 show_package () {
