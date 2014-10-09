@@ -4,6 +4,8 @@
 
 ## Init local config and set environmental defaults
 bpkg_initrc() {
+  local global_config=${BPKG_GLOBAL_CONFIG:-"/etc/bpkgrc"}
+  [ -f "$global_config" ] && source "$global_config"
   local config=${BPKG_CONFIG:-"$HOME/.bpkgrc"}
   [ -f "$config" ] && source "$config"
   ## set defaults
@@ -80,9 +82,12 @@ bpkg_info () {
 }
 
 ## takes a remote and git-remote and sets the globals:
-##  BPKG_REMOTE: remote URI
-##  BPKG_GIT_REMOTE: git remote with oauth info embedded,
+##  BPKG_REMOTE: raw remote URI
+##  BPKG_GIT_REMOTE: git remote for cloning
+##  BPKG_AUTH_GIT_REMOTE: git remote with oauth info embedded,
 ##  BPKG_OAUTH_TOKEN: token for x-oauth-basic
+##  BPKG_CURL_AUTH_PARAM: auth arguments for raw curl requests
+##  BPKG_REMOTE_INDEX: location of local index for remote
 bpkg_select_remote () {
   local remote=$1
   local git_remote=$2
@@ -91,6 +96,8 @@ bpkg_select_remote () {
   BPKG_REMOTE_INDEX_FILE="$BPKG_REMOTE_INDEX/index.txt"
   BPKG_OAUTH_TOKEN=""
   BPKG_CURL_AUTH_PARAM=""
+  BPKG_GIT_REMOTE=$git_remote
+  BPKG_AUTH_GIT_REMOTE=$git_remote
   if [ "${remote:0:10}" == "raw-oauth|" ]; then
     OLDIFS="${IFS}"
     IFS="|"
@@ -100,12 +107,11 @@ bpkg_select_remote () {
     BPKG_CURL_AUTH_PARAM="-u $BPKG_OAUTH_TOKEN:x-oauth-basic"
     BPKG_REMOTE=${remote_parts[2]}
     if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${BPKG_OAUTH_TOKEN}* ]]; then
-      git_remote=${git_remote/https:\/\//https:\/\/$BPKG_OAUTH_TOKEN:x-oauth-basic@}
+      BPKG_AUTH_GIT_REMOTE=${git_remote/https:\/\//https:\/\/$BPKG_OAUTH_TOKEN:x-oauth-basic@}
     fi
   else
     BPKG_REMOTE=$remote
   fi
-  BPKG_GIT_REMOTE=$git_remote
 }
 
 ## given a user and name, sets BPKG_RAW_PATH using the available

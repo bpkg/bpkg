@@ -12,23 +12,28 @@ fi
 bpkg_initrc
 
 usage () {
-  echo "bpkg-show [-Vhds] <user/package_name>"
+  mesg=$1
+  if [ "$mesg" != "" ]; then
+    echo "$mesg"
+    echo
+  fi
+  echo "bpkg-show [-Vh] [sources|readme] <user/package_name>"
   echo
   echo "Show bash package details.  You must first run \`bpkg update' to sync the repo locally."
   echo
   echo "Options:"
   echo "  --help|-h     Print this help dialogue"
   echo "  --version|-V  Print version and exit"
-  echo "  --details|-d  Print package README.md file, if available"
-  echo "  --source|-s   Print all sources listed in package.json scripts, in order. This"
+  echo "  readme        Print package README.md file, if available, suppressing other output"
+  echo "  sources       Print all sources listed in package.json scripts, in order. This"
   echo "                option suppresses other output and prints executable bash."
 }
 
 show_package () {
   local pkg=$1
   local desc=$2
-  local verbose=$3
-  local print_source=$4
+  local show_readme=$3
+  local show_sources=$4
   local host=$BPKG_REMOTE_HOST
   local remote=$BPKG_REMOTE
   local git_remote=$BPKG_GIT_REMOTE
@@ -63,7 +68,7 @@ show_package () {
     desc="$pkg_desc"
   fi
 
-  if [ "$print_source" == '0' ]; then
+  if [ "$show_sources" == '0' ] && [ "$show_readme" == "0" ]; then
     echo "Name: $pkg"
     if [ "$author" != "" ]; then
       echo "Author: $author"
@@ -74,38 +79,26 @@ show_package () {
     if [ "$install_sh" != "" ]; then
       echo "Install: $install_sh"
     fi
-    if [ "$verbose" == "0" ]; then
-      if [ "$readme" == "" ]; then
-        echo "Readme: Not Available"
-      else
-        echo "Readme: ${readme_len} lines (-d to print)"
-      fi
+    if [ "$readme" == "" ]; then
+      echo "README.md: Not Available"
     else
-      echo
-      echo "[README.md]"
-      echo "$readme"
-      echo "[/README.md]"
+      echo "README.md: ${readme_len} lines"
     fi
-  fi
-  if [ "$sources" != "" ]; then
-    if [ "$print_source" == '0' ]; then
-      echo "Sources:"
-    fi
+  elif [ "$show_readme" != '0' ]; then
+    echo "$readme"
+  else
+    # Show Sources
     OLDIFS="$IFS"
     IFS=$'\n'
     for src in $(echo "$sources"); do
-      if [ "$print_source" == '0' ]; then
-        echo " - $src"
+      local http_code=$(eval "curl $auth -sL '$uri/$src?`date +%s`' -w '%{http_code}' -o /dev/null")
+      if (( http_code < 400 )); then
+        local content=$(eval "curl $auth -sL '$uri/$src?`date +%s`'")
+        echo "#[$src]"
+        echo "$content"
+        echo "#[/$src]"
       else
-        local http_code=$(eval "curl $auth -sL '$uri/$src?`date +%s`' -w '%{http_code}' -o /dev/null")
-        if (( http_code < 400 )); then
-          local content=$(eval "curl $auth -sL '$uri/$src?`date +%s`'")
-          echo "#[$src]"
-          echo "$content"
-          echo "#[/$src]"
-        else
-          bpkg_warn "source not found: $src"
-        fi
+        bpkg_warn "source not found: $src"
       fi
     done
     IFS="$OLDIFS"
@@ -114,8 +107,8 @@ show_package () {
 
 
 bpkg_show () {
-  local verbose=0
-  local print_source=0
+  local readme=0
+  local sources=0
   local pkg=""
   for opt in "${@}"; do
     case "$opt" in
@@ -127,11 +120,19 @@ bpkg_show () {
         usage
         return 0
         ;;
-      -d|--details)
-        verbose=1
+      readme)
+        readme=1
+        if [ "$sources" == "1" ]; then
+          usage "Error: readme and sources are mutually exclusive options"
+          return 1
+        fi
         ;;
-      -s|--source)
-        print_source=1
+      source|sources)
+        sources=1
+        if [ "$readme" == "1" ]; then
+          usage "Error: readme and sources are mutually exclusive options"
+          return 1
+        fi
         ;;
       *)
         if [ "${opt:0:1}" == "-" ]; then
@@ -167,7 +168,7 @@ bpkg_show () {
       local desc=$(echo "$line" | cut -d\| -f2)
       if [ "$name" == "$pkg" ]; then
         IFS="$OLDIFS"
-        show_package "$pkg" "$desc" "$verbose" "$print_source"
+        show_package "$pkg" "$desc" "$readme" "$sources"
         IFS=$'\n'
         return 0
       fi
