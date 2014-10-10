@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## sets optional variable from environment
-opt () { eval "if [ -z "\${$1}" ]; then ${1}=${2}; fi";  }
+opt () { eval "if [ -z "\${$1}" ]; then ${1}='${2}'; fi";  }
 
 ## output usage
 usage () {
@@ -15,16 +15,30 @@ prompt () {
   local var="$1"
   local q="$2"
   local value=""
-  printf "%s" "${q}"
 
   {
     trap "exit -1" SIGINT SIGTERM
-    read -re value;
+    read -p "$q" -r -e value;
+
     value="${value//\"/\'}";
   } 2>&1
   if [ ! -z "${value}" ]; then
     eval "${var}"=\"${value}\"
   fi
+}
+
+prompt_if () {
+  local mesg="$1"
+  local func="$2"
+  prompt ANSWER "$mesg [y/n]: "
+  case "$ANSWER" in
+    y|Y|yes|YES|Yes)
+      shift
+      shift
+      $func $@
+      return 0
+  esac
+  return 1
 }
 
 ## alert user of hint
@@ -64,7 +78,7 @@ wrap () {
 
 intro () {
   echo
-  echo "This will walk you through initialzing the bpkg \`package.json' file."
+  echo "This will walk you through initializing the bpkg \`package.json' file."
   echo "It will prompt you for the bare minimum that is needed and provide"
   echo "defaults."
   echo
@@ -81,17 +95,22 @@ options () {
   opt VERSION "0.0.1"
   opt DESCRIPTION ""
   opt GLOBAL ""
-  opt INSTALL ""
+  opt INSTALL "install -b ${NAME}.sh \${PREFIX:-/usr/local}/bin/${NAME}"
   opt SCRIPTS "${NAME}.sh"
+}
+
+set_global () {
+  GLOBAL=1
 }
 
 prompts () {
   prompt NAME "name: (${NAME}) "
   prompt VERSION "version: (${VERSION}) "
   prompt DESCRIPTION "description: "
-  prompt GLOBAL "global: "
-  prompt INSTALL "install: "
+  prompt INSTALL "install: (${INSTALL})"
   prompt SCRIPTS "scripts: (${SCRIPTS}) "
+  prompt USER "username: (${USER}) "
+  prompt_if "Force global install?" set_global
 }
 
 ## handle required fields
@@ -108,6 +127,7 @@ required () {
 ## convert scripts to quoted csv
 csv () {
   if [ ! -z "${SCRIPTS}" ]; then
+    RAW_SCRIPTS=${SCRIPTS}
     {
       local TMP=""
       SCRIPTS="${SCRIPTS//,/ }"
@@ -165,7 +185,7 @@ delimit () {
 
 ## validate completed contents with user
 validate () {
-  prompt ANSWER "${buf}(yes) ? "
+  prompt ANSWER "${buf} Does this look OK? (type 'n' to cancel) "
   if [ "n" = "${ANSWER:0:1}" ]; then
     exit 1
   fi
@@ -174,14 +194,78 @@ validate () {
 ## if package file already exists, ensure user wants to clobber
 clobber () {
   if test -f "${file}"; then
-    prompt ANSWER "A \`package.json' already exists. Would you like to replace it? (yes): "
-    if [ "n" = "${ANSWER:0:1}" ]; then
-      exit 1
-    else
-      rm -f "${file}"
-    fi
+    prompt_if "A \`package.json' already exists. Would you like to replace it?" rm -f "${file}"
   fi
 }
+
+create_shell_file () {
+  if [ "${NAME}.sh" == "${RAW_SCRIPTS}" ] && [ ! -f "${NAME}.sh" ]; then
+    {
+      echo "#!/bin/bash"
+      echo
+      echo "VERSION=$VERSION"
+      echo
+      echo "usage () {"
+      echo "  echo \"$NAME [-hV]\""
+      echo "  echo"
+      echo "  echo \"Options:\""
+      echo "  echo \"  -h|--help      Print this help dialogue and exit\""
+      echo "  echo \"  -V|--version   Print the current version and exit\""
+      echo '}'
+      echo
+      echo "${NAME} () {"
+      echo "  for opt in \"\${@}\"; do"
+      echo "    case \"\$opt\" in"
+      echo "      -h|--help)"
+      echo "        usage"
+      echo "        return 0"
+      echo "        ;;"
+      echo "      -V|--version)"
+      echo "        echo \"\$VERSION\""
+      echo "        return 0"
+      echo "        ;;"
+      echo "    esac"
+      echo "  done"
+      echo
+      echo "  ## your code here"
+      echo "}"
+      echo
+      echo 'if [[ ${BASH_SOURCE[0]} != $0 ]]; then'
+      echo "  export -f $NAME"
+      echo 'else'
+      echo "  $NAME "'"${@}"'
+      echo "  exit $?"
+      echo 'fi'
+    } > "${NAME}.sh"
+    chmod 755 "{$NAME}.sh"
+  fi
+}
+
+create_readme () {
+  if [ ! -f "README.md" ]; then
+    {
+      echo "# $NAME"
+      echo
+      echo "$DESCRIPTION"
+      echo
+      echo "# Install"
+      echo
+      echo "Available as a [bpkg](http://www.bpkg.io/)"
+      echo '```sh'
+      echo "bpkg install [-g] ${USER:-bpkg}/$NAME"
+      echo '```'
+    } > "README.md"
+  fi
+}
+
+create_repo () {
+  if git status &>/dev/null; then
+    echo "Repo already exists"
+  else
+    git init
+  fi
+}
+
 
 ## main
 bpkg_init () {
@@ -227,6 +311,15 @@ bpkg_init () {
   ## create and write package file
   touch "${file}"
   echo "${buf}" > "${file}"
+
+  create_shell_file
+  create_readme
+
+  # initialize a git repo if one does not exist
+  if [ ! -d '.git' ]; then
+    git init
+  fi
+
   return 0
 }
 
