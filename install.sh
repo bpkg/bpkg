@@ -43,13 +43,13 @@ setup () {
   ## build
   {
     echo
-    cd ${TMPDIR}
+    cd "${TMPDIR}"
     echo "  info: Creating temporary files..."
-    test -d ${DEST} && { echo "  warn: Already exists: \`${DEST}'"; }
-    rm -rf ${DEST}
+    test -d "${DEST}" && { echo "  warn: Already exists: '${DEST}'"; }
+    rm -rf "${DEST}"
     echo "  info: Fetching latest 'bpkg'..."
-    git clone --depth=1 ${REMOTE} ${DEST} > /dev/null 2>&1
-    cd ${DEST}
+    git clone --depth=1 "${REMOTE}" "${DEST}" > /dev/null 2>&1
+    cd "${DEST}"
     echo "  info: Installing..."
     echo
     make install
