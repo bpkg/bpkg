@@ -205,8 +205,10 @@ $ my_script some more args --blah
 
 ## Sponsors
 
-* [Littlstar](https://github.com/littlstar) (littlstar.com)
-* [Spotify](https://github.com/spotify) (spotify.com)
+**bpkg** wouldn't be where it is today without the help of its authors, contributors, and sponsors:
+
+* [Littlstar](https://github.com/littlstar) [littlstar.com](https://littlstar.com)
+* [Spotify](https://github.com/spotify) [spotify.com](https://spotify.com)
 
 ## License
 
