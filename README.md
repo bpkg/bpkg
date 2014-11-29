@@ -206,6 +206,7 @@ $ my_script some more args --blah
 ## Sponsors
 
 * [Littlstar](https://github.com/littlstar) (littlstar.com)
+* [Spotify](https://github.com/spotify) (spotify.com)
 
 ## License
 
