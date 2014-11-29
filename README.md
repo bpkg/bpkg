@@ -203,12 +203,15 @@ $ source my_script.sh
 $ my_script some more args --blah
 ```
 
+## Sponsors
+
+* [Littlstar](https://github.com/littlstar) (littlstar.com)
+
 ## License
 
 `bpkg` is released under the **MIT license**.
 
 See file `LICENSE` for a more detailed description of it's terms.
-
 
 [clib]: https://github.com/clibs/clib
 [term]: https://github.com/bpkg/term
