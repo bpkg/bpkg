@@ -339,6 +339,9 @@ bpkg_install_from_remote () {
     ## make `deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
 
+    ## make `deps/bin' directory if possible
+    mkdir -p "${cwd}/deps/bin"
+
     ## copy package.json over
     curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
 
@@ -349,6 +352,10 @@ bpkg_install_from_remote () {
         info "fetch" "${url}/${script}"
         info "write" "${cwd}/deps/${name}/${script}"
         curl $auth_param -sL "${url}/${script}" -o "${cwd}/deps/${name}/${script}"
+        local scriptname="${script%.*}"
+        info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
+        ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
+        chmod u+x "${cwd}/deps/bin/${scriptname}"
       )
     done
   fi
