@@ -27,9 +27,8 @@ commands () {
     declare -a local cmds=( $(
       bpkg-suggest 'bpkg-' |
       tail -n+2            |
-      xargs basename -a    |
       sort -u              |
-      sed 's/bpkg-//g'     |
+      sed 's/.*\/bpkg-//g'     |
       tr '\n' ' '
     ) )
 
