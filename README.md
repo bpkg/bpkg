@@ -38,6 +38,14 @@ $ cd bpkg
 $ make install
 ```
 
+Or in a directory with user write permission, like `$HOME/opt/bin`
+
+```sh
+$ git clone https://github.com/bpkg/bpkg.git
+$ cd bpkg
+$ PREFIX=$HOME/opt make install
+```
+
 ## Usage
 
 You use `bpkg` by simply sending commands, pretty much like `npm` or `pip`.
