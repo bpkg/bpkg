@@ -10,6 +10,11 @@ You can install shell scripts globally (on `/usr/local/bin`) or use them on a _p
 
 You can install `bpkg` from three distinct ways:
 
+### 0. Dependencies
+
+* [curl](http://curl.haxx.se/)
+* [coreutils](https://www.gnu.org/software/coreutils/)
+
 ### 1. Install script
 
 Our install script is the simplest way. It takes care of everything for you, placing `bpkg` and related scripts on `/usr/local/bin`.
