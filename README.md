@@ -73,6 +73,12 @@ $ bpkg install term
 $ ./deps/term/term.sh
 ```
 
+After a local install the `term.sh` script is copied as `term` to the `deps/bin` directory, you can add this directory to the `PATH` with
+
+```sh
+export PATH=$PATH:/path_to_bkpg/deps/bin
+```
+
 As a bonus, you can specify a **specific version**:
 
 ```sh
