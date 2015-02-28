@@ -22,7 +22,7 @@ Our install script is the simplest way. It takes care of everything for you, pla
 Paste the following on your shell and you're good to go:
 
 ```sh
-$ curl -Lo- http://get.bpkg.io| bash
+$ curl -Lo- http://get.bpkg.io | bash
 ```
 
 ### 2. clib
