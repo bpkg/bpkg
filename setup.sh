@@ -89,6 +89,7 @@ make_uninstall () {
 
 make_link () {
   make_uninstall
+  echo "  info: Linking $PREFIX/bin/$BIN..."
   ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
   for cmd in $CMDS; do
     ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin"
