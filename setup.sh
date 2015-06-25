@@ -52,13 +52,55 @@ setup () {
     cd "${DEST}"
     echo "  info: Installing..."
     echo
-    make install
+    make_install
     echo "  info: Done!"
   } >&2
   return $?
 }
 
-## go
-setup
-exit $?
+## make targets
+BIN="bpkg"
+[ -z "$PREFIX" ] && PREFIX="/usr/local"
 
+# All 'bpkg' supported commands
+CMDS="json install package term suggest init utils update list show"
+
+make_install () {
+  make_uninstall
+  echo "  info: Installing $PREFIX/bin/$BIN..."
+  install -d "$PREFIX/bin"
+  local source=$(<$BIN)
+  [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN" || install "$BIN" "$PREFIX/bin"
+  for cmd in $CMDS; do
+    source=$(<$BIN-$cmd)
+    [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN-$cmd" || install "$BIN-$cmd" "$PREFIX/bin"
+  done
+  return $?
+}
+
+make_uninstall () {
+  echo "  info: Uninstalling $PREFIX/bin/$BIN..."
+  rm -f "$PREFIX/bin/$BIN"
+  for cmd in $CMDS; do
+    rm -f "$PREFIX/bin/$BIN-$cmd"
+  done
+  return $?
+}
+
+make_link () {
+  make_uninstall
+  echo "  info: Linking $PREFIX/bin/$BIN..."
+  ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
+  for cmd in $CMDS; do
+    ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin"
+  done
+  return $?
+}
+
+make_unlink () {
+  make_uninstall
+}
+
+## go
+[ $# -eq 0 ] && setup || make_$1
+exit $?
