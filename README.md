@@ -35,12 +35,12 @@ $ clib install bpkg/bpkg
 
 ### 3. Source Code
 
-To directly install `bpkg` from it's source code you have to clone it's repository and install with `make`:
+To directly install `bpkg` from it's source code you have to clone it's repository and run the `install` script:
 
 ```sh
 $ git clone https://github.com/bpkg/bpkg.git
 $ cd bpkg
-$ make install
+$ ./setup.sh
 ```
 
 Or in a directory with user write permission, like `$HOME/opt/bin`
@@ -48,7 +48,7 @@ Or in a directory with user write permission, like `$HOME/opt/bin`
 ```sh
 $ git clone https://github.com/bpkg/bpkg.git
 $ cd bpkg
-$ PREFIX=$HOME/opt make install
+$ PREFIX=$HOME/opt ./setup.sh
 ```
 
 ## Usage
