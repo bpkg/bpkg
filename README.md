@@ -87,8 +87,8 @@ $ bpkg install jwerle/suggest.sh@0.0.1 -g
 
 **Note:** to do that the packages **must be tagged releases** on the repository.
 
-You can also *installing packages without a `package.json`*.
-As long as there is a `Makefile` in the repository it will try to invoke `make install` so long as the `-g` or `--global` flags are set when invoking `bpkg install`.
+You can also *install packages without a `package.json`*.
+As long as there is a `Makefile` in the repository it will try to invoke `make install` as long as the `-g` or `--global` flags are set when invoking `bpkg install`.
 
 For example you could install [git-standup](https://github.com/stephenmathieson/git-standup) with an omitted `package.json` because of the `Makefile` and the `install` target found in it.
 
