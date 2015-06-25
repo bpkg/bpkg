@@ -69,9 +69,11 @@ make_install () {
   make_uninstall
   echo "  info: Installing $PREFIX/bin/$BIN..."
   install -d "$PREFIX/bin"
-  install "$BIN" "$PREFIX/bin"
+  local source=$(<$BIN)
+  [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN" || install "$BIN" "$PREFIX/bin"
   for cmd in $CMDS; do
-    install "$BIN-$cmd" "$PREFIX/bin"
+    source=$(<$BIN-$cmd)
+    [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN-$cmd" || install "$BIN-$cmd" "$PREFIX/bin"
   done
   return $?
 }
