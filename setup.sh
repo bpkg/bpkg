@@ -68,6 +68,7 @@ CMDS="json install package term suggest init utils update list show"
 make_install () {
   make_uninstall
   echo "  info: Installing $PREFIX/bin/$BIN..."
+  install -d "$PREFIX/bin"
   install "$BIN" "$PREFIX/bin"
   for cmd in $CMDS; do
     install "$BIN-$cmd" "$PREFIX/bin"
