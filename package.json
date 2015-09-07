@@ -4,5 +4,5 @@
   "description": "Lightweight bash package manager",
   "global": true,
   "repo": "bpkg/bpkg",
-  "install": "make install"
+  "install": "bash setup.sh"
 }
