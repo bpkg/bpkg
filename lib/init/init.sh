@@ -237,7 +237,7 @@ create_shell_file () {
       echo "  exit $?"
       echo 'fi'
     } > "${NAME}.sh"
-    chmod 755 "{$NAME}.sh"
+    chmod 755 "${NAME}.sh"
   fi
 }
 
