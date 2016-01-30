@@ -103,6 +103,13 @@ $ bpkg install stephenmathieson/git-standup -g
 cp -f git-standup /usr/local/bin
 ```
 
+### Packages With Dependencies
+
+You can install a packages dependencies with the `bpkg getdeps` command. These will recursively install in `deps/` sub-folders to resolve all dependencies.
+
+_Note: There is no protection against circular dependencies, so be careful!_
+
+
 ### Retrieving package info
 
 After installing a package, you can obtain info from it using `bpkg`.
@@ -194,6 +201,17 @@ This is an array of scripts that will be installed into a project.
 ```json
   "scripts": ["script.sh"]
 ```
+
+### dependencies (optional)
+ 
+This is a hash of dependencies. The keys are the package names, and the values are the version specifiers. If you want the latest code use `'master'` in the version specifier. Otherwise, use a tagged release identifier. This works the same as `bpkg install`'s package/version specifiers. 
+
+```json
+  "dependencies": {
+    "term": "0.0.1"
+  }
+```
+
 
 ## Packaging best practices
 

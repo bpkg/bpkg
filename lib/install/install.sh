@@ -358,6 +358,8 @@ bpkg_install_from_remote () {
         chmod u+x "${cwd}/deps/bin/${scriptname}"
       )
     done
+    # install package dependencies
+    (cd ${cwd}/deps/${name} && bpkg getdeps)
   fi
 
   return 0
