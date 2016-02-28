@@ -202,9 +202,17 @@ This is an array of scripts that will be installed into a project.
   "scripts": ["script.sh"]
 ```
 
+### files
+
+This is an array of files that will be installed into a project.
+
+```json
+  "files": ["bar.txt", "foo.txt"]
+```
+
 ### dependencies (optional)
- 
-This is a hash of dependencies. The keys are the package names, and the values are the version specifiers. If you want the latest code use `'master'` in the version specifier. Otherwise, use a tagged release identifier. This works the same as `bpkg install`'s package/version specifiers. 
+
+This is a hash of dependencies. The keys are the package names, and the values are the version specifiers. If you want the latest code use `'master'` in the version specifier. Otherwise, use a tagged release identifier. This works the same as `bpkg install`'s package/version specifiers.
 
 ```json
   "dependencies": {

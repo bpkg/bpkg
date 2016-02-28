@@ -168,6 +168,7 @@ bpkg_install_from_remote () {
   declare -a local pkg_parts=()
   declare -a local remote_parts=()
   declare -a local scripts=()
+  declare -a local files=()
 
   ## get version if available
   {
@@ -272,6 +273,28 @@ bpkg_install_from_remote () {
   json=$(curl $auth_param -sL "${url}/package.json?`date +%s`")
 
   if (( 1 == $has_pkg_json )); then
+    ## get package name from `package.json'
+    name="$(
+      echo -n ${json} |
+      bpkg-json -b |
+      grep 'name' |
+      awk '{ $1=""; print $0 }' |
+      tr -d '\"' |
+      tr -d ' '
+    )"
+
+    ## copy package.json over
+    curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
+
+    ## make `deps/' directory if possible
+    mkdir -p "${cwd}/deps/${name}"
+
+    ## make `deps/bin' directory if possible
+    mkdir -p "${cwd}/deps/bin"
+
+    # install package dependencies
+    (cd "${cwd}/deps/${name}" && bpkg getdeps)
+
     ## check if forced global
     if [ ! -z $(echo -n $json | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"') ]; then
       needs_global=1
@@ -290,6 +313,21 @@ bpkg_install_from_remote () {
       ## account for existing space
       scripts=($(echo ${scripts[@]}))
     }
+
+    ## construct files array
+    {
+      files=$(echo -n $json | bpkg-json -b | grep '\["files' | awk '{$1=""; print $0 }' | tr -d '"')
+      OLDIFS="${IFS}"
+
+      ## comma to space
+      IFS=','
+      files=($(echo ${files[@]}))
+      IFS="${OLDIFS}"
+
+      ## account for existing space
+      files=($(echo ${files[@]}))
+    }
+
   fi
 
   ## build global if needed
@@ -325,26 +363,8 @@ bpkg_install_from_remote () {
         ## clean up
       rm -rf ${name}-${version}
     )}
-  elif [ "${#scripts[@]}" -gt "0" ]; then
-    ## get package name from `package.json'
-    name="$(
-      echo -n ${json} |
-      bpkg-json -b |
-      grep 'name' |
-      awk '{ $1=""; print $0 }' |
-      tr -d '\"' |
-      tr -d ' '
-    )"
-
-    ## make `deps/' directory if possible
-    mkdir -p "${cwd}/deps/${name}"
-
-    ## make `deps/bin' directory if possible
-    mkdir -p "${cwd}/deps/bin"
-
-    ## copy package.json over
-    curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
-
+  fi
+  if [ "${#scripts[@]}" -gt "0" ]; then
     ## grab each script and place in deps directory
     for (( i = 0; i < ${#scripts[@]} ; ++i )); do
       (
@@ -358,10 +378,22 @@ bpkg_install_from_remote () {
         chmod u+x "${cwd}/deps/bin/${scriptname}"
       )
     done
-    # install package dependencies
-    (cd ${cwd}/deps/${name} && bpkg getdeps)
   fi
-
+  if [ "${#files[@]}" -gt "0" ]; then
+    ## grab each file
+    for (( i = 0; i < ${#files[@]} ; ++i )); do
+      (
+        local file="$(echo ${files[$i]})"
+        local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
+        info "fetch" "${url}/${file}"
+        if [ ! -d "$filedir" ]; then
+          mkdir -p "$filedir"
+        fi
+        info "write" "${filedir}/${file}"
+        curl $auth_param -sL "${url}/${script}" -o "${filedir}/${file}"
+      )
+    done
+  fi
   return 0
 }
 
