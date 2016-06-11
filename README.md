@@ -35,7 +35,7 @@ $ clib install bpkg/bpkg
 
 ### 3. Source Code
 
-To directly install `bpkg` from it's source code you have to clone it's repository and run the `setup.sh` script:
+To directly install `bpkg` from its source code you have to clone its repository and run the `setup.sh` script:
 
 ```sh
 $ git clone https://github.com/bpkg/bpkg.git
@@ -97,7 +97,7 @@ $ bpkg install stephenmathieson/git-standup -g
 
     info: Using latest (master)
     warn: Package doesn't exist
-    warn: Mssing build script
+    warn: Missing build script
     warn: Trying `make install'...
     info: install: `make install'
 cp -f git-standup /usr/local/bin
@@ -180,7 +180,7 @@ A human readable description of what the package offers for functionality.
 
 ### global
 
-Indicates that the package is only intended to be install as a script. This allows the ommition of the `-g` or `--global` flag during installation.
+Indicates that the package is only intended to be install as a script. This allows the omission of the `-g` or `--global` flag during installation.
 
 ```json
   "global": "true"
@@ -259,7 +259,7 @@ $ my_script some more args --blah
 
 `bpkg` is released under the **MIT license**.
 
-See file `LICENSE` for a more detailed description of it's terms.
+See file `LICENSE` for a more detailed description of its terms.
 
 [clib]: https://github.com/clibs/clib
 [term]: https://github.com/bpkg/term
