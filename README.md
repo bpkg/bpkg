@@ -6,6 +6,33 @@ _JavaScript has npm, Ruby has Gems, Python has pip and now Shell has bpkg!_
 
 You can install shell scripts globally (on `/usr/local/bin`) or use them on a _per-project basis_ (on `./deps/`), as a lazy-man "copy and paste".
 
+<!-- BEGIN-MARKDOWN-TOC -->
+* [Install](#install)
+	* [0. Dependencies](#0-dependencies)
+	* [1. Install script](#1-install-script)
+	* [2. clib](#2-clib)
+	* [3. Source Code](#3-source-code)
+* [Usage](#usage)
+	* [Installing packages](#installing-packages)
+	* [Packages With Dependencies](#packages-with-dependencies)
+	* [Retrieving package info](#retrieving-package-info)
+* [Package details](#package-details)
+* [package.json](#packagejson)
+	* [name](#name)
+	* [version (optional)](#version-optional)
+	* [description](#description)
+	* [global](#global)
+	* [install](#install-1)
+	* [scripts](#scripts)
+	* [files](#files)
+	* [dependencies (optional)](#dependencies-optional)
+* [Packaging best practices](#packaging-best-practices)
+	* [Package exports](#package-exports)
+* [Sponsors](#sponsors)
+* [License](#license)
+
+<!-- END-MARKDOWN-TOC -->
+
 ## Install
 
 You can install `bpkg` from three distinct ways:
