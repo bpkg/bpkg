@@ -207,7 +207,7 @@ A human readable description of what the package offers for functionality.
 
 ### global
 
-Indicates that the package is only intended to be install as a script. This allows the ommition of the `-g` or `--global` flag during installation.
+Indicates that the package is only intended to be install as a script. This allows the omission of the `-g` or `--global` flag during installation.
 
 ```json
   "global": "true"
