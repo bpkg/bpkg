@@ -234,7 +234,7 @@ create_shell_file () {
       echo "  export -f $NAME"
       echo 'else'
       echo "  $NAME "'"${@}"'
-      echo "  exit $?"
+      echo '  exit $?'
       echo 'fi'
     } > "${NAME}.sh"
     chmod 755 "${NAME}.sh"
