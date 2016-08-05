@@ -109,7 +109,7 @@ prompts () {
   prompt DESCRIPTION "description: "
   prompt INSTALL "install: (${INSTALL})"
   prompt SCRIPTS "scripts: (${SCRIPTS}) "
-  prompt USER "username: (${USER}) "
+  prompt USER "Github username: (${USER}) "
   prompt_if "Force global install?" set_global
 }
 
