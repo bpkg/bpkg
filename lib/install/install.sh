@@ -283,18 +283,6 @@ bpkg_install_from_remote () {
       tr -d ' '
     )"
 
-    ## copy package.json over
-    curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
-
-    ## make `deps/' directory if possible
-    mkdir -p "${cwd}/deps/${name}"
-
-    ## make `deps/bin' directory if possible
-    mkdir -p "${cwd}/deps/bin"
-
-    # install package dependencies
-    (cd "${cwd}/deps/${name}" && bpkg getdeps)
-
     ## check if forced global
     if [ ! -z $(echo -n $json | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"') ]; then
       needs_global=1
@@ -363,36 +351,50 @@ bpkg_install_from_remote () {
         ## clean up
       rm -rf ${name}-${version}
     )}
-  fi
-  if [ "${#scripts[@]}" -gt "0" ]; then
-    ## grab each script and place in deps directory
-    for (( i = 0; i < ${#scripts[@]} ; ++i )); do
-      (
-        local script="$(echo ${scripts[$i]} | xargs basename )"
-        info "fetch" "${url}/${script}"
-        info "write" "${cwd}/deps/${name}/${script}"
-        curl $auth_param -sL "${url}/${script}" -o "${cwd}/deps/${name}/${script}"
-        local scriptname="${script%.*}"
-        info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
-        ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
-        chmod u+x "${cwd}/deps/bin/${scriptname}"
-      )
-    done
-  fi
-  if [ "${#files[@]}" -gt "0" ]; then
-    ## grab each file
-    for (( i = 0; i < ${#files[@]} ; ++i )); do
-      (
-        local file="$(echo ${files[$i]})"
-        local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
-        info "fetch" "${url}/${file}"
-        if [ ! -d "$filedir" ]; then
-          mkdir -p "$filedir"
-        fi
-        info "write" "${filedir}/${file}"
-        curl $auth_param -sL "${url}/${script}" -o "${filedir}/${file}"
-      )
-    done
+  ## perform local install otherwise
+  else
+    ## copy package.json over
+    curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
+
+    ## make `deps/' directory if possible
+    mkdir -p "${cwd}/deps/${name}"
+
+    ## make `deps/bin' directory if possible
+    mkdir -p "${cwd}/deps/bin"
+
+    # install package dependencies
+    (cd "${cwd}/deps/${name}" && bpkg getdeps)
+
+    if [ "${#scripts[@]}" -gt "0" ]; then
+      ## grab each script and place in deps directory
+      for (( i = 0; i < ${#scripts[@]} ; ++i )); do
+        (
+          local script="$(echo ${scripts[$i]} | xargs basename )"
+          info "fetch" "${url}/${script}"
+          info "write" "${cwd}/deps/${name}/${script}"
+          curl $auth_param -sL "${url}/${script}" -o "${cwd}/deps/${name}/${script}"
+          local scriptname="${script%.*}"
+          info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
+          ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
+          chmod u+x "${cwd}/deps/bin/${scriptname}"
+        )
+      done
+    fi
+    if [ "${#files[@]}" -gt "0" ]; then
+      ## grab each file
+      for (( i = 0; i < ${#files[@]} ; ++i )); do
+        (
+          local file="$(echo ${files[$i]})"
+          local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
+          info "fetch" "${url}/${file}"
+          if [ ! -d "$filedir" ]; then
+            mkdir -p "$filedir"
+          fi
+          info "write" "${filedir}/${file}"
+          curl $auth_param -sL "${url}/${script}" -o "${filedir}/${file}"
+        )
+      done
+    fi
   fi
   return 0
 }
