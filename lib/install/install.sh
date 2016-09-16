@@ -283,18 +283,6 @@ bpkg_install_from_remote () {
       tr -d ' '
     )"
 
-    ## copy package.json over
-    curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
-
-    ## make `deps/' directory if possible
-    mkdir -p "${cwd}/deps/${name}"
-
-    ## make `deps/bin' directory if possible
-    mkdir -p "${cwd}/deps/bin"
-
-    # install package dependencies
-    (cd "${cwd}/deps/${name}" && bpkg getdeps)
-
     ## check if forced global
     if [ ! -z $(echo -n $json | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"') ]; then
       needs_global=1
@@ -365,6 +353,18 @@ bpkg_install_from_remote () {
     )}
   ## perform local install otherwise
   else
+    ## copy package.json over
+    curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
+
+    ## make `deps/' directory if possible
+    mkdir -p "${cwd}/deps/${name}"
+
+    ## make `deps/bin' directory if possible
+    mkdir -p "${cwd}/deps/bin"
+
+    # install package dependencies
+    (cd "${cwd}/deps/${name}" && bpkg getdeps)
+
     if [ "${#scripts[@]}" -gt "0" ]; then
       ## grab each script and place in deps directory
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
