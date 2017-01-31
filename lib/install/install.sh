@@ -254,14 +254,14 @@ bpkg_install_from_remote () {
   url="${remote}${uri}"
   repo_url=$git_remote/$user/$name.git
 
-  ## determine if `package.json' exists at url
+  ## determine if 'package.json' exists at url
   {
-    status=$(curl $auth_param -sL "${url}/package.json?`date +%s`" -w '%{http_code}' -o /dev/null)
+    status=$(curl $auth_param -sL "${url}/package.json?$(date +%s)" -w '%{http_code}' -o /dev/null)
     if [ "0" != "$?" ] || (( status >= 400 )); then
       warn "package.json doesn't exist"
       has_pkg_json=0
       # check to see if there's a Makefile. If not, this is not a valid package
-      status=$(curl $auth_param -sL "${url}/Makefile?`date +%s`" -w '%{http_code}' -o /dev/null)
+      status=$(curl $auth_param -sL "${url}/Makefile?$(date +%s)" -w '%{http_code}' -o /dev/null)
       if [ "0" != "$?" ] || (( status >= 400 )); then
         warn "Makefile not found, skipping remote: $url"
         return 1
@@ -270,10 +270,10 @@ bpkg_install_from_remote () {
   }
 
   ## read package.json
-  json=$(curl $auth_param -sL "${url}/package.json?`date +%s`")
+  json=$(curl $auth_param -sL "${url}/package.json?$(date +%s)")
 
   if (( 1 == $has_pkg_json )); then
-    ## get package name from `package.json'
+    ## get package name from 'package.json'
     name="$(
       echo -n ${json} |
       bpkg-json -b |
@@ -356,10 +356,10 @@ bpkg_install_from_remote () {
     ## copy package.json over
     curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
 
-    ## make `deps/' directory if possible
+    ## make 'deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
 
-    ## make `deps/bin' directory if possible
+    ## make 'deps/bin' directory if possible
     mkdir -p "${cwd}/deps/bin"
 
     # install package dependencies

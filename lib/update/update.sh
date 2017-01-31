@@ -6,7 +6,7 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  source `which bpkg-utils`
+  source $(which bpkg-utils)
 fi
 
 bpkg_initrc
@@ -47,7 +47,7 @@ bpkg_update_remote() {
 }
 
 bpkg_update () {
-  for opt in "${@}"; do
+  { for opt in "${@}"; do
     case "$opt" in
       -V|--version)
         echo "${VERSION}"
@@ -64,7 +64,7 @@ bpkg_update () {
         fi
         ;;
     esac
-  done
+  done }
 
   local let i=0
   for remote in "${BPKG_REMOTES[@]}"; do

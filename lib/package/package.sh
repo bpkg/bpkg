@@ -10,7 +10,7 @@ usage () {
 ## Read a package property
 bpkg_package () {
   local prop="${1}"
-  local cwd="`pwd`"
+  local cwd="$(pwd)"
   local pkg="${cwd}/package.json"
 
   ## parse flags
@@ -23,7 +23,7 @@ bpkg_package () {
 
   ## ensure there is a package to read
   if ! test -f "${pkg}"; then
-    echo 2>&1 "error: Unable to find \`package.json' in `pwd`"
+    echo 2>&1 "error: Unable to find \`package.json' in $(pwd)"
     return 1
   fi
 
@@ -35,7 +35,7 @@ bpkg_package () {
     }
   else
     ## show value for a specific property
-    ## in `package.json'
+    ## in 'package.json'
     {
       cat "${pkg}" | bpkg-json -b | grep "${prop}" | awk '{ $1=""; printf $0 }'
       echo

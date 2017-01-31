@@ -6,7 +6,7 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  source `which bpkg-utils`
+  source $(which bpkg-utils)
 fi
 
 bpkg_initrc
@@ -57,8 +57,8 @@ show_package () {
     uri=$BPKG_REMOTE/$pkg/raw/master
   fi
 
-  json=$(eval "curl $auth -sL '$uri/package.json?`date +%s`'")
-  readme=$(eval "curl $auth -sL '$uri/README.md?`date +%s`'")
+  json=$(eval "curl $auth -sL '$uri/package.json?$(date +%s)'")
+  readme=$(eval "curl $auth -sL '$uri/README.md?$(date +%s)'")
 
   local readme_len=$(echo "$readme" | wc -l | tr -d ' ')
 
@@ -96,9 +96,9 @@ show_package () {
     OLDIFS="$IFS"
     IFS=$'\n'
     for src in $(echo "$sources"); do
-      local http_code=$(eval "curl $auth -sL '$uri/$src?`date +%s`' -w '%{http_code}' -o /dev/null")
+      local http_code=$(eval "curl $auth -sL '$uri/$src?$(date +%s)' -w '%{http_code}' -o /dev/null")
       if (( http_code < 400 )); then
-        local content=$(eval "curl $auth -sL '$uri/$src?`date +%s`'")
+        local content=$(eval "curl $auth -sL '$uri/$src?$(date +%s)'")
         echo "#[$src]"
         echo "$content"
         echo "#[/$src]"

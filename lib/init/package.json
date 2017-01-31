@@ -4,6 +4,8 @@
   "description": "Initialize a bpkg package.json",
   "global": "true",
   "install": "make install",
-  "scripts": [ "bpkg-init.sh" ]
+  "scripts": [
+    "bpkg-init.sh"
+  ]
 }
 

@@ -2,6 +2,8 @@
   "name": "term",
   "version": "0.0.1",
   "description": "Terminal utility functions",
-  "scripts": [ "term.sh" ],
+  "scripts": [
+    "term.sh"
+  ],
   "install": "make install"
 }
