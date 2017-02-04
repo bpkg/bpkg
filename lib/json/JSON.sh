@@ -112,7 +112,7 @@ parse_array () {
       done
       ;;
   esac
-  [ "$BRIEF" -eq 0 ] && value=$(printf '[%s]' "$ary") || value=
+  [ "$BRIEF" -eq 0 ] && value=`printf '[%s]' "$ary"` || value=
   :
 }
 
@@ -147,7 +147,7 @@ parse_object () {
       done
     ;;
   esac
-  [ "$BRIEF" -eq 0 ] && value=$(printf '{%s}' "$obj") || value=
+  [ "$BRIEF" -eq 0 ] && value=`printf '{%s}' "$obj"` || value=
   :
 }
 
