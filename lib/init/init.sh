@@ -67,7 +67,7 @@ append () {
 appendf () {
   local fmt="$1"
   shift
-  buf+="`printf "${fmt}" "${@}"`"
+  buf+="$(printf "${fmt}" "${@}")"
 }
 
 ## wraps each argument in quotes
@@ -91,7 +91,7 @@ intro () {
 }
 
 options () {
-  opt NAME "$(basename `pwd`)"
+  opt NAME "$(basename $(pwd))"
   opt VERSION "0.0.1"
   opt DESCRIPTION ""
   opt GLOBAL ""
@@ -120,7 +120,8 @@ required () {
     "SCRIPTS"
   do
     eval local val="\${${key}}"
-    [ -z "${val}" ] && error "Missing \`${key}' property"
+    [ -z "${val}" ] && error "Missing \`
+    ${key}' property"
   done
 }
 
@@ -270,7 +271,7 @@ create_repo () {
 ## main
 bpkg_init () {
   local version="0.0.1"
-  local cwd="`pwd`"
+  local cwd="$(pwd)"
   local buf="" ## output buffer
   local file="${cwd}/package.json" ## output file
   local arg="$1"
