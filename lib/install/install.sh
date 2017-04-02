@@ -85,7 +85,6 @@ info () {
 bpkg_install () {
   local pkg=""
   local let needs_global=0
-  declare -a args=( "${@}" )
 
   for opt in "${@}"; do
     if [ "-" = "${opt:0:1}" ]; then
@@ -156,7 +155,6 @@ bpkg_install_from_remote () {
   local cwd=$(pwd)
   local url=""
   local uri=""
-  local test_uri=""
   local version=""
   local status=""
   local json=""
@@ -243,25 +241,25 @@ bpkg_install_from_remote () {
   ## error since the user may have intended to install the package
   ## from the broken remote.
   {
-    status=$(curl $auth_param -s "${remote}" -w '%{http_code}' -o /dev/null)
+    status=$(curl "${auth_param}" -s "${remote}" -w '%{http_code}' -o /dev/null)
     if [ "0" != "$?" ] || (( status >= 400 )); then
-      error "Remote unreachable: $remote"
+      error "Remote unreachable: ${remote}"
       return 2
     fi
   }
 
   ## build url
   url="${remote}${uri}"
-  repo_url=$git_remote/$user/$name.git
+  repo_url="${git_remote}/${user}/${name}.git"
 
   ## determine if 'package.json' exists at url
   {
-    status=$(curl $auth_param -sL "${url}/package.json?$(date +%s)" -w '%{http_code}' -o /dev/null)
+    status=$(curl "${auth_param}" -sL "${url}/package.json?$(date +%s)" -w '%{http_code}' -o /dev/null)
     if [ "0" != "$?" ] || (( status >= 400 )); then
       warn "package.json doesn't exist"
       has_pkg_json=0
       # check to see if there's a Makefile. If not, this is not a valid package
-      status=$(curl $auth_param -sL "${url}/Makefile?$(date +%s)" -w '%{http_code}' -o /dev/null)
+      status=$(curl "${auth_param}" -sL "${url}/Makefile?$(date +%s)" -w '%{http_code}' -o /dev/null)
       if [ "0" != "$?" ] || (( status >= 400 )); then
         warn "Makefile not found, skipping remote: $url"
         return 1
@@ -270,12 +268,12 @@ bpkg_install_from_remote () {
   }
 
   ## read package.json
-  json=$(curl $auth_param -sL "${url}/package.json?$(date +%s)")
+  json=$(curl "${auth_param}" -sL "${url}/package.json?$(date +%s)")
 
-  if (( 1 == $has_pkg_json )); then
+  if (( 1 == has_pkg_json )); then
     ## get package name from 'package.json'
     name="$(
-      echo -n ${json} |
+      echo -n "${json}" |
       bpkg-json -b |
       grep 'name' |
       awk '{ $1=""; print $0 }' |
@@ -284,46 +282,46 @@ bpkg_install_from_remote () {
     )"
 
     ## check if forced global
-    if [ ! -z $(echo -n $json | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"') ]; then
+    if [ ! -"z $(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" ]; then
       needs_global=1
     fi
 
     ## construct scripts array
     {
-      scripts=$(echo -n $json | bpkg-json -b | grep '\["scripts' | awk '{$1=""; print $0 }' | tr -d '"')
+      scripts=$(echo -n "${json}" | bpkg-json -b | grep '\["scripts' | awk '{$1=""; print $0 }' | tr -d '"')
       OLDIFS="${IFS}"
 
       ## comma to space
       IFS=','
-      scripts=($(echo ${scripts[@]}))
+      scripts=("${scripts[@]}")
       IFS="${OLDIFS}"
 
       ## account for existing space
-      scripts=($(echo ${scripts[@]}))
+      scripts=("${scripts[@]}")
     }
 
     ## construct files array
     {
-      files=$(echo -n $json | bpkg-json -b | grep '\["files' | awk '{$1=""; print $0 }' | tr -d '"')
+      files=$(echo -n "${json}" | bpkg-json -b | grep '\["files' | awk '{$1=""; print $0 }' | tr -d '"')
       OLDIFS="${IFS}"
 
       ## comma to space
       IFS=','
-      files=($(echo ${files[@]}))
+      files=("${files[@]}")
       IFS="${OLDIFS}"
 
       ## account for existing space
-      files=($(echo ${files[@]}))
+      files=("${files[@]}")
     }
 
   fi
 
   ## build global if needed
-  if (( 1 == $needs_global )); then
-    if (( 1 == $has_pkg_json )); then
+  if (( 1 == needs_global )); then
+    if (( 1 == has_pkg_json )); then
       ## install bin if needed
-      build="$(echo -n ${json} | bpkg-json -b | grep '\["install"\]' | awk '{$1=""; print $0 }' | tr -d '\"')"
-      build="$(echo -n ${build} | sed -e 's/^ *//' -e 's/ *$//')"
+      build="$(echo -n "${json}" | bpkg-json -b | grep '\["install"\]' | awk '{$1=""; print $0 }' | tr -d '\"')"
+      build="$(echo -n "${build}" | sed -e 's/^ *//' -e 's/ *$//')"
     fi
 
     if [ -z "${build}" ]; then
@@ -332,29 +330,29 @@ bpkg_install_from_remote () {
       build="make install"
     fi
 
-    {(
+    { (
       ## go to tmp dir
-      cd $( [ ! -z $TMPDIR ] && echo $TMPDIR || echo /tmp) &&
+      cd "$( [ ! -z "${TMPDIR}" ] && echo "${TMPDIR}" || echo /tmp)" &&
         ## prune existing
-      rm -rf ${name}-${version} &&
+      rm -rf "${name}-${version}" &&
         ## shallow clone
-      info "Cloning $repo_url to $name-$version"
-      git clone $repo_url ${name}-${version} &&
+      info "Cloning ${repo_url} to ${name}-${version}"
+      git clone "${repo_url}" "${name}-${version}" &&
         (
       ## move into directory
-      cd ${name}-${version} &&
+      cd "${name}-${version}" &&
         ## build
       info "Performing install: \`${build}'"
       build_output=$(eval "${build}")
-      echo "$build_output"
+      echo "${build_output}"
       ) &&
         ## clean up
-      rm -rf ${name}-${version}
-    )}
+      rm -rf "${name}-${version}"
+    ) }
   ## perform local install otherwise
   else
     ## copy package.json over
-    curl $auth_param -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
+    curl "${auth_param}" -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
 
     ## make 'deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
@@ -372,7 +370,7 @@ bpkg_install_from_remote () {
           local script="$(echo ${scripts[$i]} | xargs basename )"
           info "fetch" "${url}/${script}"
           info "write" "${cwd}/deps/${name}/${script}"
-          curl $auth_param -sL "${url}/${script}" -o "${cwd}/deps/${name}/${script}"
+          curl "${auth_param}" -sL "${url}/${script}" -o "${cwd}/deps/${name}/${script}"
           local scriptname="${script%.*}"
           info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
           ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
@@ -384,14 +382,14 @@ bpkg_install_from_remote () {
       ## grab each file
       for (( i = 0; i < ${#files[@]} ; ++i )); do
         (
-          local file="$(echo ${files[$i]})"
+          local file="${files[$i]}"
           local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
           info "fetch" "${url}/${file}"
-          if [ ! -d "$filedir" ]; then
-            mkdir -p "$filedir"
+          if [ ! -d "${filedir}" ]; then
+            mkdir -p "${filedir}"
           fi
           info "write" "${filedir}/${file}"
-          curl $auth_param -sL "${url}/${script}" -o "${filedir}/${file}"
+          curl "${auth_param}" -sL "${url}/${script}" -o "${filedir}/${file}"
         )
       done
     fi
