@@ -81,6 +81,46 @@ info () {
   message "cyan" "${title}" "${@}"
 }
 
+
+url_exists () {
+    local auth_param exists url
+
+    url="${1}"
+    auth_param="${2}"
+
+    exists=0
+
+    status=$(gurl "${url}" "${auth_param}" '-L' '-w %{http_code}' '-o /dev/null')
+    result="$?"
+
+    # In some rare cases, curl will return CURLE_WRITE_ERROR (23) when writing
+    # to `/dev/null`. In such a case we do not care that such an error occured.
+    # We are only interested in the status, which *will* be available regardless.
+    if [[ "0" != "${result}" && '23' != "${result}" ]] || (( status >= 400 )); then
+      exists=1
+    fi
+
+    return "${exists}"
+}
+
+# [G]et from [URL]
+#
+# Very thin wrapper that passes all non-empty parameters to "curl"
+#
+gurl () {
+    local param params url
+
+    url="${1}"
+
+    for param in "${@:2}"; do
+        if test "${param}"; then
+            params+=("${param}");
+        fi
+    done
+
+    curl --silent "${params[@]}" "${url}"
+}
+
 ## Install a bash package
 bpkg_install () {
   local pkg=""
@@ -241,8 +281,7 @@ bpkg_install_from_remote () {
   ## error since the user may have intended to install the package
   ## from the broken remote.
   {
-    status=$(curl "${auth_param}" -s "${remote}" -w '%{http_code}' -o /dev/null)
-    if [ "0" != "$?" ] || (( status >= 400 )); then
+    if ! url_exists "${remote}" "${auth_param}"; then
       error "Remote unreachable: ${remote}"
       return 2
     fi
@@ -254,13 +293,11 @@ bpkg_install_from_remote () {
 
   ## determine if 'package.json' exists at url
   {
-    status=$(curl "${auth_param}" -sL "${url}/package.json?$(date +%s)" -w '%{http_code}' -o /dev/null)
-    if [ "0" != "$?" ] || (( status >= 400 )); then
+    if ! url_exists "${url}/package.json?$(date +%s)" "${auth_param}"; then
       warn "package.json doesn't exist"
       has_pkg_json=0
       # check to see if there's a Makefile. If not, this is not a valid package
-      status=$(curl "${auth_param}" -sL "${url}/Makefile?$(date +%s)" -w '%{http_code}' -o /dev/null)
-      if [ "0" != "$?" ] || (( status >= 400 )); then
+      if ! url_exists "${url}/Makefile?$(date +%s)" "${auth_param}"; then
         warn "Makefile not found, skipping remote: $url"
         return 1
       fi
@@ -268,7 +305,7 @@ bpkg_install_from_remote () {
   }
 
   ## read package.json
-  json=$(curl "${auth_param}" -sL "${url}/package.json?$(date +%s)")
+  json=$(gurl "${url}/package.json?$(date +%s)" "${auth_param}" '-L')
 
   if (( 1 == has_pkg_json )); then
     ## get package name from 'package.json'
@@ -352,7 +389,7 @@ bpkg_install_from_remote () {
   ## perform local install otherwise
   else
     ## copy package.json over
-    curl "${auth_param}" -sL "${url}/package.json" -o "${cwd}/deps/${name}/package.json"
+    gurl "${url}/package.json" "${auth_param}" '-L' "-o '${cwd}/deps/${name}/package.json'"
 
     ## make 'deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
@@ -370,7 +407,7 @@ bpkg_install_from_remote () {
           local script="$(echo ${scripts[$i]} | xargs basename )"
           info "fetch" "${url}/${script}"
           info "write" "${cwd}/deps/${name}/${script}"
-          curl "${auth_param}" -sL "${url}/${script}" -o "${cwd}/deps/${name}/${script}"
+          gurl "${url}/${script}" "${auth_param}" '-L' "-o '${cwd}/deps/${name}/${script}'"
           local scriptname="${script%.*}"
           info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
           ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
@@ -389,7 +426,7 @@ bpkg_install_from_remote () {
             mkdir -p "${filedir}"
           fi
           info "write" "${filedir}/${file}"
-          curl "${auth_param}" -sL "${url}/${script}" -o "${filedir}/${file}"
+          gurl "${url}/${script}" "${auth_param}" '-L' "-o '${filedir}/${file}'"
         )
       done
     fi
