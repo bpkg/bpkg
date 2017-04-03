@@ -89,7 +89,7 @@ save_remote_file () {
   path="${2}"
   auth_param="${3}"
 
-  gurl "${url}" "${auth_param}" '-L' "-o '${path}'"
+  gurl "${url}" "${auth_param}" '-L' '-o' "${path}"
 }
 
 
@@ -101,7 +101,7 @@ url_exists () {
 
     exists=0
 
-    status=$(gurl "${url}" "${auth_param}" '-L' '-w %{http_code}' '-o /dev/null')
+    status=$(gurl "${url}" "${auth_param}" '-L' '-w %{http_code}' '-o' '/dev/null')
     result="$?"
 
     # In some rare cases, curl will return CURLE_WRITE_ERROR (23) when writing
