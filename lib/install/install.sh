@@ -2,18 +2,18 @@
 
 # Include config rc file if found
 CONFIG_FILE="$HOME/.bpkgrc"
-[ -f "$CONFIG_FILE" ] && source "$CONFIG_FILE"
+[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
 
 ## set defaults
-if [ ${#BPKG_REMOTES[@]} -eq 0 ]; then
+if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
   BPKG_REMOTES[0]=${BPKG_REMOTE-https://raw.githubusercontent.com}
   BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
 fi
-BPKG_USER="${BPKG_USER:-"bpkg"}"
+BPKG_USER="${BPKG_USER:-bpkg}"
 
 ## check parameter consistency
 validate_parameters () {
-  if [ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]; then
+  if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
     mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
     fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
     error "$fmesg"
@@ -127,7 +127,7 @@ bpkg_install () {
   local let needs_global=0
 
   for opt in "${@}"; do
-    if [ '-' = "${opt:0:1}" ]; then
+    if [[ '-' = "${opt:0:1}" ]]; then
       continue
     fi
     pkg="${opt}"
@@ -147,7 +147,7 @@ bpkg_install () {
         ;;
 
       *)
-        if [ '-' = "${opt:0:1}" ]; then
+        if [[ '-' = "${opt:0:1}" ]]; then
           echo 2>&1 "error: Unknown argument \`${1}'"
           usage
           return 1
@@ -157,7 +157,7 @@ bpkg_install () {
   done
 
   ## ensure there is a package to install
-  if [ -z "${pkg}" ]; then
+  if [[ -z "${pkg}" ]]; then
     usage
     return 1
   fi
@@ -169,9 +169,9 @@ bpkg_install () {
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
     bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global
-    if [ "$?" == '0' ]; then
+    if [[ "$?" == '0' ]]; then
       return 0
-    elif [ "$?" == '2' ]; then
+    elif [[ "$?" == '2' ]]; then
       error 'fatal error occurred during install'
       return 1
     fi
@@ -216,10 +216,10 @@ bpkg_install_from_remote () {
     IFS="${OLDIFS}"
   }
 
-  if [ ${#pkg_parts[@]} -eq 1 ]; then
+  if [[ ${#pkg_parts[@]} -eq 1 ]]; then
     version='master'
     #info "Using latest (master)"
-  elif [ ${#pkg_parts[@]} -eq 2 ]; then
+  elif [[ ${#pkg_parts[@]} -eq 2 ]]; then
     name="${pkg_parts[0]}"
     version="${pkg_parts[1]}"
   else
@@ -235,10 +235,10 @@ bpkg_install_from_remote () {
     IFS="${OLDIFS}"
   }
 
-  if [ ${#pkg_parts[@]} -eq 1 ]; then
+  if [[ ${#pkg_parts[@]} -eq 1 ]]; then
     user="${BPKG_USER}"
     name="${pkg_parts[0]}"
-  elif [ ${#pkg_parts[@]} -eq 2 ]; then
+  elif [[ ${#pkg_parts[@]} -eq 2 ]]; then
     user="${pkg_parts[0]}"
     name="${pkg_parts[1]}"
   else
@@ -253,7 +253,7 @@ bpkg_install_from_remote () {
 
 
   ## check to see if remote is raw with oauth (GHE)
-  if [ "${remote:0:10}" == "raw-oauth|" ]; then
+  if [[ "${remote:0:10}" == "raw-oauth|" ]]; then
     info 'Using OAUTH basic with content requests'
     OLDIFS="${IFS}"
     IFS="'|'"
@@ -319,7 +319,7 @@ bpkg_install_from_remote () {
     )"
 
     ## check if forced global
-    if [ ! -"z $(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" ]; then
+    if [[ ! -"z $(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" ]]; then
       needs_global=1
     fi
 
@@ -361,7 +361,7 @@ bpkg_install_from_remote () {
       build="$(echo -n "${build}" | sed -e 's/^ *//' -e 's/ *$//')"
     fi
 
-    if [ -z "${build}" ]; then
+    if [[ -z "${build}" ]]; then
       warn 'Missing build script'
       warn 'Trying `make install`...'
       build='make install'
@@ -369,7 +369,7 @@ bpkg_install_from_remote () {
 
     { (
       ## go to tmp dir
-      cd "$( [ ! -z "${TMPDIR}" ] && echo "${TMPDIR}" || echo /tmp)" &&
+      cd "$( [[ ! -z "${TMPDIR}" ]] && echo "${TMPDIR}" || echo /tmp)" &&
         ## prune existing
       rm -rf "${name}-${version}" &&
         ## shallow clone
@@ -400,7 +400,7 @@ bpkg_install_from_remote () {
     # install package dependencies
     (cd "${cwd}/deps/${name}" && bpkg getdeps)
 
-    if [ "${#scripts[@]}" -gt '0' ]; then
+    if [[ "${#scripts[@]}" -gt '0' ]]; then
       ## grab each script and place in deps directory
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
         (
@@ -415,14 +415,14 @@ bpkg_install_from_remote () {
         )
       done
     fi
-    if [ "${#files[@]}" -gt '0' ]; then
+    if [[ "${#files[@]}" -gt '0' ]]; then
       ## grab each file
       for (( i = 0; i < ${#files[@]} ; ++i )); do
         (
           local file="${files[$i]}"
           local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
           info "fetch" "${url}/${file}"
-          if [ ! -d "${filedir}" ]; then
+          if [[ ! -d "${filedir}" ]]; then
             mkdir -p "${filedir}"
           fi
           info "write" "${filedir}/${file}"
