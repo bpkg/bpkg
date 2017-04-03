@@ -82,6 +82,17 @@ info () {
 }
 
 
+save_remote_file () {
+  local auth_param path url
+
+  url="${1}"
+  path="${2}"
+  auth_param="${3}"
+
+  gurl "${url}" "${auth_param}" '-L' "-o '${path}'"
+}
+
+
 url_exists () {
     local auth_param exists url
 
@@ -389,7 +400,7 @@ bpkg_install_from_remote () {
   ## perform local install otherwise
   else
     ## copy package.json over
-    gurl "${url}/package.json" "${auth_param}" '-L' "-o '${cwd}/deps/${name}/package.json'"
+    save_remote_file "${url}/package.json" "${cwd}/deps/${name}/package.json" "${auth_param}"
 
     ## make 'deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
@@ -407,7 +418,7 @@ bpkg_install_from_remote () {
           local script="$(echo ${scripts[$i]} | xargs basename )"
           info "fetch" "${url}/${script}"
           info "write" "${cwd}/deps/${name}/${script}"
-          gurl "${url}/${script}" "${auth_param}" '-L' "-o '${cwd}/deps/${name}/${script}'"
+          save_remote_file "${url}/${script}" "${cwd}/deps/${name}/${script}" "${auth_param}"
           local scriptname="${script%.*}"
           info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
           ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
@@ -426,7 +437,7 @@ bpkg_install_from_remote () {
             mkdir -p "${filedir}"
           fi
           info "write" "${filedir}/${file}"
-          gurl "${url}/${script}" "${auth_param}" '-L' "-o '${filedir}/${file}'"
+          save_remote_file "${url}/${script}" "${filedir}/${file}" "${auth_param}"
         )
       done
     fi
