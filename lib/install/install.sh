@@ -114,6 +114,15 @@ url_exists () {
     return "${exists}"
 }
 
+read_package_json () {
+  local auth_param url
+
+  url="${1}"
+  auth_param="${2}"
+
+  gurl "${url}" "${auth_param}" '-L'
+}
+
 # [G]et from [URL]
 #
 # Very thin wrapper that passes all non-empty parameters to "curl"
@@ -316,7 +325,7 @@ bpkg_install_from_remote () {
   }
 
   ## read package.json
-  json=$(gurl "${url}/package.json?$(date +%s)" "${auth_param}" '-L')
+  json=$(read_package_json "${url}/package.json?$(date +%s)" "${auth_param}")
 
   if (( 1 == has_pkg_json )); then
     ## get package name from 'package.json'
