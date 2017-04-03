@@ -87,9 +87,13 @@ save_remote_file () {
 
   url="${1}"
   path="${2}"
-  auth_param="${3}"
+  auth_param="${3:-}"
 
-  gurl "${url}" "${auth_param}" '-L' '-o' "${path}"
+  if [[ "${auth_param}" ]];then
+    curl --silent -L -o "${path}" -u "${auth_param}" "${url}"
+  else
+    curl --silent -L -o "${path}" "${url}"
+  fi
 }
 
 
@@ -97,12 +101,17 @@ url_exists () {
     local auth_param exists url
 
     url="${1}"
-    auth_param="${2}"
+    auth_param="${2:-}"
 
     exists=0
 
-    status=$(gurl "${url}" "${auth_param}" '-L' '-w %{http_code}' '-o' '/dev/null')
-    result="$?"
+    if [[ "${auth_param}" ]];then
+      status=$(curl --silent -L -w '%{http_code}' -o '/dev/null' -u "${auth_param}" "${url}")
+      result="$?"
+    else
+      status=$(curl --silent -L -w '%{http_code}' -o '/dev/null' "${url}")
+      result="$?"
+    fi
 
     # In some rare cases, curl will return CURLE_WRITE_ERROR (23) when writing
     # to `/dev/null`. In such a case we do not care that such an error occured.
@@ -118,27 +127,13 @@ read_package_json () {
   local auth_param url
 
   url="${1}"
-  auth_param="${2}"
+  auth_param="${2:-}"
 
-  gurl "${url}" "${auth_param}" '-L'
-}
-
-# [G]et from [URL]
-#
-# Very thin wrapper that passes all non-empty parameters to "curl"
-#
-gurl () {
-    local param params url
-
-    url="${1}"
-
-    for param in "${@:2}"; do
-        if test "${param}"; then
-            params+=("${param}");
-        fi
-    done
-
-    curl --silent "${params[@]}" "${url}"
+  if [[ "${auth_param}" ]];then
+    curl --silent -L -u "${auth_param}" "${url}"
+  else
+    curl --silent -L "${url}"
+  fi
 }
 
 ## Install a bash package
@@ -281,7 +276,7 @@ bpkg_install_from_remote () {
     IFS="${OLDIFS}"
     local token=${remote_parts[1]}
     remote=${remote_parts[2]}
-    auth_param="-u $token:x-oauth-basic"
+    auth_param="$token:x-oauth-basic"
     uri="/${user}/${name}/raw/${version}"
     ## If git remote is a URL, and doesn't contain token information, we
     ## inject it into the <user>@host field
