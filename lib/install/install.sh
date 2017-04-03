@@ -24,9 +24,9 @@ validate_parameters () {
 
 ## outut usage
 usage () {
-  echo "usage: bpkg-install [-h|--help]"
-  echo "   or: bpkg-install [-g|--global] <package>"
-  echo "   or: bpkg-install [-g|--global] <user>/<package>"
+  echo 'usage: bpkg-install [-h|--help]'
+  echo '   or: bpkg-install [-g|--global] <package>'
+  echo '   or: bpkg-install [-g|--global] <user>/<package>'
 }
 
 ## format and output message
@@ -43,7 +43,7 @@ message () {
     bpkg-term reset
   fi
 
-  printf ": "
+  printf ': '
 
   if type -f bpkg-term > /dev/null 2>&1; then
     bpkg-term reset
@@ -60,25 +60,25 @@ message () {
 ## output error
 error () {
   {
-    message "red" "error" "${@}"
+    message 'red' 'error' "${@}"
   } >&2
 }
 
 ## output warning
 warn () {
   {
-    message "yellow" "warn" "${@}"
+    message 'yellow' 'warn' "${@}"
   } >&2
 }
 
 ## output info
 info () {
-  local title="info"
+  local title='info'
   if (( "${#}" > 1 )); then
     title="${1}"
     shift
   fi
-  message "cyan" "${title}" "${@}"
+  message 'cyan' "${title}" "${@}"
 }
 
 
@@ -96,7 +96,7 @@ url_exists () {
     # In some rare cases, curl will return CURLE_WRITE_ERROR (23) when writing
     # to `/dev/null`. In such a case we do not care that such an error occured.
     # We are only interested in the status, which *will* be available regardless.
-    if [[ "0" != "${result}" && '23' != "${result}" ]] || (( status >= 400 )); then
+    if [[ '0' != "${result}" && '23' != "${result}" ]] || (( status >= 400 )); then
       exists=1
     fi
 
@@ -123,11 +123,11 @@ gurl () {
 
 ## Install a bash package
 bpkg_install () {
-  local pkg=""
+  local pkg=''
   local let needs_global=0
 
   for opt in "${@}"; do
-    if [ "-" = "${opt:0:1}" ]; then
+    if [ '-' = "${opt:0:1}" ]; then
       continue
     fi
     pkg="${opt}"
@@ -147,7 +147,7 @@ bpkg_install () {
         ;;
 
       *)
-        if [ "-" = "${opt:0:1}" ]; then
+        if [ '-' = "${opt:0:1}" ]; then
           echo 2>&1 "error: Unknown argument \`${1}'"
           usage
           return 1
@@ -169,15 +169,15 @@ bpkg_install () {
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
     bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global
-    if [ "$?" == "0" ]; then
+    if [ "$?" == '0' ]; then
       return 0
-    elif [ "$?" == "2" ]; then
-      error "fatal error occurred during install"
+    elif [ "$?" == '2' ]; then
+      error 'fatal error occurred during install'
       return 1
     fi
     i=$((i+1))
   done
-  error "package not found on any remote"
+  error 'package not found on any remote'
   return 1
 }
 
@@ -193,15 +193,15 @@ bpkg_install_from_remote () {
   local let needs_global=$4
 
   local cwd=$(pwd)
-  local url=""
-  local uri=""
-  local version=""
-  local status=""
-  local json=""
-  local user=""
-  local name=""
-  local version=""
-  local auth_param=""
+  local url=''
+  local uri=''
+  local version=''
+  local status=''
+  local json=''
+  local user=''
+  local name=''
+  local version=''
+  local auth_param=''
   local let has_pkg_json=1
   declare -a local pkg_parts=()
   declare -a local remote_parts=()
@@ -217,13 +217,13 @@ bpkg_install_from_remote () {
   }
 
   if [ ${#pkg_parts[@]} -eq 1 ]; then
-    version="master"
+    version='master'
     #info "Using latest (master)"
   elif [ ${#pkg_parts[@]} -eq 2 ]; then
     name="${pkg_parts[0]}"
     version="${pkg_parts[1]}"
   else
-     error "Error parsing package version"
+     error 'Error parsing package version'
     return 1
   fi
 
@@ -242,7 +242,7 @@ bpkg_install_from_remote () {
     user="${pkg_parts[0]}"
     name="${pkg_parts[1]}"
   else
-    error "Unable to determine package name"
+    error 'Unable to determine package name'
     return 1
   fi
 
@@ -254,9 +254,9 @@ bpkg_install_from_remote () {
 
   ## check to see if remote is raw with oauth (GHE)
   if [ "${remote:0:10}" == "raw-oauth|" ]; then
-    info "Using OAUTH basic with content requests"
+    info 'Using OAUTH basic with content requests'
     OLDIFS="${IFS}"
-    IFS="|"
+    IFS="'|'"
     local remote_parts=($remote)
     IFS="${OLDIFS}"
     local token=${remote_parts[1]}
@@ -294,7 +294,7 @@ bpkg_install_from_remote () {
   ## determine if 'package.json' exists at url
   {
     if ! url_exists "${url}/package.json?$(date +%s)" "${auth_param}"; then
-      warn "package.json doesn't exist"
+      warn 'package.json doesn`t exist'
       has_pkg_json=0
       # check to see if there's a Makefile. If not, this is not a valid package
       if ! url_exists "${url}/Makefile?$(date +%s)" "${auth_param}"; then
@@ -362,9 +362,9 @@ bpkg_install_from_remote () {
     fi
 
     if [ -z "${build}" ]; then
-      warn "Missing build script"
-      warn "Trying \`make install'..."
-      build="make install"
+      warn 'Missing build script'
+      warn 'Trying `make install`...'
+      build='make install'
     fi
 
     { (
@@ -400,7 +400,7 @@ bpkg_install_from_remote () {
     # install package dependencies
     (cd "${cwd}/deps/${name}" && bpkg getdeps)
 
-    if [ "${#scripts[@]}" -gt "0" ]; then
+    if [ "${#scripts[@]}" -gt '0' ]; then
       ## grab each script and place in deps directory
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
         (
@@ -415,7 +415,7 @@ bpkg_install_from_remote () {
         )
       done
     fi
-    if [ "${#files[@]}" -gt "0" ]; then
+    if [ "${#files[@]}" -gt '0' ]; then
       ## grab each file
       for (( i = 0; i < ${#files[@]} ; ++i )); do
         (
