@@ -416,13 +416,15 @@ bpkg_install_from_remote () {
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
         (
           local script="$(echo ${scripts[$i]} | xargs basename )"
-          info "fetch" "${url}/${script}"
-          info "write" "${cwd}/deps/${name}/${script}"
-          save_remote_file "${url}/${script}" "${cwd}/deps/${name}/${script}" "${auth_param}"
-          local scriptname="${script%.*}"
-          info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
-          ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
-          chmod u+x "${cwd}/deps/bin/${scriptname}"
+          if [[ "${script}" ]];then
+            info "fetch" "${url}/${script}"
+            info "write" "${cwd}/deps/${name}/${script}"
+            save_remote_file "${url}/${script}" "${cwd}/deps/${name}/${script}" "${auth_param}"
+            local scriptname="${script%.*}"
+            info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
+            ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
+            chmod u+x "${cwd}/deps/bin/${scriptname}"
+          fi
         )
       done
     fi
@@ -431,13 +433,15 @@ bpkg_install_from_remote () {
       for (( i = 0; i < ${#files[@]} ; ++i )); do
         (
           local file="${files[$i]}"
-          local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
-          info "fetch" "${url}/${file}"
-          if [[ ! -d "${filedir}" ]]; then
-            mkdir -p "${filedir}"
+          if [[ "${file}" ]];then
+            local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
+            info "fetch" "${url}/${file}"
+            if [[ ! -d "${filedir}" ]]; then
+              mkdir -p "${filedir}"
+            fi
+            info "write" "${filedir}/${file}"
+            save_remote_file "${url}/${script}" "${filedir}/${file}" "${auth_param}"
           fi
-          info "write" "${filedir}/${file}"
-          save_remote_file "${url}/${script}" "${filedir}/${file}" "${auth_param}"
         )
       done
     fi
