@@ -415,7 +415,7 @@ bpkg_install_from_remote () {
     # install package dependencies
     (cd "${cwd}/deps/${name}" && bpkg getdeps)
 
-    if [[ "${#scripts[@]}" -gt '0' ]]; then
+    if [[ "${#scripts[@]}" -gt '0' && "${scripts}" != "" ]]; then
       ## grab each script and place in deps directory
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
         (
