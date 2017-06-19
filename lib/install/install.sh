@@ -415,23 +415,22 @@ bpkg_install_from_remote () {
     # install package dependencies
     (cd "${cwd}/deps/${name}" && bpkg getdeps)
 
-    if [[ "${#scripts[@]}" -gt '0' && "${scripts}" != "" ]]; then
-      ## grab each script and place in deps directory
-      for (( i = 0; i < ${#scripts[@]} ; ++i )); do
-        (
-          local script="$(echo ${scripts[$i]} | xargs basename )"
-          if [[ "${script}" ]];then
-            info "fetch" "${url}/${script}"
-            info "write" "${cwd}/deps/${name}/${script}"
-            save_remote_file "${url}/${script}" "${cwd}/deps/${name}/${script}" "${auth_param}"
-            local scriptname="${script%.*}"
-            info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
-            ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
-            chmod u+x "${cwd}/deps/bin/${scriptname}"
-          fi
-        )
-      done
-    fi
+    ## grab each script and place in deps directory
+    for script in $scripts; do
+      (
+        local script="$(echo $script | xargs basename )"
+        if [[ "${script}" ]];then
+          info "fetch" "${url}/${script}"
+          info "write" "${cwd}/deps/${name}/${script}"
+          save_remote_file "${url}/${script}" "${cwd}/deps/${name}/${script}" "${auth_param}"
+          local scriptname="${script%.*}"
+          info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
+          ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
+          chmod u+x "${cwd}/deps/bin/${scriptname}"
+        fi
+      )
+    done
+
     if [[ "${#files[@]}" -gt '0' ]]; then
       ## grab each file
       for (( i = 0; i < ${#files[@]} ; ++i )); do
