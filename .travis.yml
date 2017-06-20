@@ -1,10 +1,10 @@
 language: ruby
 sudo: required
 install:
-- ./setup.sh
+- sudo ./setup.sh
 script:
 - bpkg update
 - bpkg list
 - bpkg show bpkg/github
-- bpkg install bpkg/github -g
+- sudo bpkg install bpkg/github -g
 - bpkg install bpkg/term
