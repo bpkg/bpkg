@@ -1,0 +1,14 @@
+language: ruby
+rvm:
+- 2.0.0
+- 1.9.3
+- jruby-19mode
+- rbx-2
+install:
+- ./setup.sh
+script:
+- bpkg update
+- bpkg list
+- bpkg show bpkg/github
+- bpkg install bpkg/github -g
+- bpkg install bpkg/term
