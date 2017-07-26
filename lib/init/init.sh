@@ -251,7 +251,7 @@ create_readme () {
       echo
       echo "# Install"
       echo
-      echo "Available as a [bpkg](http://www.bpkg.io/)"
+      echo "Available as a [bpkg](http://www.bpkg.sh/)"
       echo '```sh'
       echo "bpkg install [-g] ${USER:-bpkg}/$NAME"
       echo '```'
