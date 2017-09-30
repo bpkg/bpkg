@@ -393,6 +393,7 @@ bpkg_install_from_remote () {
         (
       ## move into directory
       cd "${name}-${version}" &&
+      git checkout ${version} &&
         ## build
       info "Performing install: \`${build}'"
       build_output=$(eval "${build}")
