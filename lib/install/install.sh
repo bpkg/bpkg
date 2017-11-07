@@ -125,7 +125,6 @@ url_exists () {
 
     url="${1}"
     auth_param="${2:-}"
-    echo "url_exists: url: ${url}"
     exists=0
 
     if [[ "${auth_param}" ]];then
