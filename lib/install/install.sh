@@ -11,6 +11,22 @@ if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
 fi
 BPKG_USER="${BPKG_USER:-bpkg}"
 
+function _is_osx(){
+  if [[ "$(uname -a | grep "Darwin")" != "" ]] ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+function _esed(){
+  if _is_osx; then
+    sed -E "$@"
+  else
+    sed -r "$@"
+  fi
+}
+
 ## check parameter consistency
 validate_parameters () {
   if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
@@ -109,7 +125,7 @@ url_exists () {
 
     url="${1}"
     auth_param="${2:-}"
-
+    echo "url_exists: url: ${url}"
     exists=0
 
     if [[ "${auth_param}" ]];then
@@ -144,13 +160,47 @@ read_package_json () {
 }
 
 is_coding_net () {
-  local remote=$1
+  local remote="$1"
 
   if [[ "$(echo ${remote} | grep coding.net)" ]]; then
     return 0
   else
     return 1
   fi
+}
+
+is_github () {
+  local remote="$1"
+
+  if [[ "$(echo ${remote} | grep github)" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+is_full_url () {
+  local url=$1
+  if [[ "$(echo \"${url}\" | egrep '[^/]+:\/\/.*')" != "" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+parse_proto () {
+  local url="$1"
+  echo "${url}" | _esed "s|([^\/""]+):\/\/([^\/]+)(\/.*)|\1|"
+}
+
+parse_host () {
+  local url="$1"
+  echo "${url}" | _esed "s|([^\/]+):\/\/([^\/]+)(\/.*)|\2|"
+}
+
+parse_path () {
+  local url="$1"
+  echo "${url}" | _esed "s|([^\/]+):\/\/([^\/]+)(\/.*)|\3|"
 }
 
 ## Install a bash package
@@ -195,6 +245,23 @@ bpkg_install () {
   fi
 
   echo
+
+  # if [[ "$(echo \"${pkg}\" | egrep -o 'http|https')" ]]
+
+  if is_full_url "${pkg}"; then
+    local bpkg_remote_proto="$(parse_proto "${pkg}")"
+    local bpkg_remote="$(parse_host "${pkg}")"
+    local bpkg_remote_uri="${bpkg_remote_proto}://${bpkg_remote}"
+
+    BPKG_REMOTES=("${bpkg_remote_uri}" "${BPKG_REMOTES[@]}")
+    BPKG_GIT_REMOTES=("${bpkg_remote_uri}" "${BPKG_GIT_REMOTES[@]}")
+    pkg="$(parse_path "${pkg}" | _esed "s|^\/(.*)|\1|")"
+
+    if is_coding_net "${bpkg_remote}"; then
+      # update /u/{username}/p/{project} to {username}/{project}
+      pkg="$(echo ${pkg} | _esed "s|\/u\/([^\/]+)\/p\/(.+)|\1/\2|")"      
+    fi
+  fi
 
   ## Check each remote in order
   local let i=0
@@ -273,6 +340,9 @@ bpkg_install_from_remote () {
   elif [[ ${#pkg_parts[@]} -eq 2 ]]; then
     user="${pkg_parts[0]}"
     name="${pkg_parts[1]}"
+  elif [[ ${#pkg_parts[@]} -eq 3 ]]; then
+    user="${pkg_parts[0]}/${pkg_parts[1]}"
+    name="${pkg_parts[2]}"
   else
     error 'Unable to determine package name'
     return 1
@@ -301,6 +371,8 @@ bpkg_install_from_remote () {
     fi
   elif is_coding_net "${remote}"; then
     uri="/u/${user}/p/${name}/git/raw/${version}"
+  elif ! is_github "${remote}"; then
+    uri="/${user}/${name}/raw/${version}"
   else 
     uri="/${user}/${name}/${version}"
   fi
@@ -322,7 +394,7 @@ bpkg_install_from_remote () {
 
   ## build url
   url="${remote}${uri}"
-
+  
   if is_coding_net "${remote}"; then
     repo_url="${git_remote}/u/${user}/p/${name}/git"
   else
