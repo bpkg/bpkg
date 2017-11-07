@@ -222,6 +222,67 @@ parse_path () {
   echo "${url}" | _esed "s|([^\/]+):\/\/([^\/]+)(\/.*)|\3|"
 }
 
+wrap_script () {
+  local src dest src_content src_shabang tmp_script_file dest_name
+  
+  src="$1"
+  dest="$2"
+  src_content=$(cat ${src})
+  dest_name=$(basename ${dest})
+
+  if [[ "$(cat ${src} | head -n 1 | grep '#!')" ]]; then
+    src_shabang=$(cat ${src} | head -n 1)
+    src_content=$(cat ${src} | tail -n +2)
+  else
+    src_shabang="#!/usr/local/bin/bash"
+  fi
+
+  readonly tmp_script_file=$(mktemp "/tmp/bpkg.wrapper.XXXXXXXXXX")
+  echo "${src_shabang}" | tee -a "${tmp_script_file}" > /dev/null
+
+  cat <<EOF | tee -a "${tmp_script_file}" > /dev/null
+
+#########################################
+# THIS SECTION !!SHOULD NOT!! BE MODIFIED BY
+# DEVELOPERS AS IT PROVIDES COMMON FUNCTIONS
+# FOR ALL KINDS OF SCRIPTS
+#
+# Maintainer: Edison Guo <hydra1983@gmail.com>
+#########################################
+# Resolve Script Base
+
+function __func_${dest_name}_script_dir() {
+    local script_file script_base script_name
+    
+    script_file="\${BASH_SOURCE[0]}"    
+    
+    if [[ -L \${BASH_SOURCE[0]} ]] ; then
+        script_base=\$(cd \$(dirname \$(readlink -f \${script_file})); pwd)
+    else
+        script_base=\$(cd \$(dirname \${script_file}); pwd)
+    fi
+
+    script_name="\$(basename \${script_file})"
+
+    if [[ -d "\${script_base}/../share/\${__script_name}" ]]; then
+        script_base="\$(cd ${script_base}/../share/\${__script_name}; pwd)"
+    fi
+
+    echo "\${script_base}"
+}
+
+readonly __${dest_name}_script_name="${dest_name}"
+readonly __${dest_name}_script_dir="\$(__func_${dest_name}_script_dir)"
+readonly __${dest_name}_script_file="\${__${dest_name}_script_dir}/\${__${dest_name}_script_name}"
+#########################################
+EOF
+
+  echo "${src_content}" | tee -a "${tmp_script_file}" > /dev/null
+
+  cp -f "${tmp_script_file}" "${dest}"
+  chmod +x "${dest}"
+}
+
 ## Install a bash package
 bpkg_install () {
   local pkg=''
@@ -549,7 +610,9 @@ bpkg_install_from_remote () {
 
           scriptname="${scriptname%.*}"
           info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
-          ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
+          cp -f "${cwd}/deps/${name}/${script}" "${cwd}/deps/${name}/${script}.orig"
+          wrap_script "${cwd}/deps/${name}/${script}.orig" "${cwd}/deps/${name}/${script}"
+          ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"          
           chmod u+x "${cwd}/deps/bin/${scriptname}"
         fi
       )
