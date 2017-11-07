@@ -115,8 +115,8 @@ save_remote_file () {
   path="${2}"
   auth_param="${3:-}"
   
-  info "fetch" "${url}"
-  info "write" "${path}"
+  debug "fetch" "${url}"
+  debug "write" "${path}"
   
   local filedir="$(dirname ${path})"
   if [[ ! -d "${filedir}" ]]; then
@@ -283,7 +283,7 @@ bpkg_install () {
 
     if is_coding_net "${bpkg_remote_host}"; then
       # update /u/{username}/p/{project} to {username}/{project}
-      debug "reset pkg for coding.net"
+      info "reset pkg for coding.net"
       pkg="$(echo ${pkg} | _esed "s|\/?u\/([^\/]+)\/p\/(.+)|\1/\2|")"      
     fi
 
