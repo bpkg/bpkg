@@ -104,6 +104,14 @@ save_remote_file () {
   url="${1}"
   path="${2}"
   auth_param="${3:-}"
+  
+  info "fetch" "${url}"
+  info "write" "${path}"
+  
+  local filedir="$(dirname ${path})"
+  if [[ ! -d "${filedir}" ]]; then
+    mkdir -p "${filedir}"
+  fi
 
   local dirname="$(dirname "${path}")"
 
@@ -436,22 +444,28 @@ bpkg_install_from_remote () {
     {
       scripts=$(echo -n "${json}" | bpkg-json -b | grep '\["scripts' | awk '{ print $2 }' | tr -d '"')
 
-      ## create array by splitting on newline
-      OLDIFS="${IFS}"
-      IFS=$'\n'
-      scripts=(${scripts[@]})
-      IFS="${OLDIFS}"
+      ## multilines to array
+      new_scripts=()
+      while read -r script; do
+        new_scripts+=("${script}")
+      done <<< "${scripts}"
+
+      ## account for existing space
+      scripts=("${new_scripts[@]}")
     }
 
     ## construct files array
     {
       files=$(echo -n "${json}" | bpkg-json -b | grep '\["files' | awk '{ print $2 }' | tr -d '"')
 
-      ## create array by splitting on newline
-      OLDIFS="${IFS}"
-      IFS=$'\n'
-      files=(${files[@]})
-      IFS="${OLDIFS}"
+      ## multilines to array
+      new_files=()
+      while read -r file; do
+        new_files+=("${file}")
+      done <<< "${files}"
+
+      ## account for existing space
+      files=("${new_files[@]}")
     }
 
   fi
@@ -492,7 +506,7 @@ bpkg_install_from_remote () {
     ) }
   ## perform local install otherwise
   else
-    ## copy package.json over
+    ## copy package.json over    
     save_remote_file "${url}/package.json" "${cwd}/deps/${name}/package.json" "${auth_param}"
 
     ## make 'deps/' directory if possible
@@ -505,14 +519,12 @@ bpkg_install_from_remote () {
     info "Install dependencies for ${name}"
     (cd "${cwd}/deps/${name}" && bpkg getdeps)
 
-    ## grab each script and place in deps directory
-    for script in "${scripts[@]}"; do
+    ## grab each script and place in deps directory    
+    for script in $scripts; do
       (
-        if [[ "${script}" ]];then
-          local scriptname="$(echo "${script}" | xargs basename )"
+        local script="$(echo $script | xargs basename )"
 
-          info "fetch" "${url}/${script}"
-          info "write" "${cwd}/deps/${name}/${script}"
+        if [[ "${script}" ]];then          
           save_remote_file "${url}/${script}" "${cwd}/deps/${name}/${script}" "${auth_param}"
 
           scriptname="${scriptname%.*}"
@@ -528,11 +540,9 @@ bpkg_install_from_remote () {
       for file in "${files[@]}"; do
       (
           if [[ "${file}" ]];then
-            local filename="$(echo "${file}" | xargs basename )"
-
-            info "fetch" "${url}/${file}"
-            info "write" "${cwd}/deps/${name}/${file}"
-            save_remote_file "${url}/${file}" "${cwd}/deps/${name}/${file}" "${auth_param}"
+            local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
+            local filename="$(basename "${file}")"            
+            save_remote_file "${url}/${file}" "${filedir}/${filename}" "${auth_param}"
           fi
         )
       done
