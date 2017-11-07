@@ -53,7 +53,7 @@ $ curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
 ```
 
 Or
-```shell
+```sh
 $ curl -Lo- "https://coding.net/u/hydra1983/p/bpkg/git/raw/master/setup.sh" | \
   REMOTE="https://git.coding.net/hydra1983/bpkg.git" bash
 ```
@@ -120,18 +120,18 @@ $ bpkg install jwerle/suggest.sh@0.0.1 -g
 
 Install from github directly
 ```sh
-bpkg install https://{gitlabhost}/{group}/{project}
-bpkg install https://{gitlabhost}/{group}/{subgroup}/{project}
+bpkg install "https://{gitlabhost}/{group}/{project}"
+bpkg install "https://{gitlabhost}/{group}/{subgroup}/{project}"
 ```
 
 Install from self hosted gitlab directly
 ```sh
-bpkg install https://github.com/{user}/{project}
+bpkg install "https://github.com/{user}/{project}"
 ```
 
 Install from coding.net directly
 ```sh
-bpkg install https://coding.net/u/{user}/p/{project}
+bpkg install "https://coding.net/u/{user}/p/{project}"
 ```
 
 **Note:** to do that the packages **must be tagged releases** on the repository.
