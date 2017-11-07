@@ -168,10 +168,10 @@ is_coding_net () {
   fi
 }
 
-is_github () {
+is_github_raw () {
   local remote="$1"
 
-  if [[ "$(echo ${remote} | grep github)" ]]; then
+  if [[ "$(echo ${remote} | grep raw.githubusercontent.com)" ]]; then
     return 0
   else
     return 1
@@ -370,10 +370,10 @@ bpkg_install_from_remote () {
     fi
   elif is_coding_net "${remote}"; then
     uri="/u/${user}/p/${name}/git/raw/${version}"
-  elif ! is_github "${remote}"; then
-    uri="/${user}/${name}/raw/${version}"
-  else 
+  elif is_github_raw "${remote}"; then
     uri="/${user}/${name}/${version}"
+  else 
+    uri="/${user}/${name}/raw/${version}"    
   fi
 
   ## clean up extra slashes in uri
