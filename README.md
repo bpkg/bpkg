@@ -120,13 +120,13 @@ $ bpkg install jwerle/suggest.sh@0.0.1 -g
 
 Install from github directly
 ```sh
-bpkg install "https://{gitlabhost}/{group}/{project}"
-bpkg install "https://{gitlabhost}/{group}/{subgroup}/{project}"
+bpkg install "https://github.com/{user}/{project}"
 ```
 
 Install from self hosted gitlab directly
 ```sh
-bpkg install "https://github.com/{user}/{project}"
+bpkg install "https://{gitlabhost}/{group}/{project}"
+bpkg install "https://{gitlabhost}/{group}/{subgroup}/{project}"
 ```
 
 Install from coding.net directly
