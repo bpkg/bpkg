@@ -97,6 +97,16 @@ info () {
   message 'cyan' "${title}" "${@}"
 }
 
+## output debug
+debug () {
+  local title='info'
+  if (( "${#}" > 1 )); then
+    title="${1}"
+    shift
+  fi
+  message 'green' "${title}" "${@}"
+}
+
 
 save_remote_file () {
   local auth_param path url
@@ -135,6 +145,8 @@ url_exists () {
     auth_param="${2:-}"
     exists=0
 
+    debug "check" "${url}"
+
     if [[ "${auth_param}" ]];then
       status=$(curl --silent -L -w '%{http_code}' -o '/dev/null' -u "${auth_param}" "${url}")
       result="$?"
@@ -169,7 +181,7 @@ read_package_json () {
 is_coding_net () {
   local remote="$1"
 
-  if [[ "$(echo ${remote} | grep coding.net)" ]]; then
+  if [[ "$(echo ${remote} | grep 'coding.net')" ]]; then
     return 0
   else
     return 1
@@ -253,21 +265,29 @@ bpkg_install () {
 
   echo
 
-  # if [[ "$(echo \"${pkg}\" | egrep -o 'http|https')" ]]
-
   if is_full_url "${pkg}"; then
+    debug "parse" "${pkg}"
+
     local bpkg_remote_proto="$(parse_proto "${pkg}")"
-    local bpkg_remote="$(parse_host "${pkg}")"
-    local bpkg_remote_uri="${bpkg_remote_proto}://${bpkg_remote}"
+    local bpkg_remote_host="$(parse_host "${pkg}")"
+    local bpkg_remote_path=$(parse_path "${pkg}")
+    local bpkg_remote_uri="${bpkg_remote_proto}://${bpkg_remote_host}"
+    
+    debug "proto" "${bpkg_remote_proto}"
+    debug "host" "${bpkg_remote_host}"
+    debug "path" "${bpkg_remote_path}"
 
     BPKG_REMOTES=("${bpkg_remote_uri}" "${BPKG_REMOTES[@]}")
     BPKG_GIT_REMOTES=("${bpkg_remote_uri}" "${BPKG_GIT_REMOTES[@]}")
-    pkg="$(parse_path "${pkg}" | _esed "s|^\/(.*)|\1|")"
+    pkg="$(echo "${bpkg_remote_path}" | _esed "s|^\/(.*)|\1|")"
 
-    if is_coding_net "${bpkg_remote}"; then
+    if is_coding_net "${bpkg_remote_host}"; then
       # update /u/{username}/p/{project} to {username}/{project}
-      pkg="$(echo ${pkg} | _esed "s|\/u\/([^\/]+)\/p\/(.+)|\1/\2|")"      
+      debug "reset pkg for coding.net"
+      pkg="$(echo ${pkg} | _esed "s|\/?u\/([^\/]+)\/p\/(.+)|\1/\2|")"      
     fi
+
+    debug "pkg" "${pkg}"
   fi
 
   ## Check each remote in order
