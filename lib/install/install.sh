@@ -135,11 +135,21 @@ read_package_json () {
 
   url="${1}"
   auth_param="${2:-}"
-
+  
   if [[ "${auth_param}" ]];then
     curl --silent -L -u "${auth_param}" "${url}"
   else
     curl --silent -L "${url}"
+  fi
+}
+
+is_coding_net () {
+  local remote=$1
+
+  if [[ "$(echo ${remote} | grep coding.net)" ]]; then
+    return 0
+  else
+    return 1
   fi
 }
 
@@ -229,7 +239,7 @@ bpkg_install_from_remote () {
   declare -a local remote_parts=()
   declare -a local scripts=()
   declare -a local files=()
-
+  
   ## get version if available
   {
     OLDIFS="${IFS}"
@@ -273,7 +283,6 @@ bpkg_install_from_remote () {
   name=${name/@*//}
   name=${name////}
 
-
   ## check to see if remote is raw with oauth (GHE)
   if [[ "${remote:0:10}" == "raw-oauth|" ]]; then
     info 'Using OAUTH basic with content requests'
@@ -290,7 +299,9 @@ bpkg_install_from_remote () {
     if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${token}* ]]; then
       git_remote=${git_remote/https:\/\//https:\/\/$token:x-oauth-basic@}
     fi
-  else
+  elif is_coding_net "${remote}"; then
+    uri="/u/${user}/p/${name}/git/raw/${version}"
+  else 
     uri="/${user}/${name}/${version}"
   fi
 
@@ -311,8 +322,13 @@ bpkg_install_from_remote () {
 
   ## build url
   url="${remote}${uri}"
-  repo_url="${git_remote}/${user}/${name}.git"
 
+  if is_coding_net "${remote}"; then
+    repo_url="${git_remote}/u/${user}/p/${name}/git"
+  else
+    repo_url="${git_remote}/${user}/${name}.git"
+  fi
+  
   ## determine if 'package.json' exists at url
   {
     if ! url_exists "${url}/package.json?$(date +%s)" "${auth_param}"; then
