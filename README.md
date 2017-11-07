@@ -52,6 +52,11 @@ Paste the following on your shell and you're good to go:
 $ curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
 ```
 
+Or
+```shell
+$ curl -Lo- https://coding.net/u/hydra1983/p/bpkg/git/raw/master/setup.sh | REMOTE=https://git.coding.net/hydra1983/bpkg.git bash
+```
+
 ### 2. clib
 
 [clib][clib] is a package manager for C projects. If you already have it, installing `bpkg` is a simple matter of:
