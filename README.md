@@ -54,7 +54,8 @@ $ curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
 
 Or
 ```shell
-$ curl -Lo- https://coding.net/u/hydra1983/p/bpkg/git/raw/master/setup.sh | REMOTE=https://git.coding.net/hydra1983/bpkg.git bash
+$ curl -Lo- "https://coding.net/u/hydra1983/p/bpkg/git/raw/master/setup.sh" | \
+  REMOTE="https://git.coding.net/hydra1983/bpkg.git" bash
 ```
 
 ### 2. clib
