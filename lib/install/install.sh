@@ -249,31 +249,28 @@ wrap_script () {
 #
 # Maintainer: Edison Guo <hydra1983@gmail.com>
 #########################################
-# Resolve Script Base
 
-function __func_${dest_name}_script_dir() {
-    local script_file script_base script_name
+# Load module
+function __load () {
+  local module_file script_file script_dir script_name
     
-    script_file="\${BASH_SOURCE[0]}"    
-    
-    if [[ -L \${BASH_SOURCE[0]} ]] ; then
-        script_base=\$(cd \$(dirname \$(readlink -f \${script_file})); pwd)
-    else
-        script_base=\$(cd \$(dirname \${script_file}); pwd)
-    fi
+  script_file="\$1"
+  module_file="\$2"  
+  
+  if [[ -L \${script_file} ]] ; then
+      script_dir=\$(cd \$(dirname \$(readlink -f \${script_file})); pwd)
+  else
+      script_dir=\$(cd \$(dirname \${script_file}); pwd)
+  fi
 
-    script_name="\$(basename \${script_file})"
+  script_name="\$(basename \${script_file})"
 
-    if [[ -d "\${script_base}/../share/\${__script_name}" ]]; then
-        script_base="\$(cd ${script_base}/../share/\${__script_name}; pwd)"
-    fi
+  if [[ -d "\${script_base}/../share/\${__script_name}" ]]; then
+      script_dir="\$(cd ${script_dir}/../share/\${__script_name}; pwd)"
+  fi
 
-    echo "\${script_base}"
+  source "\${script_dir}/\${module_file}"
 }
-
-readonly __${dest_name}_script_name="${dest_name}"
-readonly __${dest_name}_script_dir="\$(__func_${dest_name}_script_dir)"
-readonly __${dest_name}_script_file="\${__${dest_name}_script_dir}/\${__${dest_name}_script_name}"
 #########################################
 EOF
 
