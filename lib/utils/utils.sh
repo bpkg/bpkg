@@ -127,6 +127,22 @@ bpkg_select_raw_path() {
   return 0
 }
 
+function bpkg_is_osx(){
+  if [[ "$(uname -a | grep "Darwin")" != "" ]] ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+function bpkg_esed(){
+  if bpkg_is_osx; then
+    sed -E "$@"
+  else
+    sed -r "$@"
+  fi
+}
+
 export -f bpkg_initrc
 export -f bpkg_validate
 
@@ -137,3 +153,6 @@ export -f bpkg_info
 
 export -f bpkg_select_remote
 export -f bpkg_select_raw_path
+
+export -f bpkg_is_osx
+export -f bpkg_esed

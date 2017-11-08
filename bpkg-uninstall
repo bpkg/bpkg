@@ -46,75 +46,8 @@ validate_parameters () {
 ## outut usage
 usage () {
   echo 'usage: bpkg-install [-h|--help]'
-  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] <package>'
-  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] <user>/<package>'
-}
-
-_wrap_script () {
-  local src dest src_content src_shabang tmp_script_file dest_name break_mode pkg_prefix
-  
-  src="$1"
-  dest="$2"
-  break_mode="$3"
-  src_content=$(cat ${src})
-  dest_name=$(basename ${dest})  
-
-  if [[ "$(cat ${src} | head -n 1 | grep '#!')" ]]; then
-    src_shabang=$(cat ${src} | head -n 1)
-    src_content=$(cat ${src} | tail -n +2)
-  else
-    src_shabang="#!/usr/local/bin/bash"
-  fi
-
-  if (( 1 == break_mode )); then
-    pkg_prefix="deps/share"
-  else
-    pkg_prefix="deps"
-  fi
-
-  readonly tmp_script_file=$(mktemp "/tmp/bpkg.wrapper.XXXXXXXXXX")
-  echo "${src_shabang}" | tee -a "${tmp_script_file}" > /dev/null
-
-  cat <<EOF | tee -a "${tmp_script_file}" > /dev/null
-
-#########################################
-# THIS SECTION !!SHOULD NOT!! BE MODIFIED BY
-# DEVELOPERS AS IT PROVIDES COMMON FUNCTIONS
-# FOR ALL KINDS OF SCRIPTS
-#
-# Maintainer: Edison Guo <hydra1983@gmail.com>
-#########################################
-
-# Load package
-function __load () {
-  local package_file script_file script_dir script_name
-    
-  script_file="\$1"
-  package_file="\$2"  
-  
-  if [[ -L \${script_file} ]] ; then
-      script_dir=\$(cd \$(dirname \$(readlink -f \${script_file})); pwd)
-  else
-      script_dir=\$(cd \$(dirname \${script_file}); pwd)
-  fi
-
-  script_name="\$(basename \${script_file})"
-
-  if [[ -d "\${script_dir}/../share/\${script_name}" ]]; then
-      script_dir="\$(cd "\${script_dir}/../share/\${script_name}"; pwd)"
-  fi
-
-  source "\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}"
-}
-#########################################
-EOF
-
-  echo "${src_content}" | tee -a "${tmp_script_file}" > /dev/null
-
-  cp -f "${tmp_script_file}" "${dest}"
-  chmod +x "${dest}"
-
-  rm -f "${tmp_script_file}"
+  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] [-d|--dry-run] <package>'
+  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] [-d|--dry-run] <user>/<package>'
 }
 
 ## try to install a package from a specific remote
@@ -122,12 +55,13 @@ EOF
 ##   0: success
 ##   1: the package was not found on the remote
 ##   2: a fatal error occurred
-_bpkg_install_from_remote () {
+_bpkg_uninstall_of_remote () {
   local pkg=$1
   local remote=$2
   local git_remote=$3
   local needs_global=$4
   local break_mode=$5
+  local dry_run=$6
 
   local cwd=$(pwd)
   local url=''
@@ -215,7 +149,7 @@ _bpkg_install_from_remote () {
 
   ## clean up extra slashes in uri
   uri=${uri/\/\///}
-  bpkg_info "Install $uri from remote $remote [$git_remote]"
+  bpkg_info "Uninstall $uri of remote $remote [$git_remote]"
 
   ## Ensure remote is reachable
   ## If a remote is totally down, this will be considered a fatal
@@ -268,7 +202,7 @@ _bpkg_install_from_remote () {
     name="$(
       echo -n "${json}" |
       bpkg-json -b |
-      grep -m 1 '"name"' |
+      grep 'name' |
       awk '{ $1=""; print $0 }' |
       tr -d '\"' |
       tr -d ' '
@@ -281,7 +215,8 @@ _bpkg_install_from_remote () {
 
     ## construct scripts array
     {
-      scripts=$(echo -n "${json}" | bpkg-json -b | grep '\["scripts' | awk '{ print $2 }' | tr -d '"')
+      scripts=$(echo -n "${json}" | bpkg-json -b | grep '\["scripts' | awk '{$1=""; print $0 }' | tr -d '"')
+      OLDIFS="${IFS}"
 
       ## multilines to array
       new_scripts=()
@@ -295,7 +230,8 @@ _bpkg_install_from_remote () {
 
     ## construct files array
     {
-      files=$(echo -n "${json}" | bpkg-json -b | grep '\["files' | awk '{ print $2 }' | tr -d '"')
+      files=$(echo -n "${json}" | bpkg-json -b | grep '\["files' | awk '{$1=""; print $0 }' | tr -d '"')
+      OLDIFS="${IFS}"
 
       ## multilines to array
       new_files=()
@@ -320,15 +256,15 @@ _bpkg_install_from_remote () {
   ## build global in legacy mode if needed
   if (( 1 == needs_global )) && (( 0 == break_mode )); then
     if (( 1 == has_pkg_json )); then
-      ## install bin if needed
-      build="$(echo -n "${json}" | bpkg-json -b | grep '\["install"\]' | awk '{$1=""; print $0 }' | tr -d '\"')"
+      ## uninstall bin if needed
+      build="$(echo -n "${json}" | bpkg-json -b | grep '\["uninstall"\]' | awk '{$1=""; print $0 }' | tr -d '\"')"
       build="$(echo -n "${build}" | sed -e 's/^ *//' -e 's/ *$//')"
     fi
 
     if [[ -z "${build}" ]]; then
       bpkg_warn "Missing build script"
-      bpkg_warn "Trying \`make install\`..."
-      build="make install"
+      bpkg_warn "Trying \`make uninstall\`..."
+      build="make uninstall"
     fi
 
     { (
@@ -342,18 +278,9 @@ _bpkg_install_from_remote () {
       (
         ## move into directory
         cd "${name}-${version}" &&
-        git checkout ${version} &&
-        ## wrap
-        for script in $scripts; do (
-            local script="$(echo $script | xargs basename )"
-
-            if [[ "${script}" ]]; then
-              cp -f "$(pwd)/${script}" "$(pwd)/${script}.orig"
-              _wrap_script "$(pwd)/${script}.orig" "$(pwd)/${script}" "${break_mode}"
-            fi
-        ) done &&
+        git checkout ${version} &&        
         ## build
-        bpkg_info "Performing install: \`${build}'" &&
+        bpkg_info "Performing uninstall: \`${build}'" &&
         eval "${build}"
       ) &&
       ## clean up
@@ -377,60 +304,39 @@ _bpkg_install_from_remote () {
 
   ## perform local install otherwise
   if (( 0 == needs_global )) || (( 1 == break_mode )); then
-    ## copy package.json over    
-    bpkg_save_remote_file "${url}/package.json" "${install_sharedir}/package.json" "${auth_param}"
-
-    ## make 'deps/bin' directory if possible
-    mkdir -p "${install_bindir}"
-
-    ## make 'deps/share' directory if possible
-    mkdir -p "${install_sharedir}"    
-
-    # install package dependencies
-    if (( 1 == break_mode )); then
-      (cd "${install_sharedir}" && bpkg getdeps -b)
-    else
-      (cd "${install_sharedir}" && bpkg getdeps)
-    fi
-
-    ## grab each script and place in deps directory    
+    ## remove scripts in bin dir
     for script in $scripts; do
       (
         local script="$(echo $script | xargs basename )"
 
         if [[ "${script}" ]];then          
-          bpkg_save_remote_file "${url}/${script}" "${install_sharedir}/${script}" "${auth_param}"
           local scriptname="${script%.*}"
-          bpkg_debug "${scriptname} to PATH" "${install_bindir}/${scriptname}"
-          cp -f "${install_sharedir}/${script}" "${install_sharedir}/${script}.orig"
-          _wrap_script "${install_sharedir}/${script}.orig" "${install_sharedir}/${script}" "${break_mode}"
-          ln -sf "${install_sharedir}/${script}" "${install_bindir}/${scriptname}"          
-          chmod u+x "${install_bindir}/${scriptname}"
+
+          if (( 0 == dry_run )); then
+            rm -rfv "${install_bindir}/${scriptname}"
+          else
+            echo "'${install_bindir}/${scriptname}' will be removed"
+          fi          
         fi
       )
     done
 
-    if [[ "${#files[@]}" -gt '0' ]]; then
-      ## grab each file and place in correct directory
-      for file in "${files[@]}"; do
-      (
-          if [[ "${file}" ]];then
-            local filedir="$(dirname "${install_sharedir}/${file}")"
-            local filename="$(basename "${file}")"            
-            bpkg_save_remote_file "${url}/${file}" "${filedir}/${filename}" "${auth_param}"
-          fi
-        )
-      done
+    ## remove share content
+    if (( 0 == dry_run )); then
+      rm -rfv "${install_sharedir}"
+    else
+      find "${install_sharedir}" -mindepth 1 | bpkg_esed "s|^\./|${install_sharedir}/|" | xargs -I {} echo "'{}' will be removed"
     fi
   fi  
   return 0
 }
 
 ## Install a bash package
-bpkg_install () {
+bpkg_uninstall () {
   local pkg=''
   local needs_global=0 
   local break_mode=0
+  local dry_run=0
 
   for opt in "${@}"; do
     if [[ '-' = "${opt:0:1}" ]]; then
@@ -455,6 +361,11 @@ bpkg_install () {
       -b|--break-mode)
         shift
         break_mode=1
+        ;;
+
+      -d|--dry-run)
+        shift
+        dry_run=1
         ;;
 
       *)
@@ -516,7 +427,7 @@ bpkg_install () {
   local i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
-    _bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode
+    _bpkg_uninstall_of_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode $dry_run
     if [[ "$?" == '0' ]]; then
       return 0
     elif [[ "$?" == '2' ]]; then
@@ -531,9 +442,9 @@ bpkg_install () {
 
 ## Use as lib or perform install
 if [[ ${BASH_SOURCE[0]} != $0 ]]; then
-  export -f bpkg_install
+  export -f bpkg_uninstall
 elif validate_parameters; then
-  bpkg_install "${@}"
+  bpkg_uninstall "${@}"
   exit $?
 else
   #param validation failed

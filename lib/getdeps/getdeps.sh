@@ -32,7 +32,7 @@ bpkg_getdeps () {
   esac
 
   if (( 1 == break_mode )); then
-    warn "Get dependencies in break mode"
+    bpkg_warn "Get dependencies in break mode"
   fi
 
   ## ensure there is a package to read

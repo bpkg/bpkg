@@ -37,7 +37,7 @@ _message () {
 }
 
 ## output error
-error () {
+bpkg_error () {
   if (( LOG_LEVEL <= 4 )); then
     {
       _message 'red' 'error' "${@}"
@@ -46,7 +46,7 @@ error () {
 }
 
 ## output warning
-warn () {
+bpkg_warn () {
   if (( LOG_LEVEL <= 3 )); then
     {
       _message 'yellow' 'warn' "${@}"
@@ -55,7 +55,7 @@ warn () {
 }
 
 ## output info
-info () {
+bpkg_info () {
   local title='info'
   if (( "${#}" > 1 )); then
     title="${1}"
@@ -68,7 +68,7 @@ info () {
 }
 
 ## output debug
-debug () {
+bpkg_debug () {
   local title='info'
   if (( "${#}" > 1 )); then
     title="${1}"
@@ -80,7 +80,7 @@ debug () {
   fi
 }
 
-export -f debug
-export -f info
-export -f warn
-export -f error
+export -f bpkg_debug
+export -f bpkg_info
+export -f bpkg_warn
+export -f bpkg_error
