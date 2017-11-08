@@ -265,8 +265,8 @@ function __load () {
 
   script_name="\$(basename \${script_file})"
 
-  if [[ -d "\${script_base}/../share/\${__script_name}" ]]; then
-      script_dir="\$(cd ${script_dir}/../share/\${__script_name}; pwd)"
+  if [[ -d "\${script_dir}/../share/\${script_name}" ]]; then
+      script_dir="\$(cd "\${script_dir}/../share/\${script_name}"; pwd)"
   fi
 
   source "\${script_dir}/\${module_file}"
@@ -278,6 +278,8 @@ EOF
 
   cp -f "${tmp_script_file}" "${dest}"
   chmod +x "${dest}"
+
+  rm -f "${tmp_script_file}"
 }
 
 ## Install a bash package
@@ -565,21 +567,29 @@ bpkg_install_from_remote () {
     { (
       ## go to tmp dir
       cd "$( [[ ! -z "${TMPDIR}" ]] && echo "${TMPDIR}" || echo /tmp)" &&
-        ## prune existing
+       ## prune existing
       rm -rf "${name}-${version}" &&
-        ## shallow clone
-      info "Cloning ${repo_url} to ${name}-${version}"
+      ## shallow clone
+      info "Cloning ${repo_url} to ${name}-${version}" &&
       git clone "${repo_url}" "${name}-${version}" &&
-        (
-      ## move into directory
-      cd "${name}-${version}" &&
-      git checkout ${version} &&
+      (
+        ## move into directory
+        cd "${name}-${version}" &&
+        git checkout ${version} &&
+        ## wrap
+        for script in $scripts; do (
+            local script="$(echo $script | xargs basename )"
+
+            if [[ "${script}" ]];then\
+              cp -f "$(pwd)/${script}" "$(pwd)/${script}.orig"
+              wrap_script "$(pwd)/${script}.orig" "$(pwd)/${script}"
+            fi
+        ) done &&
         ## build
-      info "Performing install: \`${build}'"
-      build_output=$(eval "${build}")
-      echo "${build_output}"
+        info "Performing install: \`${build}'" &&
+        eval "${build}"
       ) &&
-        ## clean up
+      ## clean up
       rm -rf "${name}-${version}"
     ) }
   ## perform local install otherwise
