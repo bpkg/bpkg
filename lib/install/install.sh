@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 
 # Include config rc file if found
 CONFIG_FILE="$HOME/.bpkgrc"
@@ -178,7 +178,7 @@ read_package_json () {
   fi
 }
 
-is_coding_net () {
+_is_coding_net () {
   local remote="$1"
 
   if [[ "$(echo ${remote} | grep 'coding.net')" ]]; then
@@ -188,7 +188,7 @@ is_coding_net () {
   fi
 }
 
-is_github_raw () {
+_is_github_raw () {
   local remote="$1"
 
   if [[ "$(echo ${remote} | grep raw.githubusercontent.com)" ]]; then
@@ -198,31 +198,40 @@ is_github_raw () {
   fi
 }
 
-is_full_url () {
-  local url=$1
-  if [[ "$(echo \"${url}\" | egrep '[^/]+:\/\/.*')" != "" ]]; then
+_is_local_path () {
+  local url="$1"
+  if [[ "$(echo \"${url}\" | grep 'file://.*')" != "" ]] || [[ -e "${url}" ]]; then
     return 0
   else
     return 1
   fi
 }
 
-parse_proto () {
-  local url="$1"
-  echo "${url}" | _esed "s|([^\/""]+):\/\/([^\/]+)(\/.*)|\1|"
+_is_full_url () {
+  local url=$1
+  if [[ "$(echo \"${url}\" | egrep '[^/]+:\/\/\/?.*')" != "" ]]; then
+    return 0
+  else
+    return 1
+  fi
 }
 
-parse_host () {
+_parse_proto () {
   local url="$1"
-  echo "${url}" | _esed "s|([^\/]+):\/\/([^\/]+)(\/.*)|\2|"
+  echo "${url}" | _esed "s|([^\/""]+):\/\/\/?([^\/]+)(\/.*)|\1|"
 }
 
-parse_path () {
+_parse_host () {
   local url="$1"
-  echo "${url}" | _esed "s|([^\/]+):\/\/([^\/]+)(\/.*)|\3|"
+  echo "${url}" | _esed "s|([^\/]+):\/\/\/?([^\/]+)(\/.*)|\2|"
 }
 
-wrap_script () {
+_parse_path () {
+  local url="$1"
+  echo "${url}" | _esed "s|([^\/]+):\/\/\/?([^\/]+)(\/.*)|\3|"
+}
+
+_wrap_script () {
   local src dest src_content src_shabang tmp_script_file dest_name
   
   src="$1"
@@ -325,13 +334,25 @@ bpkg_install () {
 
   echo
 
-  if is_full_url "${pkg}"; then
+  if _is_local_path "${pkg}"; then
+    pkg="file://$(cd ${pkg}; pwd)"
+  fi
+
+  if _is_full_url "${pkg}"; then
     debug "parse" "${pkg}"
 
-    local bpkg_remote_proto="$(parse_proto "${pkg}")"
-    local bpkg_remote_host="$(parse_host "${pkg}")"
-    local bpkg_remote_path=$(parse_path "${pkg}")
-    local bpkg_remote_uri="${bpkg_remote_proto}://${bpkg_remote_host}"
+    local bpkg_remote_proto bpkg_remote_host bpkg_remote_path bpkg_remote_uri
+    
+    bpkg_remote_proto="$(_parse_proto "${pkg}")"
+
+    if _is_local_path "${pkg}"; then
+      bpkg_remote_host="/$(_parse_host "${pkg}")"      
+    else      
+      bpkg_remote_host="$(_parse_host "${pkg}")"
+    fi
+
+    bpkg_remote_path=$(_parse_path "${pkg}") 
+    bpkg_remote_uri="${bpkg_remote_proto}://${bpkg_remote_host}" 
     
     debug "proto" "${bpkg_remote_proto}"
     debug "host" "${bpkg_remote_host}"
@@ -341,13 +362,13 @@ bpkg_install () {
     BPKG_GIT_REMOTES=("${bpkg_remote_uri}" "${BPKG_GIT_REMOTES[@]}")
     pkg="$(echo "${bpkg_remote_path}" | _esed "s|^\/(.*)|\1|")"
 
-    if is_coding_net "${bpkg_remote_host}"; then
+    if _is_coding_net "${bpkg_remote_host}"; then
       # update /u/{username}/p/{project} to {username}/{project}
       info "reset pkg for coding.net"
-      pkg="$(echo ${pkg} | _esed "s|\/?u\/([^\/]+)\/p\/(.+)|\1/\2|")"      
+      pkg="$(echo "${pkg}" | _esed "s|\/?u\/([^\/]+)\/p\/(.+)|\1/\2|")"      
     fi
 
-    debug "pkg" "${pkg}"
+    debug "pkg" "${pkg}"  
   fi
 
   ## Check each remote in order
@@ -393,14 +414,10 @@ bpkg_install_from_remote () {
   declare -a local remote_parts=()
   declare -a local scripts=()
   declare -a local files=()
+  local package_json_url makefile_url
   
   ## get version if available
-  {
-    OLDIFS="${IFS}"
-    IFS="@"
-    pkg_parts=(${pkg})
-    IFS="${OLDIFS}"
-  }
+  pkg_parts=("${pkg//@/ }")
 
   if [[ ${#pkg_parts[@]} -eq 1 ]]; then
     version='master'
@@ -414,25 +431,19 @@ bpkg_install_from_remote () {
   fi
 
   ## split by user name and repo
-  {
-    OLDIFS="${IFS}"
-    IFS='/'
-    pkg_parts=(${pkg})
-    IFS="${OLDIFS}"
-  }
+  pkg_parts=($(echo "${pkg}" | sed 's|/| |g'))
 
-  if [[ ${#pkg_parts[@]} -eq 1 ]]; then
-    user="${BPKG_USER}"
-    name="${pkg_parts[0]}"
-  elif [[ ${#pkg_parts[@]} -eq 2 ]]; then
-    user="${pkg_parts[0]}"
-    name="${pkg_parts[1]}"
-  elif [[ ${#pkg_parts[@]} -eq 3 ]]; then
-    user="${pkg_parts[0]}/${pkg_parts[1]}"
-    name="${pkg_parts[2]}"
-  else
+  if [[ ${#pkg_parts[@]} -eq 0 ]]; then
     error 'Unable to determine package name'
     return 1
+  elif [[ ${#pkg_parts[@]} -eq 1 ]]; then
+    user="${BPKG_USER}"
+    name="${pkg_parts[0]}"
+  else    
+    name="${pkg_parts[-1]}"
+    unset pkg_parts[${#pkg_parts[@]}-1]
+    pkg_parts=( "${pkg_parts[@]}" )
+    user="$(IFS='/' ; echo "${pkg_parts[*]}")"
   fi
 
   ## clean up name of weird trailing
@@ -456,10 +467,12 @@ bpkg_install_from_remote () {
     if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${token}* ]]; then
       git_remote=${git_remote/https:\/\//https:\/\/$token:x-oauth-basic@}
     fi
-  elif is_coding_net "${remote}"; then
+  elif _is_coding_net "${remote}"; then
     uri="/u/${user}/p/${name}/git/raw/${version}"
-  elif is_github_raw "${remote}"; then
+  elif _is_github_raw "${remote}"; then
     uri="/${user}/${name}/${version}"
+  elif _is_local_path "${remote}"; then
+    uri="/${user}/${name}"
   else 
     uri="/${user}/${name}/raw/${version}"    
   fi
@@ -482,19 +495,29 @@ bpkg_install_from_remote () {
   ## build url
   url="${remote}${uri}"
   
-  if is_coding_net "${remote}"; then
+  if _is_coding_net "${remote}"; then
     repo_url="${git_remote}/u/${user}/p/${name}/git"
+  elif _is_local_path "${remote}"; then
+    repo_url="${git_remote}/${user}/${name}"
   else
     repo_url="${git_remote}/${user}/${name}.git"
   fi
   
   ## determine if 'package.json' exists at url
+  package_json_url="${url}/package.json?$(date +%s)"
+  makefile_url="${url}/Makefile?$(date +%s)"
+
+  if _is_local_path "${url}"; then
+    package_json_url="${url}/package.json"
+    makefile_url="${url}/Makefile"
+  fi
+
   {
-    if ! url_exists "${url}/package.json?$(date +%s)" "${auth_param}"; then
+    if ! url_exists "${package_json_url}" "${auth_param}"; then
       warn 'package.json doesn`t exist'
       has_pkg_json=0
       # check to see if there's a Makefile. If not, this is not a valid package
-      if ! url_exists "${url}/Makefile?$(date +%s)" "${auth_param}"; then
+      if ! url_exists "${makefile_url}" "${auth_param}"; then
         warn "Makefile not found, skipping remote: $url"
         return 1
       fi
@@ -502,7 +525,7 @@ bpkg_install_from_remote () {
   }
 
   ## read package.json
-  json=$(read_package_json "${url}/package.json?$(date +%s)" "${auth_param}")
+  json=$(read_package_json "${package_json_url}" "${auth_param}")
 
   if (( 1 == has_pkg_json )); then
     ## get package name from 'package.json'
@@ -516,7 +539,11 @@ bpkg_install_from_remote () {
     )"
 
     ## check if forced global
+<<<<<<< HEAD
     if [[ "$(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" == 'true' ]]; then
+=======
+    if [[ ! -z "$(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" ]]; then
+>>>>>>> Add the ability to install from local repo
       needs_global=1
     fi
 
@@ -580,9 +607,9 @@ bpkg_install_from_remote () {
         for script in $scripts; do (
             local script="$(echo $script | xargs basename )"
 
-            if [[ "${script}" ]];then\
+            if [[ "${script}" ]]; then
               cp -f "$(pwd)/${script}" "$(pwd)/${script}.orig"
-              wrap_script "$(pwd)/${script}.orig" "$(pwd)/${script}"
+              _wrap_script "$(pwd)/${script}.orig" "$(pwd)/${script}"
             fi
         ) done &&
         ## build
@@ -618,7 +645,7 @@ bpkg_install_from_remote () {
           scriptname="${scriptname%.*}"
           info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
           cp -f "${cwd}/deps/${name}/${script}" "${cwd}/deps/${name}/${script}.orig"
-          wrap_script "${cwd}/deps/${name}/${script}.orig" "${cwd}/deps/${name}/${script}"
+          _wrap_script "${cwd}/deps/${name}/${script}.orig" "${cwd}/deps/${name}/${script}"
           ln -sf "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"          
           chmod u+x "${cwd}/deps/bin/${scriptname}"
         fi
