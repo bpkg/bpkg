@@ -1,5 +1,12 @@
 #!/usr/local/bin/bash
 
+if ! type -f bpkg-logging &>/dev/null; then
+  echo "error: bpkg-logging not found, aborting"
+  exit 1
+else
+  source $(which bpkg-logging)
+fi
+
 # Include config rc file if found
 CONFIG_FILE="$HOME/.bpkgrc"
 [[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
@@ -10,14 +17,6 @@ if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
   BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
 fi
 BPKG_USER="${BPKG_USER:-bpkg}"
-
-## log levels
-# 0 OFF
-# 1 DEBUG
-# 2 INFO 
-# 3 WARN
-# 4 ERROR
-LOG_LEVEL="${LOG_LEVEL:-2}"
 
 function _is_osx(){
   if [[ "$(uname -a | grep "Darwin")" != "" ]] ; then
@@ -52,79 +51,6 @@ usage () {
   echo '   or: bpkg-install [-g|--global] <package>'
   echo '   or: bpkg-install [-g|--global] <user>/<package>'
 }
-
-## format and output message
-message () {
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term color "${1}"
-  fi
-
-  shift
-  printf "    ${1}"
-  shift
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-  fi
-
-  printf ': '
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-    bpkg-term bright
-  fi
-
-  printf "%s\n" "${@}"
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-  fi
-}
-
-## output error
-error () {
-  if (( LOG_LEVEL <= 4 )); then
-    {
-      message 'red' 'error' "${@}"
-    } >&2
-  fi
-}
-
-## output warning
-warn () {
-  if (( LOG_LEVEL <= 3 )); then
-    {
-      message 'yellow' 'warn' "${@}"
-    } >&2
-  fi
-}
-
-## output info
-info () {
-  local title='info'
-  if (( "${#}" > 1 )); then
-    title="${1}"
-    shift
-  fi
-
-  if (( LOG_LEVEL <= 2 )); then
-    message 'cyan' "${title}" "${@}"
-  fi  
-}
-
-## output debug
-debug () {
-  local title='info'
-  if (( "${#}" > 1 )); then
-    title="${1}"
-    shift
-  fi
-
-  if (( LOG_LEVEL <= 1 )); then
-    message 'green' "${title}" "${@}"
-  fi
-}
-
 
 save_remote_file () {
   local auth_param path url

@@ -63,7 +63,7 @@ BIN="bpkg"
 [ -z "$PREFIX" ] && PREFIX="/usr/local"
 
 # All 'bpkg' supported commands
-CMDS="json install package term suggest init utils update list show getdeps"
+CMDS="json install package term suggest init utils update list show getdeps logging"
 
 make_install () {
   make_uninstall

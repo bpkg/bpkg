@@ -1,82 +1,17 @@
 #!/bin/bash
 
+if ! type -f bpkg-logging &>/dev/null; then
+  echo "error: bpkg-logging not found, aborting"
+  exit 1
+else
+  source $(which bpkg-logging)
+fi
+
 ## output usage
 usage () {
   echo "Installs dependencies for a package."
   echo "usage: bpkg-getdeps [-h|--help]"
   echo "   or: bpkg-getdeps"
-}
-
-## format and output message
-message () {
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term color "${1}"
-  fi
-
-  shift
-  printf "    ${1}"
-  shift
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-  fi
-
-  printf ': '
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-    bpkg-term bright
-  fi
-
-  printf "%s\n" "${@}"
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-  fi
-}
-
-## output error
-error () {
-  if (( LOG_LEVEL <= 4 )); then
-    {
-      message 'red' 'error' "${@}"
-    } >&2
-  fi
-}
-
-## output warning
-warn () {
-  if (( LOG_LEVEL <= 3 )); then
-    {
-      message 'yellow' 'warn' "${@}"
-    } >&2
-  fi
-}
-
-## output info
-info () {
-  local title='info'
-  if (( "${#}" > 1 )); then
-    title="${1}"
-    shift
-  fi
-
-  if (( LOG_LEVEL <= 2 )); then
-    message 'cyan' "${title}" "${@}"
-  fi  
-}
-
-## output debug
-debug () {
-  local title='info'
-  if (( "${#}" > 1 )); then
-    title="${1}"
-    shift
-  fi
-
-  if (( LOG_LEVEL <= 1 )); then
-    message 'green' "${title}" "${@}"
-  fi
 }
 
 ## Read a package property
