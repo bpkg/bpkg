@@ -609,7 +609,7 @@ bpkg_install_from_remote () {
           info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
           cp -f "${cwd}/deps/${name}/${script}" "${cwd}/deps/${name}/${script}.orig"
           wrap_script "${cwd}/deps/${name}/${script}.orig" "${cwd}/deps/${name}/${script}"
-          ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"          
+          ln -sf "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"          
           chmod u+x "${cwd}/deps/bin/${scriptname}"
         fi
       )
