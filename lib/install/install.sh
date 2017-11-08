@@ -11,6 +11,14 @@ if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
 fi
 BPKG_USER="${BPKG_USER:-bpkg}"
 
+## log levels
+# 0 OFF
+# 1 DEBUG
+# 2 INFO 
+# 3 WARN
+# 4 ERROR
+LOG_LEVEL="${LOG_LEVEL:-2}"
+
 function _is_osx(){
   if [[ "$(uname -a | grep "Darwin")" != "" ]] ; then
     return 0
@@ -75,16 +83,20 @@ message () {
 
 ## output error
 error () {
-  {
-    message 'red' 'error' "${@}"
-  } >&2
+  if (( LOG_LEVEL <= 4 )); then
+    {
+      message 'red' 'error' "${@}"
+    } >&2
+  fi
 }
 
 ## output warning
 warn () {
-  {
-    message 'yellow' 'warn' "${@}"
-  } >&2
+  if (( LOG_LEVEL <= 3 )); then
+    {
+      message 'yellow' 'warn' "${@}"
+    } >&2
+  fi
 }
 
 ## output info
@@ -94,7 +106,10 @@ info () {
     title="${1}"
     shift
   fi
-  message 'cyan' "${title}" "${@}"
+
+  if (( LOG_LEVEL <= 2 )); then
+    message 'cyan' "${title}" "${@}"
+  fi  
 }
 
 ## output debug
@@ -104,7 +119,10 @@ debug () {
     title="${1}"
     shift
   fi
-  message 'green' "${title}" "${@}"
+
+  if (( LOG_LEVEL <= 1 )); then
+    message 'green' "${title}" "${@}"
+  fi
 }
 
 
@@ -232,18 +250,25 @@ _parse_path () {
 }
 
 _wrap_script () {
-  local src dest src_content src_shabang tmp_script_file dest_name
+  local src dest src_content src_shabang tmp_script_file dest_name break_mode pkg_prefix
   
   src="$1"
   dest="$2"
+  break_mode="$3"
   src_content=$(cat ${src})
-  dest_name=$(basename ${dest})
+  dest_name=$(basename ${dest})  
 
   if [[ "$(cat ${src} | head -n 1 | grep '#!')" ]]; then
     src_shabang=$(cat ${src} | head -n 1)
     src_content=$(cat ${src} | tail -n +2)
   else
     src_shabang="#!/usr/local/bin/bash"
+  fi
+
+  if (( 1 == break_mode )); then
+    pkg_prefix="deps/share"
+  else
+    pkg_prefix="deps"
   fi
 
   readonly tmp_script_file=$(mktemp "/tmp/bpkg.wrapper.XXXXXXXXXX")
@@ -259,12 +284,12 @@ _wrap_script () {
 # Maintainer: Edison Guo <hydra1983@gmail.com>
 #########################################
 
-# Load module
+# Load package
 function __load () {
-  local module_file script_file script_dir script_name
+  local package_file script_file script_dir script_name
     
   script_file="\$1"
-  module_file="\$2"  
+  package_file="\$2"  
   
   if [[ -L \${script_file} ]] ; then
       script_dir=\$(cd \$(dirname \$(readlink -f \${script_file})); pwd)
@@ -278,7 +303,7 @@ function __load () {
       script_dir="\$(cd "\${script_dir}/../share/\${script_name}"; pwd)"
   fi
 
-  source "\${script_dir}/\${module_file}"
+  source "\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}"
 }
 #########################################
 EOF
@@ -294,7 +319,8 @@ EOF
 ## Install a bash package
 bpkg_install () {
   local pkg=''
-  local let needs_global=0
+  local needs_global=0 
+  local break_mode=0
 
   for opt in "${@}"; do
     if [[ '-' = "${opt:0:1}" ]]; then
@@ -314,6 +340,11 @@ bpkg_install () {
       -g|--global)
         shift
         needs_global=1
+        ;;
+
+      -b|--break-mode)
+        shift
+        break_mode=1
         ;;
 
       *)
@@ -364,7 +395,7 @@ bpkg_install () {
 
     if _is_coding_net "${bpkg_remote_host}"; then
       # update /u/{username}/p/{project} to {username}/{project}
-      info "reset pkg for coding.net"
+      debug "reset pkg for coding.net"
       pkg="$(echo "${pkg}" | _esed "s|\/?u\/([^\/]+)\/p\/(.+)|\1/\2|")"      
     fi
 
@@ -372,10 +403,10 @@ bpkg_install () {
   fi
 
   ## Check each remote in order
-  local let i=0
+  local i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
-    bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global
+    bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode
     if [[ "$?" == '0' ]]; then
       return 0
     elif [[ "$?" == '2' ]]; then
@@ -397,7 +428,8 @@ bpkg_install_from_remote () {
   local pkg=$1
   local remote=$2
   local git_remote=$3
-  local let needs_global=$4
+  local needs_global=$4
+  local break_mode=$5
 
   local cwd=$(pwd)
   local url=''
@@ -409,15 +441,17 @@ bpkg_install_from_remote () {
   local name=''
   local version=''
   local auth_param=''
-  local let has_pkg_json=1
+  local has_pkg_json=1
   declare -a local pkg_parts=()
   declare -a local remote_parts=()
   declare -a local scripts=()
   declare -a local files=()
-  local package_json_url makefile_url
+  local package_json_url makefile_url 
+  local install_basedir install_bindir install_sharedir
   
   ## get version if available
-  pkg_parts=("${pkg//@/ }")
+  pkg_parts=(${pkg/@/ })
+  debug "pkg_parts" "${pkg_parts[@]}"
 
   if [[ ${#pkg_parts[@]} -eq 1 ]]; then
     version='master'
@@ -431,7 +465,8 @@ bpkg_install_from_remote () {
   fi
 
   ## split by user name and repo
-  pkg_parts=($(echo "${pkg}" | sed 's|/| |g'))
+  pkg_parts=(${pkg//\// })
+  debug "pkg_parts" "${pkg_parts[@]}"
 
   if [[ ${#pkg_parts[@]} -eq 0 ]]; then
     error 'Unable to determine package name'
@@ -445,6 +480,9 @@ bpkg_install_from_remote () {
     pkg_parts=( "${pkg_parts[@]}" )
     user="$(IFS='/' ; echo "${pkg_parts[*]}")"
   fi
+
+  debug "user" "${user}"
+  debug "name" "${name}"
 
   ## clean up name of weird trailing
   ## versions and slashes
@@ -539,11 +577,7 @@ bpkg_install_from_remote () {
     )"
 
     ## check if forced global
-<<<<<<< HEAD
-    if [[ "$(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" == 'true' ]]; then
-=======
     if [[ ! -z "$(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" ]]; then
->>>>>>> Add the ability to install from local repo
       needs_global=1
     fi
 
@@ -577,8 +611,16 @@ bpkg_install_from_remote () {
 
   fi
 
-  ## build global if needed
   if (( 1 == needs_global )); then
+    info "Install ${url} globally"
+  fi
+
+  if (( 1 == break_mode )); then
+    warn "Install ${url} in break mode"
+  fi
+
+  ## build global in legacy mode if needed
+  if (( 1 == needs_global )) && (( 0 == break_mode )); then
     if (( 1 == has_pkg_json )); then
       ## install bin if needed
       build="$(echo -n "${json}" | bpkg-json -b | grep '\["install"\]' | awk '{$1=""; print $0 }' | tr -d '\"')"
@@ -586,15 +628,15 @@ bpkg_install_from_remote () {
     fi
 
     if [[ -z "${build}" ]]; then
-      warn 'Missing build script'
-      warn 'Trying `make install`...'
-      build='make install'
+      warn "Missing build script"
+      warn "Trying \`make install\`..."
+      build="make install"
     fi
 
     { (
       ## go to tmp dir
       cd "$( [[ ! -z "${TMPDIR}" ]] && echo "${TMPDIR}" || echo /tmp)" &&
-       ## prune existing
+      ## prune existing
       rm -rf "${name}-${version}" &&
       ## shallow clone
       info "Cloning ${repo_url} to ${name}-${version}" &&
@@ -609,7 +651,7 @@ bpkg_install_from_remote () {
 
             if [[ "${script}" ]]; then
               cp -f "$(pwd)/${script}" "$(pwd)/${script}.orig"
-              _wrap_script "$(pwd)/${script}.orig" "$(pwd)/${script}"
+              _wrap_script "$(pwd)/${script}.orig" "$(pwd)/${script}" "${break_mode}"
             fi
         ) done &&
         ## build
@@ -618,21 +660,40 @@ bpkg_install_from_remote () {
       ) &&
       ## clean up
       rm -rf "${name}-${version}"
-    ) }
-  ## perform local install otherwise
-  else
-    ## copy package.json over    
-    save_remote_file "${url}/package.json" "${cwd}/deps/${name}/package.json" "${auth_param}"
+    ) }  
+  fi
 
-    ## make 'deps/' directory if possible
-    mkdir -p "${cwd}/deps/${name}"
+  if (( 1 == needs_global )) && (( 1 == break_mode )); then
+    install_basedir="/usr/local"
+    install_bindir="${install_basedir}/bin"
+    install_sharedir="${install_basedir}/share/${name}"
+  elif (( 0 == needs_global )) && (( 0 == break_mode )); then
+    install_basedir="${cwd}/deps"
+    install_bindir="${install_basedir}/bin"
+    install_sharedir="${install_basedir}/${name}"
+  elif (( 0 == needs_global )) && (( 1 == break_mode )); then
+    install_basedir="${cwd}/deps"
+    install_bindir="${install_basedir}/bin"
+    install_sharedir="${install_basedir}/share/${name}"
+  fi
+
+  ## perform local install otherwise
+  if (( 0 == needs_global )) || (( 1 == break_mode )); then
+    ## copy package.json over    
+    save_remote_file "${url}/package.json" "${install_sharedir}/package.json" "${auth_param}"
 
     ## make 'deps/bin' directory if possible
-    mkdir -p "${cwd}/deps/bin"
+    mkdir -p "${install_bindir}"
+
+    ## make 'deps/share' directory if possible
+    mkdir -p "${install_sharedir}"    
 
     # install package dependencies
-    info "Install dependencies for ${name}"
-    (cd "${cwd}/deps/${name}" && bpkg getdeps)
+    if (( 1 == break_mode )); then
+      (cd "${install_sharedir}" && bpkg getdeps -b)
+    else
+      (cd "${install_sharedir}" && bpkg getdeps)
+    fi
 
     ## grab each script and place in deps directory    
     for script in $scripts; do
@@ -640,14 +701,13 @@ bpkg_install_from_remote () {
         local script="$(echo $script | xargs basename )"
 
         if [[ "${script}" ]];then          
-          save_remote_file "${url}/${script}" "${cwd}/deps/${name}/${script}" "${auth_param}"
-
-          scriptname="${scriptname%.*}"
-          info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
-          cp -f "${cwd}/deps/${name}/${script}" "${cwd}/deps/${name}/${script}.orig"
-          _wrap_script "${cwd}/deps/${name}/${script}.orig" "${cwd}/deps/${name}/${script}"
-          ln -sf "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"          
-          chmod u+x "${cwd}/deps/bin/${scriptname}"
+          save_remote_file "${url}/${script}" "${install_sharedir}/${script}" "${auth_param}"
+          local scriptname="${script%.*}"
+          debug "${scriptname} to PATH" "${install_bindir}/${scriptname}"
+          cp -f "${install_sharedir}/${script}" "${install_sharedir}/${script}.orig"
+          _wrap_script "${install_sharedir}/${script}.orig" "${install_sharedir}/${script}" "${break_mode}"
+          ln -sf "${install_sharedir}/${script}" "${install_bindir}/${scriptname}"          
+          chmod u+x "${install_bindir}/${scriptname}"
         fi
       )
     done
@@ -657,14 +717,14 @@ bpkg_install_from_remote () {
       for file in "${files[@]}"; do
       (
           if [[ "${file}" ]];then
-            local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
+            local filedir="$(dirname "${install_sharedir}/${file}")"
             local filename="$(basename "${file}")"            
             save_remote_file "${url}/${file}" "${filedir}/${filename}" "${auth_param}"
           fi
         )
       done
     fi
-  fi
+  fi  
   return 0
 }
 
