@@ -173,7 +173,7 @@ _bpkg_install_from_remote () {
     user="${BPKG_USER}"
     name="${pkg_parts[0]}"
   else    
-    name="${pkg_parts[-1]}"
+    name="${pkg_parts[${#pkg_parts[@]}-1]}"
     unset pkg_parts[${#pkg_parts[@]}-1]
     pkg_parts=( "${pkg_parts[@]}" )
     user="$(IFS='/' ; echo "${pkg_parts[*]}")"
