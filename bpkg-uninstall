@@ -32,24 +32,6 @@ if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
 fi
 BPKG_USER="${BPKG_USER:-bpkg}"
 
-## check parameter consistency
-validate_parameters () {
-  if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
-    mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
-    fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
-    bpkg_error "$fmesg"
-    return 1
-  fi
-  return 0
-}
-
-## outut usage
-usage () {
-  echo 'usage: bpkg-install [-h|--help]'
-  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] [-d|--dry-run] <package>'
-  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] [-d|--dry-run] <user>/<package>'
-}
-
 ## try to install a package from a specific remote
 ## returns values:
 ##   0: success
@@ -62,6 +44,7 @@ _bpkg_uninstall_of_remote () {
   local needs_global=$4
   local break_mode=$5
   local dry_run=$6
+  local needs_quiet=$7
 
   local cwd=$(pwd)
   local url=''
@@ -313,7 +296,11 @@ _bpkg_uninstall_of_remote () {
           local scriptname="${script%.*}"
 
           if (( 0 == dry_run )); then
-            rm -rfv "${install_bindir}/${scriptname}"
+            if (( 0 == needs_quiet )); then
+              rm -rf "${install_bindir}/${scriptname}"
+            else
+              rm -rfv "${install_bindir}/${scriptname}"
+            fi            
           else
             echo "'${install_bindir}/${scriptname}' will be removed"
           fi          
@@ -323,11 +310,33 @@ _bpkg_uninstall_of_remote () {
 
     ## remove share content
     if (( 0 == dry_run )); then
-      rm -rfv "${install_sharedir}"
+      if (( 0 == needs_quiet )); then
+        rm -rf "${install_sharedir}"
+      else
+        rm -rfv "${install_sharedir}"
+      fi      
     else
       find "${install_sharedir}" -mindepth 1 | bpkg_esed "s|^\./|${install_sharedir}/|" | xargs -I {} echo "'{}' will be removed"
     fi
   fi  
+  return 0
+}
+
+## outut usage
+_usage () {
+  echo 'usage: bpkg-install [-h|--help]'
+  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] [-d|--dry-run] [-q|--quiet] <package>'
+  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] [-d|--dry-run] [-q|--quiet] <user>/<package>'
+}
+
+## check parameter consistency
+_validate_parameters () {
+  if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
+    mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
+    fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
+    bpkg_error "$fmesg"
+    return 1
+  fi
   return 0
 }
 
@@ -337,6 +346,7 @@ bpkg_uninstall () {
   local needs_global=0 
   local break_mode=0
   local dry_run=0
+  local needs_quiet=0
 
   for opt in "${@}"; do
     if [[ '-' = "${opt:0:1}" ]]; then
@@ -349,7 +359,7 @@ bpkg_uninstall () {
   for opt in "${@}"; do
     case "${opt}" in
       -h|--help)
-        usage
+        _usage
         return 0
         ;;
 
@@ -368,10 +378,15 @@ bpkg_uninstall () {
         dry_run=1
         ;;
 
+      -q|--quiet)
+        shift
+        needs_quiet=1
+        ;;
+
       *)
         if [[ '-' = "${opt:0:1}" ]]; then
           echo 2>&1 "error: Unknown argument \`${1}'"
-          usage
+          _usage
           return 1
         fi
         ;;
@@ -380,7 +395,7 @@ bpkg_uninstall () {
 
   ## ensure there is a package to install
   if [[ -z "${pkg}" ]]; then
-    usage
+    _usage
     return 1
   fi
 
@@ -427,7 +442,7 @@ bpkg_uninstall () {
   local i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
-    _bpkg_uninstall_of_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode $dry_run
+    _bpkg_uninstall_of_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode $dry_run $needs_quiet
     if [[ "$?" == '0' ]]; then
       return 0
     elif [[ "$?" == '2' ]]; then
@@ -443,7 +458,7 @@ bpkg_uninstall () {
 ## Use as lib or perform install
 if [[ ${BASH_SOURCE[0]} != $0 ]]; then
   export -f bpkg_uninstall
-elif validate_parameters; then
+elif _validate_parameters; then
   bpkg_uninstall "${@}"
   exit $?
 else

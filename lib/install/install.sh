@@ -32,24 +32,6 @@ if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
 fi
 BPKG_USER="${BPKG_USER:-bpkg}"
 
-## check parameter consistency
-validate_parameters () {
-  if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
-    mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
-    fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
-    bpkg_error "$fmesg"
-    return 1
-  fi
-  return 0
-}
-
-## outut usage
-usage () {
-  echo 'usage: bpkg-install [-h|--help]'
-  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] <package>'
-  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] <user>/<package>'
-}
-
 _wrap_script () {
   local src dest src_content src_shabang tmp_script_file dest_name break_mode pkg_prefix
   
@@ -128,6 +110,7 @@ _bpkg_install_from_remote () {
   local git_remote=$3
   local needs_global=$4
   local break_mode=$5
+  local needs_deps=$6
 
   local cwd=$(pwd)
   local url=''
@@ -387,10 +370,12 @@ _bpkg_install_from_remote () {
     mkdir -p "${install_sharedir}"    
 
     # install package dependencies
-    if (( 1 == break_mode )); then
-      (cd "${install_sharedir}" && bpkg getdeps -b)
-    else
-      (cd "${install_sharedir}" && bpkg getdeps)
+    if (( 1 = needs_deps )); then
+      if (( 1 == break_mode )); then
+        (cd "${install_sharedir}" && bpkg getdeps -b)
+      else
+        (cd "${install_sharedir}" && bpkg getdeps)
+      fi
     fi
 
     ## grab each script and place in deps directory    
@@ -426,11 +411,30 @@ _bpkg_install_from_remote () {
   return 0
 }
 
+## outut usage
+_usage () {
+  echo 'usage: bpkg-install [-h|--help]'
+  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] [-n|--no-deps] <package>'
+  echo '   or: bpkg-install [-g|--global] [-b|--break-mode] [-n|--no-deps] <user>/<package>'
+}
+
+## check parameter consistency
+_validate_parameters () {
+  if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
+    mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
+    fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
+    bpkg_error "$fmesg"
+    return 1
+  fi
+  return 0
+}
+
 ## Install a bash package
 bpkg_install () {
   local pkg=''
   local needs_global=0 
   local break_mode=0
+  local needs_deps=1
 
   for opt in "${@}"; do
     if [[ '-' = "${opt:0:1}" ]]; then
@@ -443,7 +447,7 @@ bpkg_install () {
   for opt in "${@}"; do
     case "${opt}" in
       -h|--help)
-        usage
+        _usage
         return 0
         ;;
 
@@ -456,11 +460,15 @@ bpkg_install () {
         shift
         break_mode=1
         ;;
-
+      
+      -n|--no-deps)
+        shift
+        needs_deps=0
+        ;;
       *)
         if [[ '-' = "${opt:0:1}" ]]; then
           echo 2>&1 "error: Unknown argument \`${1}'"
-          usage
+          _usage
           return 1
         fi
         ;;
@@ -469,7 +477,7 @@ bpkg_install () {
 
   ## ensure there is a package to install
   if [[ -z "${pkg}" ]]; then
-    usage
+    _usage
     return 1
   fi
 
@@ -516,7 +524,7 @@ bpkg_install () {
   local i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
-    _bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode
+    _bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode $needs_deps
     if [[ "$?" == '0' ]]; then
       return 0
     elif [[ "$?" == '2' ]]; then
@@ -532,7 +540,7 @@ bpkg_install () {
 ## Use as lib or perform install
 if [[ ${BASH_SOURCE[0]} != $0 ]]; then
   export -f bpkg_install
-elif validate_parameters; then
+elif _validate_parameters; then
   bpkg_install "${@}"
   exit $?
 else
