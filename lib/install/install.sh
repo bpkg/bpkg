@@ -370,7 +370,7 @@ _bpkg_install_from_remote () {
     mkdir -p "${install_sharedir}"
 
     # install package dependencies
-    if (( 1 = needs_deps )); then
+    if (( 1 == needs_deps )); then
       if (( 1 == break_mode )); then
         (cd "${install_sharedir}" && bpkg getdeps -b)
       else
