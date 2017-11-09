@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 
 if ! type -f bpkg-logging &>/dev/null; then
   echo "error: bpkg-logging not found, aborting"
