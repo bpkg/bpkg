@@ -34,12 +34,12 @@ BPKG_USER="${BPKG_USER:-bpkg}"
 
 _wrap_script () {
   local src dest src_content src_shabang tmp_script_file dest_name break_mode pkg_prefix
-  
+
   src="$1"
   dest="$2"
   break_mode="$3"
   src_content=$(cat ${src})
-  dest_name=$(basename ${dest})  
+  dest_name=$(basename ${dest})
 
   if [[ "$(cat ${src} | head -n 1 | grep '#!')" ]]; then
     src_shabang=$(cat ${src} | head -n 1)
@@ -70,10 +70,10 @@ _wrap_script () {
 # Load package
 function __load () {
   local package_file script_file script_dir script_name
-    
+
   script_file="\$1"
-  package_file="\$2"  
-  
+  package_file="\$2"
+
   if [[ -L \${script_file} ]] ; then
       script_dir=\$(cd \$(dirname \$(readlink -f \${script_file})); pwd)
   else
@@ -127,9 +127,9 @@ _bpkg_install_from_remote () {
   declare -a local remote_parts=()
   declare -a local scripts=()
   declare -a local files=()
-  local package_json_url makefile_url 
+  local package_json_url makefile_url
   local install_basedir install_bindir install_sharedir
-  
+
   ## get version if available
   pkg_parts=(${pkg/@/ })
   bpkg_debug "pkg_parts" "${pkg_parts[@]}"
@@ -155,7 +155,7 @@ _bpkg_install_from_remote () {
   elif [[ ${#pkg_parts[@]} -eq 1 ]]; then
     user="${BPKG_USER}"
     name="${pkg_parts[0]}"
-  else    
+  else
     name="${pkg_parts[${#pkg_parts[@]}-1]}"
     unset pkg_parts[${#pkg_parts[@]}-1]
     pkg_parts=( "${pkg_parts[@]}" )
@@ -192,8 +192,8 @@ _bpkg_install_from_remote () {
     uri="/${user}/${name}/${version}"
   elif bpkg_is_local_path "${remote}"; then
     uri="/${user}/${name}"
-  else 
-    uri="/${user}/${name}/raw/${version}"    
+  else
+    uri="/${user}/${name}/raw/${version}"
   fi
 
   ## clean up extra slashes in uri
@@ -213,7 +213,7 @@ _bpkg_install_from_remote () {
 
   ## build url
   url="${remote}${uri}"
-  
+
   if bpkg_is_coding_net "${remote}"; then
     repo_url="${git_remote}/u/${user}/p/${name}/git"
   elif bpkg_is_local_path "${remote}"; then
@@ -221,7 +221,7 @@ _bpkg_install_from_remote () {
   else
     repo_url="${git_remote}/${user}/${name}.git"
   fi
-  
+
   ## determine if 'package.json' exists at url
   package_json_url="${url}/package.json?$(date +%s)"
   makefile_url="${url}/Makefile?$(date +%s)"
@@ -341,7 +341,7 @@ _bpkg_install_from_remote () {
       ) &&
       ## clean up
       rm -rf "${name}-${version}"
-    ) }  
+    ) }
   fi
 
   if (( 1 == needs_global )) && (( 1 == break_mode )); then
@@ -360,14 +360,14 @@ _bpkg_install_from_remote () {
 
   ## perform local install otherwise
   if (( 0 == needs_global )) || (( 1 == break_mode )); then
-    ## copy package.json over    
+    ## copy package.json over
     bpkg_save_remote_file "${url}/package.json" "${install_sharedir}/package.json" "${auth_param}"
 
     ## make 'deps/bin' directory if possible
     mkdir -p "${install_bindir}"
 
     ## make 'deps/share' directory if possible
-    mkdir -p "${install_sharedir}"    
+    mkdir -p "${install_sharedir}"
 
     # install package dependencies
     if (( 1 = needs_deps )); then
@@ -378,36 +378,37 @@ _bpkg_install_from_remote () {
       fi
     fi
 
-    ## grab each script and place in deps directory    
+    ## grab each script and place in deps directory
     for script in $scripts; do
       (
         local script="$(echo $script | xargs basename )"
 
-        if [[ "${script}" ]];then          
+        if [[ "${script}" ]]; then
           bpkg_save_remote_file "${url}/${script}" "${install_sharedir}/${script}" "${auth_param}"
           local scriptname="${script%.*}"
           bpkg_debug "${scriptname} to PATH" "${install_bindir}/${scriptname}"
           cp -f "${install_sharedir}/${script}" "${install_sharedir}/${script}.orig"
           _wrap_script "${install_sharedir}/${script}.orig" "${install_sharedir}/${script}" "${break_mode}"
-          ln -sf "${install_sharedir}/${script}" "${install_bindir}/${scriptname}"          
+          ln -sf "${install_sharedir}/${script}" "${install_bindir}/${scriptname}"
           chmod u+x "${install_bindir}/${scriptname}"
         fi
       )
     done
 
     if [[ "${#files[@]}" -gt '0' ]]; then
-      ## grab each file and place in correct directory
-      for file in "${files[@]}"; do
-      (
-          if [[ "${file}" ]];then
+      ## grab each file
+      for (( i = 0; i < ${#files[@]} ; ++i )); do
+        (
+          local file="${files[$i]}"
+          if [[ "${file}" ]]; then
             local filedir="$(dirname "${install_sharedir}/${file}")"
-            local filename="$(basename "${file}")"            
+            local filename="$(basename "${file}")"
             bpkg_save_remote_file "${url}/${file}" "${filedir}/${filename}" "${auth_param}"
           fi
         )
       done
     fi
-  fi  
+  fi
   return 0
 }
 
@@ -432,7 +433,7 @@ _validate_parameters () {
 ## Install a bash package
 bpkg_install () {
   local pkg=''
-  local needs_global=0 
+  local needs_global=0
   local break_mode=0
   local needs_deps=1
 
@@ -460,7 +461,7 @@ bpkg_install () {
         shift
         break_mode=1
         ;;
-      
+
       -n|--no-deps)
         shift
         needs_deps=0
@@ -491,18 +492,18 @@ bpkg_install () {
     bpkg_debug "parse" "${pkg}"
 
     local bpkg_remote_proto bpkg_remote_host bpkg_remote_path bpkg_remote_uri
-    
+
     bpkg_remote_proto="$(bpkg_parse_proto "${pkg}")"
 
     if bpkg_is_local_path "${pkg}"; then
-      bpkg_remote_host="/$(bpkg_parse_host "${pkg}")"      
-    else      
+      bpkg_remote_host="/$(bpkg_parse_host "${pkg}")"
+    else
       bpkg_remote_host="$(bpkg_parse_host "${pkg}")"
     fi
 
-    bpkg_remote_path=$(bpkg_parse_path "${pkg}") 
-    bpkg_remote_uri="${bpkg_remote_proto}://${bpkg_remote_host}" 
-    
+    bpkg_remote_path=$(bpkg_parse_path "${pkg}")
+    bpkg_remote_uri="${bpkg_remote_proto}://${bpkg_remote_host}"
+
     bpkg_debug "proto" "${bpkg_remote_proto}"
     bpkg_debug "host" "${bpkg_remote_host}"
     bpkg_debug "path" "${bpkg_remote_path}"
@@ -514,10 +515,10 @@ bpkg_install () {
     if bpkg_is_coding_net "${bpkg_remote_host}"; then
       # update /u/{username}/p/{project} to {username}/{project}
       bpkg_debug "reset pkg for coding.net"
-      pkg="$(echo "${pkg}" | bpkg_esed "s|\/?u\/([^\/]+)\/p\/(.+)|\1/\2|")"      
+      pkg="$(echo "${pkg}" | bpkg_esed "s|\/?u\/([^\/]+)\/p\/(.+)|\1/\2|")"
     fi
 
-    bpkg_debug "pkg" "${pkg}"  
+    bpkg_debug "pkg" "${pkg}"
   fi
 
   ## Check each remote in order
