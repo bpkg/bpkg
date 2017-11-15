@@ -22,8 +22,11 @@ else
 fi
 
 # Include config rc file if found
-CONFIG_FILE="$HOME/.bpkgrc"
-[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
+USER_CONFIG_FILE="$HOME/.bpkgrc"
+[[ -f "$USER_CONFIG_FILE" ]] && source "$USER_CONFIG_FILE"
+
+DIR_CONFIG_FILE="$(pwd)/.bpkgrc"
+[[ -f "$DIR_CONFIG_FILE" ]] && source "$DIR_CONFIG_FILE"
 
 ## set defaults
 if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
