@@ -287,7 +287,7 @@ _bpkg_uninstall_of_remote () {
   if (( 0 == needs_global )) || (( 1 == break_mode )); then    
     if [[ "${#scripts[@]}" -gt '0' ]]; then
       ## remove scripts in bin dir
-      bpkg_debug "uninstall_scripts" "Uninstall scripts ${scripts[*]}"
+      bpkg_debug "uninstall_scripts" "Uninstall scripts '${scripts[*]}'"
 
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
         (
