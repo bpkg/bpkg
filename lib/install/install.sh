@@ -89,7 +89,13 @@ function __load () {
       script_dir="\$(cd "\${script_dir}/../share/\${script_name}"; pwd)"
   fi
 
-  source "\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}"
+  if [[ -s "\${script_dir}/\${package_file}" ]]; then
+    source "\${script_dir}/\${package_file}"
+  elif [[ -s "\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}" ]]; then
+    source "\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}"
+  else
+    echo "Cannot load invalid file '\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}' as it's missing or empty"
+  fi
 }
 #########################################
 EOF
