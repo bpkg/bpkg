@@ -389,11 +389,11 @@ _bpkg_install_from_remote () {
         (cd "${install_sharedir}" && bpkg getdeps)
       fi
     fi
-
-    ## grab each script and place in deps directory
-    bpkg_debug "install_scripts" "Install scripts ${scripts[*]}"
     
     if [[ "${#scripts[@]}" -gt '0' ]]; then
+      ## grab each script and place in deps directory  
+      bpkg_debug "install_scripts" "Install scripts ${scripts[*]}"
+
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
         (
           local script="${scripts[$i]}"

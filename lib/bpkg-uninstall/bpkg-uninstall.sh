@@ -29,13 +29,14 @@ bpkg_initrc
 ##   1: the package was not found on the remote
 ##   2: a fatal error occurred
 _bpkg_uninstall_of_remote () {
-  local pkg=$1
-  local remote=$2
-  local git_remote=$3
+  local pkg="$1"
+  local remote="$2"
+  local git_remote="$3"
   local needs_global=$4
   local break_mode=$5
   local dry_run=$6
   local needs_quiet=$7
+  local auth_info="$8"
 
   local cwd=$(pwd)
   local url=''
@@ -87,31 +88,16 @@ _bpkg_uninstall_of_remote () {
     user="$(IFS='/' ; echo "${pkg_parts[*]}")"
   fi
 
-  bpkg_debug "user" "${user}"
-  bpkg_debug "name" "${name}"
-
   ## clean up name of weird trailing
   ## versions and slashes
   name=${name/@*//}
   name=${name////}
 
-  ## check to see if remote is raw with oauth (GHE)
-  if [[ "${remote:0:10}" == "raw-oauth|" ]]; then
-    bpkg_info 'Using OAUTH basic with content requests'
-    OLDIFS="${IFS}"
-    IFS="'|'"
-    local remote_parts=($remote)
-    IFS="${OLDIFS}"
-    local token=${remote_parts[1]}
-    remote=${remote_parts[2]}
-    auth_param="$token:x-oauth-basic"
-    uri="/${user}/${name}/raw/${version}"
-    ## If git remote is a URL, and doesn't contain token information, we
-    ## inject it into the <user>@host field
-    if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${token}* ]]; then
-      git_remote=${git_remote/https:\/\//https:\/\/$token:x-oauth-basic@}
-    fi
-  elif bpkg_is_coding_net "${remote}"; then
+  bpkg_debug "user" "${user}"
+  bpkg_debug "name" "${name}"
+
+  ## Adapter to different kind of git hosting services
+  if bpkg_is_coding_net "${remote}"; then
     uri="/u/${user}/p/${name}/git/raw/${version}"
   elif bpkg_is_github_raw "${remote}"; then
     uri="/${user}/${name}/${version}"
@@ -119,6 +105,28 @@ _bpkg_uninstall_of_remote () {
     uri="/${user}/${name}"
   else
     uri="/${user}/${name}/raw/${version}"
+  fi
+
+  ## check to see if remote is raw with oauth (GHE) or access token
+  if [[ ! -z "${auth_info}" ]]; then
+    OLDIFS="${IFS}"
+    IFS="'|'"
+    local auth_info_parts=($auth_info)
+    IFS="${OLDIFS}"
+    local token=${auth_info_parts[1]}
+
+    if [[ "${auth_info:0:10}" == "raw-oauth|" ]]; then
+      bpkg_info 'Using OAUTH basic with content requests'
+      auth_param="-u \"$token:x-oauth-basic\""
+
+      ## If git remote is a URL, and doesn't contain token information, we
+      ## inject it into the <user>@host field
+      if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${token}* ]]; then
+        git_remote="${git_remote/https:\/\//https:\/\/$token:x-oauth-basic@}"
+      fi
+    elif [[ "${auth_info:0:11}" == "raw-access|" ]]; then
+      auth_param="--header 'PRIVATE-TOKEN: $token'"
+    fi
   fi
 
   ## clean up extra slashes in uri
@@ -163,7 +171,6 @@ _bpkg_uninstall_of_remote () {
       # check to see if there's a Makefile. If not, this is not a valid package
       if ! bpkg_url_exists "${makefile_url}" "${auth_param}"; then
         bpkg_warn "Makefile not found, skipping remote: $url"
-        return 1
       fi
     fi
   }
@@ -277,27 +284,34 @@ _bpkg_uninstall_of_remote () {
   fi
 
   ## perform local uninstall otherwise
-  if (( 0 == needs_global )) || (( 1 == break_mode )); then
-    ## remove scripts in bin dir
-    for script in $scripts; do
-      (
-        local script="$(echo $script | xargs basename )"
+  if (( 0 == needs_global )) || (( 1 == break_mode )); then    
+    if [[ "${#scripts[@]}" -gt '0' ]]; then
+      ## remove scripts in bin dir
+      bpkg_debug "uninstall_scripts" "Uninstall scripts ${scripts[*]}"
 
-        if [[ "${script}" ]]; then
-          local scriptname="${script%.*}"
+      for (( i = 0; i < ${#scripts[@]} ; ++i )); do
+        (
+          local script="${scripts[$i]}"
+          script="$(basename "${script}")"
 
-          if (( 0 == dry_run )); then
-            if (( 0 == needs_quiet )); then
-              rm -rf "${install_bindir}/${scriptname}"
+          if [[ "${script}" ]]; then
+            local scriptname="${script%.*}"
+
+            if (( 0 == dry_run )); then
+              if (( 0 == needs_quiet )); then
+                rm -rf "${install_bindir:?}/${scriptname}"
+              else
+                rm -rfv "${install_bindir:?}/${scriptname}"
+              fi
             else
-              rm -rfv "${install_bindir}/${scriptname}"
+              bpkg_debug "'${install_bindir}/${scriptname}' will be removed"
             fi
-          else
-            echo "'${install_bindir}/${scriptname}' will be removed"
           fi
-        fi
-      )
-    done
+        )
+      done
+    else
+      bpkg_warn "instal_scripts" "No scripts to be installed"
+    fi
 
     ## remove share content
     if (( 0 == dry_run )); then
@@ -307,7 +321,7 @@ _bpkg_uninstall_of_remote () {
         rm -rfv "${install_sharedir}"
       fi
     else
-      find "${install_sharedir}" -mindepth 1 | bpkg_esed "s|^\./|${install_sharedir}/|" | xargs -I {} echo "'{}' will be removed"
+      find "${install_sharedir}" -mindepth 1 | bpkg_esed "s|^\./|${install_sharedir}/|" | xargs -I {} bpkg_debug "'{}' will be removed"
     fi
   fi
   return 0
@@ -338,6 +352,7 @@ bpkg_uninstall () {
   local break_mode=0
   local dry_run=0
   local needs_quiet=0
+  local auth_info=''
 
   for opt in "${@}"; do
     if [[ '-' = "${opt:0:1}" ]]; then
@@ -396,6 +411,14 @@ bpkg_uninstall () {
     pkg="file://$(cd ${pkg}; pwd)"
   fi
 
+  if bpkg_has_auth_info "${pkg}"; then
+    auth_info="$(bpkg_parse_auth_info "${pkg}")"
+    bpkg_debug "auth_info" "${auth_info}"
+
+    pkg="$(bpkg_remove_auth_info "${pkg}")"
+    bpkg_debug "pkg" "${pkg}"
+  fi
+
   if bpkg_is_full_url "${pkg}"; then
     bpkg_debug "parse" "${pkg}"
 
@@ -433,7 +456,7 @@ bpkg_uninstall () {
   local i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
-    _bpkg_uninstall_of_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode $dry_run $needs_quiet
+    _bpkg_uninstall_of_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode $dry_run $needs_quiet "$auth_info"
     if [[ "$?" == '0' ]]; then
       return 0
     elif [[ "$?" == '2' ]]; then
