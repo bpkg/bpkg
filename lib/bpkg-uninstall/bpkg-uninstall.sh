@@ -295,13 +295,15 @@ _bpkg_uninstall_of_remote () {
           script="$(basename "${script}")"
 
           if [[ "${script}" ]]; then
-            local scriptname="${script%.*}"
+            local scriptname="${script%.*}"            
 
             if (( 0 == dry_run )); then
               if (( 0 == needs_quiet )); then
-                rm -rf "${install_bindir:?}/${scriptname}"
+                bpkg_debug "Remove '${install_bindir}/${scriptname}' quietly"
+                rm -rf "${install_bindir}/${scriptname}"
               else
-                rm -rfv "${install_bindir:?}/${scriptname}"
+                bpkg_debug "Remove '${install_bindir}/${scriptname}'"
+                rm -rfv "${install_bindir}/${scriptname}"
               fi
             else
               bpkg_debug "'${install_bindir}/${scriptname}' will be removed"
@@ -314,15 +316,20 @@ _bpkg_uninstall_of_remote () {
     fi
 
     ## remove share content
-    if (( 0 == dry_run )); then
-      if (( 0 == needs_quiet )); then
-        rm -rf "${install_sharedir}"
+    if [[ "${#files[@]}" -gt '0' ]]; then
+      bpkg_debug "uninstall_files" "Uninstall files '${files[*]}'"
+      if (( 0 == dry_run )); then
+        if (( 0 == needs_quiet )); then
+          bpkg_debug "Remove '${install_bindir}' quietly"
+          rm -rf "${install_sharedir}"
+        else
+          bpkg_debug "Remove '${install_bindir}'"
+          rm -rfv "${install_sharedir}"
+        fi
       else
-        rm -rfv "${install_sharedir}"
+        find "${install_sharedir}" -mindepth 1 | bpkg_esed "s|^\./|${install_sharedir}/|" | xargs -I {} bpkg_debug "'{}' will be removed"
       fi
-    else
-      find "${install_sharedir}" -mindepth 1 | bpkg_esed "s|^\./|${install_sharedir}/|" | xargs -I {} bpkg_debug "'{}' will be removed"
-    fi
+    fi    
   fi
   return 0
 }
@@ -351,7 +358,7 @@ bpkg_uninstall () {
   local needs_global=0
   local break_mode=0
   local dry_run=0
-  local needs_quiet=0
+  local needs_quiet=1
   local auth_info=''
 
   for opt in "${@}"; do
@@ -386,7 +393,7 @@ bpkg_uninstall () {
 
       -q|--quiet)
         shift
-        needs_quiet=1
+        needs_quiet=0
         ;;
 
       *)

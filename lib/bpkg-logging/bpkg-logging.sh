@@ -40,7 +40,7 @@ bpkg_message () {
 bpkg_error () {
   if (( BPKG_LOG_LEVEL <= 4 )); then
     {
-      bpkg_message 'red' 'error' "${@}"
+      bpkg_message 'red' '[ERROR]' "${@}"
     } >&2
   fi
 }
@@ -49,16 +49,16 @@ bpkg_error () {
 bpkg_warn () {
   if (( BPKG_LOG_LEVEL <= 3 )); then
     {
-      bpkg_message 'yellow' 'warn' "${@}"
+      bpkg_message 'yellow' '[WARN]' "${@}"
     } >&2
   fi
 }
 
 ## output info
 bpkg_info () {
-  local title='info'
+  local title='[INFO]'
   if (( "${#}" > 1 )); then
-    title="${1}"
+    title="${title} ${1}"
     shift
   fi
 
@@ -69,9 +69,9 @@ bpkg_info () {
 
 ## output debug
 bpkg_debug () {
-  local title='info'
+  local title='[DEBUG]'
   if (( "${#}" > 1 )); then
-    title="${1}"
+    title="${title} ${1}"
     shift
   fi
 
