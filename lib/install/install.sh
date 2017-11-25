@@ -21,19 +21,7 @@ else
   source $(which bpkg-utils-url)
 fi
 
-# Include config rc file if found
-USER_CONFIG_FILE="$HOME/.bpkgrc"
-[[ -f "$USER_CONFIG_FILE" ]] && source "$USER_CONFIG_FILE"
-
-DIR_CONFIG_FILE="$(pwd)/.bpkgrc"
-[[ -f "$DIR_CONFIG_FILE" ]] && source "$DIR_CONFIG_FILE"
-
-## set defaults
-if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
-  BPKG_REMOTES[0]=${BPKG_REMOTE-https://raw.githubusercontent.com}
-  BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
-fi
-BPKG_USER="${BPKG_USER:-bpkg}"
+bpkg_initrc
 
 _wrap_script () {
   local src dest src_content src_shabang tmp_script_file dest_name break_mode pkg_prefix
@@ -70,6 +58,14 @@ _wrap_script () {
 # Maintainer: Edison Guo <hydra1983@gmail.com>
 #########################################
 
+# Load bpkg-logging
+if ! type -f bpkg-logging &>/dev/null; then
+  echo "error: bpkg-logging not found, aborting"
+  exit 1
+else
+  source \$(which bpkg-logging)
+fi
+
 # Load package
 function __load () {
   local package_file script_file script_dir script_name
@@ -94,7 +90,7 @@ function __load () {
   elif [[ -s "\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}" ]]; then
     source "\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}"
   else
-    echo "Cannot load invalid file '\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}' as it's missing or empty"
+    bpkg_warn "Cannot load invalid file '\${script_dir}/${pkg_prefix}/\${package_file}/\${package_file}' as it's missing or empty"
   fi
 }
 #########################################

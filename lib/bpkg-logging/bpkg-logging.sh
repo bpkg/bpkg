@@ -6,10 +6,10 @@
 # 2 INFO 
 # 3 WARN
 # 4 ERROR
-LOG_LEVEL="${LOG_LEVEL:-2}"
+BPKG_LOG_LEVEL="${BPKG_LOG_LEVEL:-2}"
 
 ## format and output message
-_message () {
+bpkg_message () {
   if type -f bpkg-term > /dev/null 2>&1; then
     bpkg-term color "${1}"
   fi
@@ -38,18 +38,18 @@ _message () {
 
 ## output error
 bpkg_error () {
-  if (( LOG_LEVEL <= 4 )); then
+  if (( BPKG_LOG_LEVEL <= 4 )); then
     {
-      _message 'red' 'error' "${@}"
+      bpkg_message 'red' 'error' "${@}"
     } >&2
   fi
 }
 
 ## output warning
 bpkg_warn () {
-  if (( LOG_LEVEL <= 3 )); then
+  if (( BPKG_LOG_LEVEL <= 3 )); then
     {
-      _message 'yellow' 'warn' "${@}"
+      bpkg_message 'yellow' 'warn' "${@}"
     } >&2
   fi
 }
@@ -62,8 +62,8 @@ bpkg_info () {
     shift
   fi
 
-  if (( LOG_LEVEL <= 2 )); then
-    _message 'cyan' "${title}" "${@}"
+  if (( BPKG_LOG_LEVEL <= 2 )); then
+    bpkg_message 'cyan' "${title}" "${@}"
   fi  
 }
 
@@ -75,11 +75,12 @@ bpkg_debug () {
     shift
   fi
 
-  if (( LOG_LEVEL <= 1 )); then
-    _message 'green' "${title}" "${@}"
+  if (( BPKG_LOG_LEVEL <= 1 )); then
+    bpkg_message 'green' "${title}" "${@}"
   fi
 }
 
+export -f bpkg_message
 export -f bpkg_debug
 export -f bpkg_info
 export -f bpkg_warn

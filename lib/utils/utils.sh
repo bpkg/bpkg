@@ -1,18 +1,23 @@
 #!/bin/bash
 
 ## Collection of shared bpkg functions
-
 ## Init local config and set environmental defaults
 bpkg_initrc() {
   local global_config=${BPKG_GLOBAL_CONFIG:-"/etc/bpkgrc"}
   [ -f "$global_config" ] && source "$global_config"
-  local config=${BPKG_CONFIG:-"$HOME/.bpkgrc"}
-  [ -f "$config" ] && source "$config"
+  
+  local user_config="$HOME/.bpkgrc"
+  [[ -f "$user_config" ]] && source "$user_config"
+
+  local dir_config="$(pwd)/.bpkgrc"
+  [[ -f "$dir_config" ]] && source "$dir_config"
+
   ## set defaults
-  if [ ${#BPKG_REMOTES[@]} -eq 0 ]; then
+  if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
     BPKG_REMOTES[0]=${BPKG_REMOTE-https://raw.githubusercontent.com}
     BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
   fi
+
   BPKG_USER="${BPKG_USER:-"bpkg"}"
   BPKG_INDEX=${BPKG_INDEX:-"$HOME/.bpkg/index"}
 }
@@ -20,6 +25,7 @@ bpkg_initrc() {
 ## check parameter consistency
 bpkg_validate () {
   bpkg_initrc
+
   if [ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]; then
     mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
     fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
@@ -27,58 +33,6 @@ bpkg_validate () {
     return 1
   fi
   return 0
-}
-
-## format and output message
-bpkg_message () {
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term color "${1}"
-  fi
-
-  shift
-  printf "    ${1}"
-  shift
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-  fi
-
-  printf ": "
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-    bpkg-term bright
-  fi
-
-  printf "%s\n" "${@}"
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-  fi
-}
-
-## output error
-bpkg_error () {
-  {
-    bpkg_message "red" "error" "${@}"
-  } >&2
-}
-
-## output warning
-bpkg_warn () {
-  {
-    bpkg_message "yellow" "warn" "${@}"
-  } >&2
-}
-
-## output info
-bpkg_info () {
-  local title="info"
-  if (( "${#}" > 1 )); then
-    title="${1}"
-    shift
-  fi
-  bpkg_message "cyan" "${title}" "${@}"
 }
 
 ## takes a remote and git-remote and sets the globals:
@@ -145,11 +99,6 @@ function bpkg_esed(){
 
 export -f bpkg_initrc
 export -f bpkg_validate
-
-export -f bpkg_message
-export -f bpkg_warn
-export -f bpkg_error
-export -f bpkg_info
 
 export -f bpkg_select_remote
 export -f bpkg_select_raw_path

@@ -21,19 +21,7 @@ else
   source $(which bpkg-utils-url)
 fi
 
-# Include config rc file if found
-USER_CONFIG_FILE="$HOME/.bpkgrc"
-[[ -f "$USER_CONFIG_FILE" ]] && source "$USER_CONFIG_FILE"
-
-DIR_CONFIG_FILE="$(pwd)/.bpkgrc"
-[[ -f "$DIR_CONFIG_FILE" ]] && source "$DIR_CONFIG_FILE"
-
-## set defaults
-if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
-  BPKG_REMOTES[0]=${BPKG_REMOTE-https://raw.githubusercontent.com}
-  BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
-fi
-BPKG_USER="${BPKG_USER:-bpkg}"
+bpkg_initrc
 
 ## try to uninstall a package from a specific remote
 ## returns values:
