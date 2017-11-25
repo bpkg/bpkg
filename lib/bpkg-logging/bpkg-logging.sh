@@ -6,7 +6,7 @@
 # 2 INFO 
 # 3 WARN
 # 4 ERROR
-BPKG_LOG_LEVEL="${BPKG_LOG_LEVEL:-2}"
+BPKG_LOG_LEVEL="${BPKG_LOG_LEVEL:-${LOG_LEVEL:-2}}"
 
 ## format and output message
 bpkg_message () {

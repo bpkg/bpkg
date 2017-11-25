@@ -110,12 +110,13 @@ EOF
 ##   1: the package was not found on the remote
 ##   2: a fatal error occurred
 _bpkg_install_from_remote () {
-  local pkg=$1
-  local remote=$2
-  local git_remote=$3
+  local pkg="$1"
+  local remote="$2"
+  local git_remote="$3"
   local needs_global=$4
   local break_mode=$5
   local needs_deps=$6
+  local auth_info="$7"
 
   local cwd=$(pwd)
   local url=''
@@ -167,31 +168,16 @@ _bpkg_install_from_remote () {
     user="$(IFS='/' ; echo "${pkg_parts[*]}")"
   fi
 
-  bpkg_debug "user" "${user}"
-  bpkg_debug "name" "${name}"
-
   ## clean up name of weird trailing
   ## versions and slashes
   name=${name/@*//}
   name=${name////}
 
-  ## check to see if remote is raw with oauth (GHE)
-  if [[ "${remote:0:10}" == "raw-oauth|" ]]; then
-    bpkg_info 'Using OAUTH basic with content requests'
-    OLDIFS="${IFS}"
-    IFS="'|'"
-    local remote_parts=($remote)
-    IFS="${OLDIFS}"
-    local token=${remote_parts[1]}
-    remote=${remote_parts[2]}
-    auth_param="$token:x-oauth-basic"
-    uri="/${user}/${name}/raw/${version}"
-    ## If git remote is a URL, and doesn't contain token information, we
-    ## inject it into the <user>@host field
-    if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${token}* ]]; then
-      git_remote=${git_remote/https:\/\//https:\/\/$token:x-oauth-basic@}
-    fi
-  elif bpkg_is_coding_net "${remote}"; then
+  bpkg_debug "user" "${user}"
+  bpkg_debug "name" "${name}"
+
+  ## Adapter to different kind of git hosting services
+  if bpkg_is_coding_net "${remote}"; then
     uri="/u/${user}/p/${name}/git/raw/${version}"
   elif bpkg_is_github_raw "${remote}"; then
     uri="/${user}/${name}/${version}"
@@ -199,6 +185,28 @@ _bpkg_install_from_remote () {
     uri="/${user}/${name}"
   else
     uri="/${user}/${name}/raw/${version}"
+  fi
+
+  ## check to see if remote is raw with oauth (GHE) or access token
+  if [[ ! -z "${auth_info}" ]]; then
+    OLDIFS="${IFS}"
+    IFS="'|'"
+    local auth_info_parts=($auth_info)
+    IFS="${OLDIFS}"
+    local token=${auth_info_parts[1]}
+
+    if [[ "${auth_info:0:10}" == "raw-oauth|" ]]; then
+      bpkg_info 'Using OAUTH basic with content requests'
+      auth_param="-u \"$token:x-oauth-basic\""
+
+      ## If git remote is a URL, and doesn't contain token information, we
+      ## inject it into the <user>@host field
+      if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${token}* ]]; then
+        git_remote="${git_remote/https:\/\//https:\/\/$token:x-oauth-basic@}"
+      fi
+    elif [[ "${auth_info:0:11}" == "raw-access|" ]]; then
+      auth_param="--header 'PRIVATE-TOKEN: $token'"
+    fi
   fi
 
   ## clean up extra slashes in uri
@@ -243,7 +251,6 @@ _bpkg_install_from_remote () {
       # check to see if there's a Makefile. If not, this is not a valid package
       if ! bpkg_url_exists "${makefile_url}" "${auth_param}"; then
         bpkg_warn "Makefile not found, skipping remote: $url"
-        return 1
       fi
     fi
   }
@@ -384,21 +391,28 @@ _bpkg_install_from_remote () {
     fi
 
     ## grab each script and place in deps directory
-    for script in $scripts; do
-      (
-        local script="$(echo $script | xargs basename )"
+    bpkg_debug "install_scripts" "Install scripts ${scripts[*]}"
+    
+    if [[ "${#scripts[@]}" -gt '0' ]]; then
+      for (( i = 0; i < ${#scripts[@]} ; ++i )); do
+        (
+          local script="${scripts[$i]}"
+          script="$(basename "${script}")"
 
-        if [[ "${script}" ]]; then
-          bpkg_save_remote_file "${url}/${script}" "${install_sharedir}/${script}" "${auth_param}"
-          local scriptname="${script%.*}"
-          bpkg_debug "${scriptname} to PATH" "${install_bindir}/${scriptname}"
-          cp -f "${install_sharedir}/${script}" "${install_sharedir}/${script}.orig"
-          _wrap_script "${install_sharedir}/${script}.orig" "${install_sharedir}/${script}" "${break_mode}"
-          ln -sf "${install_sharedir}/${script}" "${install_bindir}/${scriptname}"
-          chmod u+x "${install_bindir}/${scriptname}"
-        fi
-      )
-    done
+          if [[ "${script}" ]]; then
+            bpkg_save_remote_file "${url}/${script}" "${install_sharedir}/${script}" "${auth_param}"
+            local scriptname="${script%.*}"
+            bpkg_debug "${scriptname} to PATH" "${install_bindir}/${scriptname}"
+            cp -f "${install_sharedir}/${script}" "${install_sharedir}/${script}.orig"
+            _wrap_script "${install_sharedir}/${script}.orig" "${install_sharedir}/${script}" "${break_mode}"
+            ln -sf "${install_sharedir}/${script}" "${install_bindir}/${scriptname}"
+            chmod u+x "${install_bindir}/${scriptname}"
+          fi
+        )
+      done
+    else
+      bpkg_warn "instal_scripts" "No scripts to be installed"
+    fi
 
     if [[ "${#files[@]}" -gt '0' ]]; then
       ## grab each file
@@ -406,8 +420,9 @@ _bpkg_install_from_remote () {
         (
           local file="${files[$i]}"
           if [[ "${file}" ]]; then
-            local filedir="$(dirname "${install_sharedir}/${file}")"
-            local filename="$(basename "${file}")"
+            local filedir filename
+            filedir="$(dirname "${install_sharedir}/${file}")"
+            filename="$(basename "${file}")"
             bpkg_save_remote_file "${url}/${file}" "${filedir}/${filename}" "${auth_param}"
           fi
         )
@@ -441,6 +456,7 @@ bpkg_install () {
   local needs_global=0
   local break_mode=0
   local needs_deps=1
+  local auth_info=''
 
   for opt in "${@}"; do
     if [[ '-' = "${opt:0:1}" ]]; then
@@ -490,7 +506,16 @@ bpkg_install () {
   echo
 
   if bpkg_is_local_path "${pkg}"; then
-    pkg="file://$(cd ${pkg}; pwd)"
+    #shellcheck disable=SC2164
+    pkg="file://$(cd "${pkg}"; pwd)"
+  fi
+
+  if bpkg_has_auth_info "${pkg}"; then
+    auth_info="$(bpkg_parse_auth_info "${pkg}")"
+    bpkg_debug "auth_info" "${auth_info}"
+
+    pkg="$(bpkg_remove_auth_info "${pkg}")"
+    bpkg_debug "pkg" "${pkg}"
   fi
 
   if bpkg_is_full_url "${pkg}"; then
@@ -530,7 +555,7 @@ bpkg_install () {
   local i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
-    _bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode $needs_deps
+    _bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global $break_mode $needs_deps "$auth_info"
     if [[ "$?" == '0' ]]; then
       return 0
     elif [[ "$?" == '2' ]]; then

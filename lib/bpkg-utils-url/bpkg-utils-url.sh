@@ -1,9 +1,28 @@
 #!/bin/bash
 
+bpkg_has_auth_info () {
+  local url=$1
+  if [[ "$(echo "${url}" | grep -E '[^|]+[|][^|]+[|][^/]+:\/\/\/?.*')" != "" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+bpkg_parse_auth_info () {
+  local url="$1"
+  echo "${url}" | bpkg_esed 's|([^|]+[|][^|]+)[|][^/]+:\/\/\/?.*|\1|'
+}
+
+bpkg_remove_auth_info () {
+  local url="$1"
+  echo "${url}" | bpkg_esed "s|[^|]+[|][^|]+[|]([^/]+:\/\/\/?.*)|\1|"
+}
+
 bpkg_is_coding_net () {
   local remote="$1"
 
-  if [[ "$(echo ${remote} | grep 'coding.net')" ]]; then
+  if [[ "$(echo "${remote}" | grep 'coding.net')" ]]; then
     return 0
   else
     return 1
@@ -13,7 +32,7 @@ bpkg_is_coding_net () {
 bpkg_is_github_raw () {
   local remote="$1"
 
-  if [[ "$(echo ${remote} | grep raw.githubusercontent.com)" ]]; then
+  if [[ "$(echo "${remote}" | grep raw.githubusercontent.com)" ]]; then
     return 0
   else
     return 1
@@ -22,7 +41,7 @@ bpkg_is_github_raw () {
 
 bpkg_is_local_path () {
   local url="$1"
-  if [[ "$(echo \"${url}\" | grep 'file://.*')" != "" ]] || [[ -e "${url}" ]]; then
+  if [[ "$(echo "${url}" | grep 'file://.*')" != "" ]] || [[ -e "${url}" ]]; then
     return 0
   else
     return 1
@@ -31,7 +50,7 @@ bpkg_is_local_path () {
 
 bpkg_is_full_url () {
   local url=$1
-  if [[ "$(echo \"${url}\" | egrep '[^/]+:\/\/\/?.*')" != "" ]]; then
+  if [[ "$(echo "${url}" | grep -E '[^/]+:\/\/\/?.*')" != "" ]]; then
     return 0
   else
     return 1
@@ -54,7 +73,7 @@ bpkg_parse_path () {
 }
 
 bpkg_save_remote_file () {
-  local auth_param path url
+  local auth_param path url filedir
 
   url="${1}"
   path="${2}"
@@ -63,16 +82,16 @@ bpkg_save_remote_file () {
   bpkg_debug "fetch" "${url}"
   bpkg_debug "write" "${path}"
   
-  local filedir="$(dirname ${path})"
+  filedir="$(dirname "${path}")"
   if [[ ! -d "${filedir}" ]]; then
     mkdir -p "${filedir}"
   fi
 
-  if [[ "${auth_param}" ]];then
-    curl --silent -L -o "${path}" -u "${auth_param}" "${url}"
-  else
-    curl --silent -L -o "${path}" "${url}"
-  fi
+  bpkg_debug "save_remote_file" "from ${url} to ${filedir}"
+
+  curl_cmd="curl --silent -L --output '${path}' ${auth_param} '${url}'"
+  bpkg_debug "url_save_remote" "$curl_cmd"
+  eval $curl_cmd
 }
 
 bpkg_url_exists () {
@@ -84,13 +103,14 @@ bpkg_url_exists () {
 
     bpkg_debug "check" "${url}"
 
-    if [[ "${auth_param}" ]];then
-      status=$(curl --silent -L -w '%{http_code}' -o '/dev/null' -u "${auth_param}" "${url}")
-      result="$?"
-    else
-      status=$(curl --silent -L -w '%{http_code}' -o '/dev/null' "${url}")
-      result="$?"
-    fi
+    curl_cmd="curl --silent -L -w '%{http_code}'  --output '/dev/null' ${auth_param} '${url}'"
+    bpkg_debug "url_exists" "curl_cmd: $curl_cmd"
+    eval "status=\$($curl_cmd)"
+    result=$?
+
+    bpkg_debug "url_exists" "curl status: $result"
+    # shellcheck disable=SC2154
+    bpkg_debug "url_exists" "http status: $status"
 
     # In some rare cases, curl will return CURLE_WRITE_ERROR (23) when writing
     # to `/dev/null`. In such a case we do not care that such an error occured.
@@ -107,12 +127,9 @@ bpkg_read_package_json () {
 
   url="${1}"
   auth_param="${2:-}"
-  
-  if [[ "${auth_param}" ]];then
-    curl --silent -L -u "${auth_param}" "${url}"
-  else
-    curl --silent -L "${url}"
-  fi
+
+  curl_cmd="curl --silent -L ${auth_param} '${url}'"  
+  eval "$curl_cmd"
 }
 
 export -f bpkg_is_coding_net
