@@ -19,7 +19,10 @@ bpkg_initrc() {
   fi
 
   BPKG_USER="${BPKG_USER:-"bpkg"}"
-  BPKG_INDEX=${BPKG_INDEX:-"$HOME/.bpkg/index"}
+  BPKG_INDEX="${BPKG_INDEX:-"$HOME/.bpkg/index"}"
+  BPKG_PKG_PREFIX="${BPKG_PKG_PREFIX:-"deps"}"
+  
+  export BPKG_PKG_PREFIX
 }
 
 ## check parameter consistency

@@ -40,9 +40,9 @@ _wrap_script () {
   fi
 
   if (( 1 == break_mode )); then
-    pkg_prefix="deps/share"
+    pkg_prefix="${BPKG_PKG_PREFIX}/share"
   else
-    pkg_prefix="deps"
+    pkg_prefix="${BPKG_PKG_PREFIX}"
   fi
 
   readonly tmp_script_file=$(mktemp "/tmp/bpkg.wrapper.XXXXXXXXXX")
@@ -368,11 +368,11 @@ _bpkg_install_from_remote () {
     install_bindir="${install_basedir}/bin"
     install_sharedir="${install_basedir}/share/${name}"
   elif (( 0 == needs_global )) && (( 0 == break_mode )); then
-    install_basedir="${cwd}/deps"
+    install_basedir="${cwd}/${BPKG_PKG_PREFIX}"
     install_bindir="${install_basedir}/bin"
     install_sharedir="${install_basedir}/${name}"
   elif (( 0 == needs_global )) && (( 1 == break_mode )); then
-    install_basedir="${cwd}/deps"
+    install_basedir="${cwd}/${BPKG_PKG_PREFIX}"
     install_bindir="${install_basedir}/bin"
     install_sharedir="${install_basedir}/share/${name}"
   fi
@@ -382,10 +382,10 @@ _bpkg_install_from_remote () {
     ## copy package.json over
     bpkg_save_remote_file "${url}/package.json" "${install_sharedir}/package.json" "${auth_param}"
 
-    ## make 'deps/bin' directory if possible
+    ## make '${BPKG_PKG_PREFIX}/bin' directory if possible
     mkdir -p "${install_bindir}"
 
-    ## make 'deps/share' directory if possible
+    ## make '${BPKG_PKG_PREFIX}/share' directory if possible
     mkdir -p "${install_sharedir}"
 
     # install package dependencies
@@ -398,7 +398,7 @@ _bpkg_install_from_remote () {
     fi
 
     if [[ "${#scripts[@]}" -gt '0' ]]; then
-      ## grab each script and place in deps directory
+      ## grab each script and place in ${BPKG_PKG_PREFIX} directory
       bpkg_debug "install_scripts" "Install scripts '${scripts[*]}'"
 
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do

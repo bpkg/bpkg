@@ -281,11 +281,11 @@ _bpkg_uninstall_of_remote () {
     install_bindir="${install_basedir}/bin"
     install_sharedir="${install_basedir}/share/${name}"
   elif (( 0 == needs_global )) && (( 0 == break_mode )); then
-    install_basedir="${cwd}/deps"
+    install_basedir="${cwd}/${BPKG_PKG_PREFIX}"
     install_bindir="${install_basedir}/bin"
     install_sharedir="${install_basedir}/${name}"
   elif (( 0 == needs_global )) && (( 1 == break_mode )); then
-    install_basedir="${cwd}/deps"
+    install_basedir="${cwd}/${BPKG_PKG_PREFIX}"
     install_bindir="${install_basedir}/bin"
     install_sharedir="${install_basedir}/share/${name}"
   fi
