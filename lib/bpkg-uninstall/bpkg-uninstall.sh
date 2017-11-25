@@ -310,7 +310,7 @@ _bpkg_uninstall_of_remote () {
         )
       done
     else
-      bpkg_warn "instal_scripts" "No scripts to be installed"
+      bpkg_warn "uninstal_scripts" "No scripts to be uninstalled"
     fi
 
     ## remove share content
