@@ -327,10 +327,10 @@ _bpkg_uninstall_of_remote () {
       bpkg_debug "uninstall_files" "Uninstall files '${files[*]}'"
       if (( 0 == dry_run )); then
         if (( 0 == needs_quiet )); then
-          bpkg_debug "Remove '${install_bindir}' quietly"
+          bpkg_debug "Remove '${install_sharedir}' quietly"
           rm -rf "${install_sharedir}"
         else
-          bpkg_debug "Remove '${install_bindir}'"
+          bpkg_debug "Remove '${install_sharedir}'"
           rm -rfv "${install_sharedir}"
         fi
       else
