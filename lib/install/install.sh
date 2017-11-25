@@ -392,7 +392,7 @@ _bpkg_install_from_remote () {
     
     if [[ "${#scripts[@]}" -gt '0' ]]; then
       ## grab each script and place in deps directory  
-      bpkg_debug "install_scripts" "Install scripts ${scripts[*]}"
+      bpkg_debug "install_scripts" "Install scripts '${scripts[*]}'"
 
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
         (
