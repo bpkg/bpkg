@@ -250,7 +250,14 @@ _bpkg_install_from_remote () {
       has_pkg_json=0
       # check to see if there's a Makefile. If not, this is not a valid package
       if ! bpkg_url_exists "${makefile_url}" "${auth_param}"; then
-        bpkg_warn "Makefile not found, skipping remote: $url"
+        local makefile_missing_msg
+        makefile_missing_msg="Makefile not found, skipping remote: $url"
+        if (( 0 == break_mode )); then
+          bpkg_error "${makefile_missing_msg}"
+          return 1
+        else
+          bpkg_warn "${makefile_missing_msg}"
+        fi
       fi
     fi
   }
@@ -389,9 +396,9 @@ _bpkg_install_from_remote () {
         (cd "${install_sharedir}" && bpkg getdeps)
       fi
     fi
-    
+
     if [[ "${#scripts[@]}" -gt '0' ]]; then
-      ## grab each script and place in deps directory  
+      ## grab each script and place in deps directory
       bpkg_debug "install_scripts" "Install scripts '${scripts[*]}'"
 
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do

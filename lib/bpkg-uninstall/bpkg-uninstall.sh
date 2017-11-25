@@ -170,7 +170,14 @@ _bpkg_uninstall_of_remote () {
       has_pkg_json=0
       # check to see if there's a Makefile. If not, this is not a valid package
       if ! bpkg_url_exists "${makefile_url}" "${auth_param}"; then
-        bpkg_warn "Makefile not found, skipping remote: $url"
+        local makefile_missing_msg
+        makefile_missing_msg="Makefile not found, skipping remote: $url"
+        if (( 0 == break_mode )); then
+          bpkg_error "${makefile_missing_msg}"
+          return 1
+        else
+          bpkg_warn "${makefile_missing_msg}"
+        fi
       fi
     fi
   }
@@ -284,7 +291,7 @@ _bpkg_uninstall_of_remote () {
   fi
 
   ## perform local uninstall otherwise
-  if (( 0 == needs_global )) || (( 1 == break_mode )); then    
+  if (( 0 == needs_global )) || (( 1 == break_mode )); then
     if [[ "${#scripts[@]}" -gt '0' ]]; then
       ## remove scripts in bin dir
       bpkg_debug "uninstall_scripts" "Uninstall scripts '${scripts[*]}'"
@@ -295,7 +302,7 @@ _bpkg_uninstall_of_remote () {
           script="$(basename "${script}")"
 
           if [[ "${script}" ]]; then
-            local scriptname="${script%.*}"            
+            local scriptname="${script%.*}"
 
             if (( 0 == dry_run )); then
               if (( 0 == needs_quiet )); then
@@ -329,7 +336,7 @@ _bpkg_uninstall_of_remote () {
       else
         find "${install_sharedir}" -mindepth 1 | bpkg_esed "s|^\./|${install_sharedir}/|" | xargs -I {} bpkg_debug "'{}' will be removed"
       fi
-    fi    
+    fi
   fi
   return 0
 }
