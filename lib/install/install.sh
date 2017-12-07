@@ -66,6 +66,14 @@ else
   source \$(which bpkg-logging)
 fi
 
+function __is_linux() {
+  if [[ "\$(echo "\${OSTYPE}" | grep 'linux')" != "" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 # Load package
 function __load () {
   local package_file script_file script_dir script_name
@@ -74,7 +82,13 @@ function __load () {
   package_file="\$2"
 
   if [[ -L \${script_file} ]] ; then
-      script_dir=\$(cd \$(dirname \$(readlink -f \${script_file})); pwd)
+      if __is_linux; then
+        # suppose is running in linux env
+        script_dir=\$(cd \$(dirname \$(readlink -f \${script_file})); pwd)
+      else
+        # suppose is running in unix env ( tested in osx)
+        script_dir=\$(cd \$(dirname \$(readlink -n \${script_file})); pwd)
+      fi
   else
       script_dir=\$(cd \$(dirname \${script_file}); pwd)
   fi
