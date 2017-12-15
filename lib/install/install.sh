@@ -63,7 +63,7 @@ if ! type -f bpkg-logging &>/dev/null; then
   echo "error: bpkg-logging not found, aborting"
   exit 1
 else
-  source \$(which bpkg-logging)
+  . \$(which bpkg-logging) 1>/dev/null
 fi
 
 function __is_linux() {
