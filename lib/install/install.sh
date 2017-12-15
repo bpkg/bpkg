@@ -417,17 +417,20 @@ _bpkg_install_from_remote () {
 
       for (( i = 0; i < ${#scripts[@]} ; ++i )); do
         (
-          local script="${scripts[$i]}"
-          script="$(basename "${script}")"
-
+          local script
+          script="${scripts[$i]}"
           if [[ "${script}" ]]; then
-            bpkg_save_remote_file "${url}/${script}" "${install_sharedir}/${script}" "${auth_param}"
-            local scriptname="${script%.*}"
-            bpkg_debug "${scriptname} to PATH" "${install_bindir}/${scriptname}"
-            cp -f "${install_sharedir}/${script}" "${install_sharedir}/${script}.orig"
-            _wrap_script "${install_sharedir}/${script}.orig" "${install_sharedir}/${script}" "${break_mode}"
-            ln -sf "${install_sharedir}/${script}" "${install_bindir}/${scriptname}"
-            chmod u+x "${install_bindir}/${scriptname}"
+            local script_dir script_name bin_name
+            script_dir="$(dirname "${install_sharedir}/${script}")"
+            script_name="$(basename "${script}")"
+            bpkg_save_remote_file "${url}/${script}" "${script_dir}/${script_name}" "${auth_param}"
+
+            bin_name="${script_name%.*}"
+            cp -f "${script_dir}/${script_name}" "${script_dir}/${script_name}.orig"
+            _wrap_script "${script_dir}/${script_name}.orig" "${script_dir}/${script_name}" "${break_mode}"
+            bpkg_debug "${bin_name} to PATH" "${install_bindir}/${bin_name}"
+            ln -sf "${script_dir}/${script_name}" "${install_bindir}/${bin_name}"
+            chmod u+x "${install_bindir}/${bin_name}"
           fi
         )
       done
