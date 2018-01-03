@@ -10,7 +10,7 @@ fi
 ## output usage
 usage () {
   echo "Installs dependencies for a package."
-  echo "usage: bpkg-getdeps [-h|--help]"
+  echo "usage: bpkg-getdeps [-h|--help] [-b|--break-mode]"
   echo "   or: bpkg-getdeps"
 }
 
