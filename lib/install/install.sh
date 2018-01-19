@@ -415,6 +415,7 @@ bpkg_install_from_remote () {
     mkdir -p "${cwd}/deps/bin"
 
     # install package dependencies
+    info "Install dependencies for ${name}"
     (cd "${cwd}/deps/${name}" && bpkg getdeps)
 
     ## grab each script and place in deps directory
