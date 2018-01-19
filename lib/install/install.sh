@@ -347,30 +347,24 @@ bpkg_install_from_remote () {
 
     ## construct scripts array
     {
-      scripts=$(echo -n "${json}" | bpkg-json -b | grep '\["scripts' | awk '{$1=""; print $0 }' | tr -d '"')
+      scripts=$(echo -n "${json}" | bpkg-json -b | grep '\["scripts' | awk '{ print $2 }' | tr -d '"')
+
+      ## create array by splitting on newline
       OLDIFS="${IFS}"
-
-      ## comma to space
-      IFS=','
-      scripts=("${scripts[@]}")
+      IFS=$'\n'
+      scripts=(${scripts[@]})
       IFS="${OLDIFS}"
-
-      ## account for existing space
-      scripts=("${scripts[@]}")
     }
 
     ## construct files array
     {
-      files=$(echo -n "${json}" | bpkg-json -b | grep '\["files' | awk '{$1=""; print $0 }' | tr -d '"')
+      files=$(echo -n "${json}" | bpkg-json -b | grep '\["files' | awk '{ print $2 }' | tr -d '"')
+
+      ## create array by splitting on newline
       OLDIFS="${IFS}"
-
-      ## comma to space
-      IFS=','
-      files=("${files[@]}")
+      IFS=$'\n'
+      files=(${files[@]})
       IFS="${OLDIFS}"
-
-      ## account for existing space
-      files=("${files[@]}")
     }
 
   fi
