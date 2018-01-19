@@ -89,6 +89,13 @@ save_remote_file () {
   path="${2}"
   auth_param="${3:-}"
 
+  local dirname="$(dirname "${path}")"
+
+  # Make sure directory exists
+  if [[ ! -d "${dirname}" ]];then
+    mkdir -p  "${dirname}"
+  fi
+
   if [[ "${auth_param}" ]];then
     curl --silent -L -o "${path}" -u "${auth_param}" "${url}"
   else
