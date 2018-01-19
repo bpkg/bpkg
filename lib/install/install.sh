@@ -341,7 +341,7 @@ bpkg_install_from_remote () {
     )"
 
     ## check if forced global
-    if [[ ! -z "$(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" ]]; then
+    if [[ "$(echo -n "${json}" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" == 'true' ]]; then
       needs_global=1
     fi
 
