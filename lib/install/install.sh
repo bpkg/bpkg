@@ -419,14 +419,16 @@ bpkg_install_from_remote () {
     (cd "${cwd}/deps/${name}" && bpkg getdeps)
 
     ## grab each script and place in deps directory
-    for script in $scripts; do
+    for script in "${scripts[@]}"; do
       (
-        local script="$(echo $script | xargs basename )"
         if [[ "${script}" ]];then
+          local scriptname="$(echo "${script}" | xargs basename )"
+
           info "fetch" "${url}/${script}"
           info "write" "${cwd}/deps/${name}/${script}"
           save_remote_file "${url}/${script}" "${cwd}/deps/${name}/${script}" "${auth_param}"
-          local scriptname="${script%.*}"
+
+          scriptname="${scriptname%.*}"
           info "${scriptname} to PATH" "${cwd}/deps/bin/${scriptname}"
           ln -si "${cwd}/deps/${name}/${script}" "${cwd}/deps/bin/${scriptname}"
           chmod u+x "${cwd}/deps/bin/${scriptname}"
@@ -435,18 +437,15 @@ bpkg_install_from_remote () {
     done
 
     if [[ "${#files[@]}" -gt '0' ]]; then
-      ## grab each file
-      for (( i = 0; i < ${#files[@]} ; ++i )); do
-        (
-          local file="${files[$i]}"
+      ## grab each file and place in correct directory
+      for file in "${files[@]}"; do
+      (
           if [[ "${file}" ]];then
-            local filedir="$(dirname "${cwd}/deps/${name}/${file}")"
+            local filename="$(echo "${file}" | xargs basename )"
+
             info "fetch" "${url}/${file}"
-            if [[ ! -d "${filedir}" ]]; then
-              mkdir -p "${filedir}"
-            fi
-            info "write" "${filedir}/${file}"
-            save_remote_file "${url}/${script}" "${filedir}/${file}" "${auth_param}"
+            info "write" "${cwd}/deps/${name}/${file}"
+            save_remote_file "${url}/${file}" "${cwd}/deps/${name}/${file}" "${auth_param}"
           fi
         )
       done
