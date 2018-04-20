@@ -1,4 +1,4 @@
-# bpkg [![Build Status](https://travis-ci.org/bpkg/bpkg.svg?branch=master)](https://travis-ci.org/bpkg/bpkg)
+# bpkg [![Build Status](https://travis-ci.org/bpkg/bpkg.svg?branch=master)](https://travis-ci.org/bpkg/bpkg) [![Backers on Open Collective](https://opencollective.com/bpkg/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/bpkg/sponsors/badge.svg)](#sponsors) 
 
 _JavaScript has npm, Ruby has Gems, Python has pip and now Shell has bpkg!_
 
@@ -281,6 +281,34 @@ $ my_script some more args --blah
 
 * [@littlstar](https://github.com/littlstar) ([littlstar.com](https://littlstar.com))
 * [@spotify](https://github.com/spotify) ([spotify.com](https://spotify.com))
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/bpkg#sponsor)]
+
+<a href="https://opencollective.com/bpkg/sponsor/0/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/1/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/2/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/3/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/4/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/5/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/6/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/7/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/8/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/bpkg/sponsor/9/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/9/avatar.svg"></a>
+
+
+### Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="graphs/contributors"><img src="https://opencollective.com/bpkg/contributors.svg?width=890&button=false" /></a>
+
+
+### Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/bpkg#backer)]
+
+<a href="https://opencollective.com/bpkg#backers" target="_blank"><img src="https://opencollective.com/bpkg/backers.svg?width=890"></a>
+
+
 
 ## License
 
