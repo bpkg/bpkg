@@ -334,7 +334,7 @@ bpkg_install_from_remote () {
     name="$(
       echo -n "${json}" |
       bpkg-json -b |
-      grep 'name' |
+      grep -m 1 'name' |
       awk '{ $1=""; print $0 }' |
       tr -d '\"' |
       tr -d ' '
