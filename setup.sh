@@ -113,6 +113,6 @@ make_unlink () {
 if [ $# -eq 0 ]; then
   setup
 else
-  make_$1
+  make_${1}
 fi
 exit $?
