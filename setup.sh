@@ -9,9 +9,7 @@
 #        "               ""
 #        bash package manager
 
-REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
-TMPDIR=${TMPDIR:-/tmp}
-DEST=${DEST:-${TMPDIR}/bpkg-master}
+set -u
 
 echo_info () {
     echo -n "  info: "
@@ -45,16 +43,36 @@ setup () {
   ## test for require features
   features git || return 1
 
+  local REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
+  local TMPDIR
+  local DEST
+
+  TMPDIR=$(mktemp -d bpkg_tmp.XXXXXX -p /tmp) || {
+    echo_error "Could not create a temporary directory!"
+    return 1
+  }
+
+  DEST=${DEST:-${TMPDIR}/bpkg-master}
+
   ## build
   {
     echo
-    cd "${TMPDIR}"
+    cd "${TMPDIR}" || {
+        echo_error "Could not cd into ${TMPDIR}"
+        return 1
+    }
     echo_info "Creating temporary files..."
     test -d "${DEST}" && { echo "  warn: Already exists: '${DEST}'"; }
     rm -rf "${DEST}"
     echo_info "Fetching latest 'bpkg'..."
-    git clone --depth=1 "${REMOTE}" "${DEST}" > /dev/null 2>&1
-    cd "${DEST}"
+    git clone -q --depth=1 "${REMOTE}" "${DEST}" > /dev/null || {
+        echo_error "Could not complete git clone!"
+        return 1
+    }
+    cd "${DEST}" || {
+        echo_error "Could not cd into ${DEST}"
+        return 1
+    }
     echo_info "Installing..."
     echo
     make_install
@@ -63,8 +81,8 @@ setup () {
 }
 
 ## make targets
-BIN="bpkg"
-[ -z "$PREFIX" ] && PREFIX="/usr/local"
+declare -r BIN="bpkg"
+declare -r PREFIX=${PREFIX:-/usr/local}
 
 # All 'bpkg' supported commands
 CMDS=("json" "install" "package" "term" "suggest" "init" "utils" "update" "list" "show" "getdeps")
@@ -91,9 +109,15 @@ make_install () {
 
 make_uninstall () {
   echo_info "Uninstalling $PREFIX/bin/$BIN..."
-  rm -f "$PREFIX/bin/$BIN"
-  for cmd in $CMDS; do
-    rm -f "$PREFIX/bin/$BIN-$cmd"
+  rm -f "$PREFIX/bin/$BIN" || {
+    echo_error "rm error; aborting!"
+    exit 1
+  }
+  for cmd in "${CMDS[@]}"; do
+    rm -f "$PREFIX/bin/$BIN-$cmd" || {
+      echo_error "rm error; aborting!"
+      exit 1
+    }
   done
 }
 
