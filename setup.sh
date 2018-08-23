@@ -70,10 +70,18 @@ make_install () {
   echo "  info: Installing $PREFIX/bin/$BIN..."
   install -d "$PREFIX/bin"
   local source=$(<$BIN)
-  [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN" || install "$BIN" "$PREFIX/bin"
+  if [ -f "$source" ]; then
+    install "$source" "$PREFIX/bin/$BIN"
+  else
+    install "$BIN" "$PREFIX/bin"
+  fi
   for cmd in $CMDS; do
     source=$(<$BIN-$cmd)
-    [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN-$cmd" || install "$BIN-$cmd" "$PREFIX/bin"
+    if [ -f "$source" ]; then
+        install "$source" "$PREFIX/bin/$BIN-$cmd"
+    else
+        install "$BIN-$cmd" "$PREFIX/bin"
+    fi
   done
   return $?
 }
@@ -102,5 +110,9 @@ make_unlink () {
 }
 
 ## go
-[ $# -eq 0 ] && setup || make_$1
+if [ $# -eq 0 ]; then
+  setup
+else
+  make_$1
+fi
 exit $?
