@@ -18,6 +18,11 @@ echo_info () {
     echo "${@}"
 }
 
+echo_error () {
+    echo -n "  error: " >&2
+    echo "${@}" >&2
+}
+
 ## test if command exists
 ftest () {
   echo_info "Checking for ${1}..."
@@ -28,7 +33,7 @@ ftest () {
 features () {
   for f in "${@}"; do
     ftest "${f}" || {
-      echo >&2 "  error: Missing \`${f}'! Make sure it exists and try again."
+      echo_error "Missing \`${f}'! Make sure it exists and try again."
       return 1
     }
   done
