@@ -16,11 +16,7 @@ DEST=${DEST:-${TMPDIR}/bpkg-master}
 ## test if command exists
 ftest () {
   echo "  info: Checking for ${1}..."
-  if ! type -f "${1}" > /dev/null 2>&1; then
-    return 1
-  else
-    return 0
-  fi
+  ! type -f "${1}" > /dev/null 2>&1
 }
 
 ## feature tests
@@ -31,7 +27,6 @@ features () {
       return 1
     }
   done
-  return 0
 }
 
 ## main setup
@@ -55,7 +50,6 @@ setup () {
     make_install
     echo "  info: Done!"
   } >&2
-  return $?
 }
 
 ## make targets
@@ -83,7 +77,6 @@ make_install () {
         install "$BIN-$cmd" "$PREFIX/bin"
     fi
   done
-  return $?
 }
 
 make_uninstall () {
@@ -92,7 +85,6 @@ make_uninstall () {
   for cmd in $CMDS; do
     rm -f "$PREFIX/bin/$BIN-$cmd"
   done
-  return $?
 }
 
 make_link () {
@@ -102,7 +94,6 @@ make_link () {
   for cmd in $CMDS; do
     ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin"
   done
-  return $?
 }
 
 make_unlink () {
@@ -115,4 +106,3 @@ if [ $# -eq 0 ]; then
 else
   make_${1}
 fi
-exit $?
