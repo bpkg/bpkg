@@ -13,10 +13,15 @@ REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
 TMPDIR=${TMPDIR:-/tmp}
 DEST=${DEST:-${TMPDIR}/bpkg-master}
 
+echo_info () {
+    echo -n "  info: "
+    echo "${@}"
+}
+
 ## test if command exists
 ftest () {
-  echo "  info: Checking for ${1}..."
-  ! type -f "${1}" > /dev/null 2>&1
+  echo_info "Checking for ${1}..."
+  type -f "${1}" > /dev/null 2>&1
 }
 
 ## feature tests
@@ -31,7 +36,7 @@ features () {
 
 ## main setup
 setup () {
-  echo "  info: Welcome to the 'bpkg' installer!"
+  echo_info "Welcome to the 'bpkg' installer!"
   ## test for require features
   features git || return $?
 
@@ -39,16 +44,16 @@ setup () {
   {
     echo
     cd "${TMPDIR}"
-    echo "  info: Creating temporary files..."
+    echo_info "Creating temporary files..."
     test -d "${DEST}" && { echo "  warn: Already exists: '${DEST}'"; }
     rm -rf "${DEST}"
-    echo "  info: Fetching latest 'bpkg'..."
+    echo_info "Fetching latest 'bpkg'..."
     git clone --depth=1 "${REMOTE}" "${DEST}" > /dev/null 2>&1
     cd "${DEST}"
-    echo "  info: Installing..."
+    echo_info "Installing..."
     echo
     make_install
-    echo "  info: Done!"
+    echo_info "Done!"
   } >&2
 }
 
@@ -61,7 +66,7 @@ CMDS="json install package term suggest init utils update list show getdeps"
 
 make_install () {
   make_uninstall
-  echo "  info: Installing $PREFIX/bin/$BIN..."
+  echo_info "Installing $PREFIX/bin/$BIN..."
   install -d "$PREFIX/bin"
   local source=$(<$BIN)
   if [ -f "$source" ]; then
@@ -80,7 +85,7 @@ make_install () {
 }
 
 make_uninstall () {
-  echo "  info: Uninstalling $PREFIX/bin/$BIN..."
+  echo_info "Uninstalling $PREFIX/bin/$BIN..."
   rm -f "$PREFIX/bin/$BIN"
   for cmd in $CMDS; do
     rm -f "$PREFIX/bin/$BIN-$cmd"
@@ -89,7 +94,7 @@ make_uninstall () {
 
 make_link () {
   make_uninstall
-  echo "  info: Linking $PREFIX/bin/$BIN..."
+  echo_info "Linking $PREFIX/bin/$BIN..."
   ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
   for cmd in $CMDS; do
     ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin"
