@@ -43,7 +43,7 @@ features () {
 setup () {
   echo_info "Welcome to the 'bpkg' installer!"
   ## test for require features
-  features git || return $?
+  features git || return 1
 
   ## build
   {
@@ -67,20 +67,20 @@ BIN="bpkg"
 [ -z "$PREFIX" ] && PREFIX="/usr/local"
 
 # All 'bpkg' supported commands
-CMDS="json install package term suggest init utils update list show getdeps"
+CMDS=("json" "install" "package" "term" "suggest" "init" "utils" "update" "list" "show" "getdeps")
 
 make_install () {
   make_uninstall
   echo_info "Installing $PREFIX/bin/$BIN..."
   install -d "$PREFIX/bin"
-  local source=$(<$BIN)
+  local source=$(<"$BIN")
   if [ -f "$source" ]; then
     install "$source" "$PREFIX/bin/$BIN"
   else
     install "$BIN" "$PREFIX/bin"
   fi
-  for cmd in $CMDS; do
-    source=$(<$BIN-$cmd)
+  for cmd in "${CMDS[@]}"; do
+    source=$(<"$BIN-$cmd")
     if [ -f "$source" ]; then
         install "$source" "$PREFIX/bin/$BIN-$cmd"
     else
@@ -101,7 +101,7 @@ make_link () {
   make_uninstall
   echo_info "Linking $PREFIX/bin/$BIN..."
   ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
-  for cmd in $CMDS; do
+  for cmd in "${CMDS[@]}"; do
     ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin"
   done
 }
