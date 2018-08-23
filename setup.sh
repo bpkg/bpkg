@@ -47,6 +47,7 @@ setup () {
   local TMPDIR
   local DEST
 
+  echo_info "Creating temporary files..."
   TMPDIR=$(mktemp -d bpkg_tmp.XXXXXX -p /tmp) || {
     echo_error "Could not create a temporary directory!"
     return 1
@@ -61,7 +62,6 @@ setup () {
         echo_error "Could not cd into ${TMPDIR}"
         return 1
     }
-    echo_info "Creating temporary files..."
     test -d "${DEST}" && { echo "  warn: Already exists: '${DEST}'"; }
     rm -rf "${DEST}"
     echo_info "Fetching latest 'bpkg'..."
