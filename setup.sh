@@ -91,7 +91,8 @@ make_install () {
   make_uninstall
   echo_info "Installing $PREFIX/bin/$BIN..."
   install -d "$PREFIX/bin"
-  local source=$(<"$BIN")
+  local source
+  source=$(<"$BIN")
   if [ -f "$source" ]; then
     install "$source" "$PREFIX/bin/$BIN"
   else
@@ -138,5 +139,5 @@ make_unlink () {
 if [ $# -eq 0 ]; then
   setup
 else
-  make_${1}
+  make_"${1}"
 fi
