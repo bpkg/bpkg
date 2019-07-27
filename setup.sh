@@ -9,92 +9,126 @@
 #        "               ""
 #        bash package manager
 
-REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
-TMPDIR=${TMPDIR:-/tmp}
-DEST=${DEST:-${TMPDIR}/bpkg-master}
+set -u
+
+echo_info () {
+    echo -n "  info: "
+    echo "${@}"
+}
+
+echo_error () {
+    echo -n "  error: " >&2
+    echo "${@}" >&2
+}
 
 ## test if command exists
 ftest () {
-  echo "  info: Checking for ${1}..."
-  if ! type -f "${1}" > /dev/null 2>&1; then
-    return 1
-  else
-    return 0
-  fi
+  echo_info "Checking for ${1}..."
+  type -f "${1}" > /dev/null 2>&1
 }
 
 ## feature tests
 features () {
   for f in "${@}"; do
     ftest "${f}" || {
-      echo >&2 "  error: Missing \`${f}'! Make sure it exists and try again."
+      echo_error "Missing \`${f}'! Make sure it exists and try again."
       return 1
     }
   done
-  return 0
 }
 
 ## main setup
 setup () {
-  echo "  info: Welcome to the 'bpkg' installer!"
+  echo_info "Welcome to the 'bpkg' installer!"
   ## test for require features
-  features git || return $?
+  features git || return 1
+
+  local REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
+  local TMPDIR
+  local DEST
+
+  echo_info "Creating temporary files..."
+  TMPDIR=$(mktemp -d bpkg_tmp.XXXXXX -p /tmp) || {
+    echo_error "Could not create a temporary directory!"
+    return 1
+  }
+
+  DEST=${DEST:-${TMPDIR}/bpkg-master}
 
   ## build
   {
     echo
-    cd "${TMPDIR}"
-    echo "  info: Creating temporary files..."
+    cd "${TMPDIR}" || {
+        echo_error "Could not cd into ${TMPDIR}"
+        return 1
+    }
     test -d "${DEST}" && { echo "  warn: Already exists: '${DEST}'"; }
     rm -rf "${DEST}"
-    echo "  info: Fetching latest 'bpkg'..."
-    git clone --depth=1 "${REMOTE}" "${DEST}" > /dev/null 2>&1
-    cd "${DEST}"
-    echo "  info: Installing..."
+    echo_info "Fetching latest 'bpkg'..."
+    git clone -q --depth=1 "${REMOTE}" "${DEST}" > /dev/null || {
+        echo_error "Could not complete git clone!"
+        return 1
+    }
+    cd "${DEST}" || {
+        echo_error "Could not cd into ${DEST}"
+        return 1
+    }
+    echo_info "Installing..."
     echo
     make_install
-    echo "  info: Done!"
+    echo_info "Done!"
   } >&2
-  return $?
 }
 
 ## make targets
-BIN="bpkg"
-[ -z "$PREFIX" ] && PREFIX="/usr/local"
+declare -r BIN="bpkg"
+declare -r PREFIX=${PREFIX:-/usr/local}
 
 # All 'bpkg' supported commands
-CMDS="json install package term suggest init utils update list show getdeps"
+CMDS=("json" "install" "package" "term" "suggest" "init" "utils" "update" "list" "show" "getdeps")
 
 make_install () {
   make_uninstall
-  echo "  info: Installing $PREFIX/bin/$BIN..."
+  echo_info "Installing $PREFIX/bin/$BIN..."
   install -d "$PREFIX/bin"
-  local source=$(<$BIN)
-  [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN" || install "$BIN" "$PREFIX/bin"
-  for cmd in $CMDS; do
-    source=$(<$BIN-$cmd)
-    [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN-$cmd" || install "$BIN-$cmd" "$PREFIX/bin"
+  local source
+  source=$(<"$BIN")
+  if [ -f "$source" ]; then
+    install "$source" "$PREFIX/bin/$BIN"
+  else
+    install "$BIN" "$PREFIX/bin"
+  fi
+  for cmd in "${CMDS[@]}"; do
+    source=$(<"$BIN-$cmd")
+    if [ -f "$source" ]; then
+        install "$source" "$PREFIX/bin/$BIN-$cmd"
+    else
+        install "$BIN-$cmd" "$PREFIX/bin"
+    fi
   done
-  return $?
 }
 
 make_uninstall () {
-  echo "  info: Uninstalling $PREFIX/bin/$BIN..."
-  rm -f "$PREFIX/bin/$BIN"
-  for cmd in $CMDS; do
-    rm -f "$PREFIX/bin/$BIN-$cmd"
+  echo_info "Uninstalling $PREFIX/bin/$BIN..."
+  rm -f "$PREFIX/bin/$BIN" || {
+    echo_error "rm error; aborting!"
+    exit 1
+  }
+  for cmd in "${CMDS[@]}"; do
+    rm -f "$PREFIX/bin/$BIN-$cmd" || {
+      echo_error "rm error; aborting!"
+      exit 1
+    }
   done
-  return $?
 }
 
 make_link () {
   make_uninstall
-  echo "  info: Linking $PREFIX/bin/$BIN..."
+  echo_info "Linking $PREFIX/bin/$BIN..."
   ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
-  for cmd in $CMDS; do
+  for cmd in "${CMDS[@]}"; do
     ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin"
   done
-  return $?
 }
 
 make_unlink () {
@@ -102,5 +136,8 @@ make_unlink () {
 }
 
 ## go
-[ $# -eq 0 ] && setup || make_$1
-exit $?
+if [ $# -eq 0 ]; then
+  setup
+else
+  make_"${1}"
+fi
