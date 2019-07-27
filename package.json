@@ -4,15 +4,5 @@
   "description": "Lightweight bash package manager",
   "global": true,
   "repo": "bpkg/bpkg",
-  "install": "bash setup.sh",
-  "dependencies": {
-    "opencollective": "^1.0.3"
-  },
-  "collective": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/bpkg"
-  },
-  "scripts": {
-    "postinstall": "opencollective postinstall"
-  }
+  "install": "bash setup.sh"
 }
