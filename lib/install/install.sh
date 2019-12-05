@@ -383,6 +383,15 @@ bpkg_install_from_remote () {
       build='make install'
     fi
 
+    if [ -z "$PREFIX" ]; then
+      if [ $USER == 'root' ]; then
+        PREFIX="/usr/local"
+      else
+        PREFIX="$HOME/.local"
+      fi
+      build="env PREFIX=$PREFIX $build"
+    fi
+      
     { (
       ## go to tmp dir
       cd "$( [[ ! -z "${TMPDIR}" ]] && echo "${TMPDIR}" || echo /tmp)" &&
