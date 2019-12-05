@@ -60,7 +60,13 @@ setup () {
 
 ## make targets
 BIN="bpkg"
-[ -z "$PREFIX" ] && PREFIX="/usr/local"
+if [ -z "$PREFIX" ]; then
+  if [ $USER == 'root' ]; then
+    PREFIX="/usr/local"
+  else
+    PREFIX="$HOME/.local"
+  fi
+fi
 
 # All 'bpkg' supported commands
 CMDS="json install package term suggest init utils update list show getdeps"
