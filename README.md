@@ -67,15 +67,9 @@ To directly install `bpkg` from its source code you have to clone its repository
 ```sh
 $ git clone https://github.com/bpkg/bpkg.git
 $ cd bpkg
-$ ./setup.sh
-```
-
-Or in a directory with user write permission, like `$HOME/opt/bin`
-
-```sh
-$ git clone https://github.com/bpkg/bpkg.git
-$ cd bpkg
-$ PREFIX=$HOME/opt ./setup.sh
+$ ./setup.sh                             # Will install bpkg in $HOME/.local/bin
+$ sudo ./setup.sh                        # Will install bpkg in /usr/local/bin.
+$ PREFIX=/my/custom/directory ./setup.sh # Will install bpkg in a custom directory.
 ```
 
 ## Usage
@@ -84,9 +78,10 @@ You use `bpkg` by simply sending commands, pretty much like `npm` or `pip`.
 
 ### Installing packages
 
-Packages can either be global (on `/usr/local/bin`) or local (under `./deps`).
+Packages can either be global (on `/usr/local/bin` if installed as root or
+ `$HOME/.local/bin` otherwize) or local (under `./deps`).
 
-For example, here's a **global install** of the [term package][term]:
+For example, here's a **global install for the current user** of the [term package][term]:
 
 ```sh
 $ bpkg install term -g
