@@ -384,7 +384,7 @@ bpkg_install_from_remote () {
     fi
 
     if [ -z "$PREFIX" ]; then
-      if [[ $USER == "root" ]]; then
+      if [ "$USER" == "root" ]; then
         PREFIX="/usr/local"
       else
         PREFIX="$HOME/.local"
