@@ -1,8 +1,9 @@
-language: ruby
+language: shell
 sudo: required
 install:
 - sudo ./setup.sh
 script:
+- bash -c 'shopt -s globstar nullglob; shellcheck **/*.sh'
 - bpkg update
 - bpkg list
 - bpkg show bpkg/github
