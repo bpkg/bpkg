@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="0.0.1"
+VERSION="0.1.0"
 
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
@@ -26,8 +26,8 @@ usage () {
   echo
   echo "Commands:"
   echo "  readme        Print package README.md file, if available, suppressing other output"
-  echo "  sources       Print all sources listed in package.json scripts, in order. This"
-  echo "                option suppresses other output and prints executable bash."
+  echo "  sources       Print all sources listed in bpkg.json (or package.json) scripts, in "
+  echo "                order. This option suppresses other output and prints executable bash."
   echo
   echo "Options:"
   echo "  --help|-h     Print this help dialogue"
@@ -57,7 +57,10 @@ show_package () {
     uri=$BPKG_REMOTE/$pkg/raw/master
   fi
 
-  json=$(eval "curl $auth -sL '$uri/package.json?$(date +%s)'")
+  json=$(eval "curl $auth -sL '$uri/bpkg.json?$(date +%s)'")
+  if [ "${json}" = '404: Not Found' ];then
+    json=$(eval "curl $auth -sL '$uri/package.json?$(date +%s)'")
+  fi
   readme=$(eval "curl $auth -sL '$uri/README.md?$(date +%s)'")
 
   local readme_len=$(echo "$readme" | wc -l | tr -d ' ')
