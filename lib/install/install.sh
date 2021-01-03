@@ -224,7 +224,7 @@ bpkg_install_from_remote () {
   local name=''
   local version=''
   local auth_param=''
-  local let has_pkg_json=1
+  local let has_pkg_json=0
   declare -a local pkg_parts=()
   declare -a local remote_parts=()
   declare -a local scripts=()
@@ -313,24 +313,35 @@ bpkg_install_from_remote () {
   url="${remote}${uri}"
   repo_url="${git_remote}/${user}/${name}.git"
 
-  ## determine if 'package.json' exists at url
+  ## determine if `bpkg.json` or 'package.json' exists at url
   {
-    if ! url_exists "${url}/package.json?$(date +%s)" "${auth_param}"; then
-      warn 'package.json doesn`t exist'
-      has_pkg_json=0
-      # check to see if there's a Makefile. If not, this is not a valid package
-      if ! url_exists "${url}/Makefile?$(date +%s)" "${auth_param}"; then
-        warn "Makefile not found, skipping remote: $url"
-        return 1
+    if url_exists "${url}/bpkg.json?$(date +%s)" "${auth_param}"; then
+      has_pkg_json=2
+    else
+      warn 'bpkg.json doesn`t exist'
+      if url_exists "${url}/package.json?$(date +%s)" "${auth_param}"; then
+        has_pkg_json=1
+      else
+        warn 'package.json doesn`t exist'
+        has_pkg_json=0
+        # check to see if there's a Makefile. If not, this is not a valid package
+        if ! url_exists "${url}/Makefile?$(date +%s)" "${auth_param}"; then
+          warn "Makefile not found, skipping remote: $url"
+          return 1
+        fi
       fi
     fi
   }
 
-  ## read package.json
-  json=$(read_package_json "${url}/package.json?$(date +%s)" "${auth_param}")
+  ## read bpkg.json or package.json
+  if (( 2 == has_pkg_json )); then
+    json=$(read_package_json "${url}/bpkg.json?$(date +%s)" "${auth_param}")
+  elif (( 1 == has_pkg_json )); then
+    json=$(read_package_json "${url}/package.json?$(date +%s)" "${auth_param}")
+  fi
 
-  if (( 1 == has_pkg_json )); then
-    ## get package name from 'package.json'
+  if (( has_pkg_json > 0 )); then
+    ## get package name from 'bpkg.json' or 'package.json'
     name="$(
       echo -n "${json}" |
       bpkg-json -b |
@@ -371,7 +382,7 @@ bpkg_install_from_remote () {
 
   ## build global if needed
   if (( 1 == needs_global )); then
-    if (( 1 == has_pkg_json )); then
+    if (( has_pkg_json > 0 )); then
       ## install bin if needed
       build="$(echo -n "${json}" | bpkg-json -b | grep '\["install"\]' | awk '{$1=""; print $0 }' | tr -d '\"')"
       build="$(echo -n "${build}" | sed -e 's/^ *//' -e 's/ *$//')"
@@ -414,8 +425,12 @@ bpkg_install_from_remote () {
     ) }
   ## perform local install otherwise
   else
-    ## copy package.json over
-    save_remote_file "${url}/package.json" "${cwd}/deps/${name}/package.json" "${auth_param}"
+    ## copy bpkg.json or package.json over
+    if (( 2 == has_pkg_json )); then
+      save_remote_file "${url}/bpkg.json" "${cwd}/deps/${name}/bpkg.json" "${auth_param}"
+    elif (( 1 == has_pkg_json )); then
+      save_remote_file "${url}/package.json" "${cwd}/deps/${name}/package.json" "${auth_param}"
+    fi
 
     ## make 'deps/' directory if possible
     mkdir -p "${cwd}/deps/${name}"
