@@ -4,8 +4,8 @@
 VERSION="0.0.1"
 
 ## coords
-let _x=0
-let _y=0
+(( _x=0 ))
+(( _y=0 ))
 
 ## output error to stderr
 error () {
