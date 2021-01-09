@@ -40,11 +40,11 @@ bpkg_update_remote() {
   fi
 
   #echo "curl -slo- $auth '$wiki_url' | grep -o '\[.*\](.*).*'"
-  repo_list=$(curl -sLo- $auth "$wiki_url" | grep -o '\[.*\](.*).*' | sed 's/\[\(.*\)\](.*)[ \-]*/\1|/' )
+  repo_list=$(curl -sLo- "$auth" "$wiki_url" | grep -o '\[.*\](.*).*' | sed 's/\[\(.*\)\](.*)[ \-]*/\1|/' )
 
   num_repos=$(echo "$repo_list" | wc -l | tr -d ' ')
   bpkg_info "indexing ${num_repos} repos from $BPKG_REMOTE_HOST to $index_file"
-  echo "$repo_list" > $index_file
+  echo "$repo_list" > "$index_file"
 }
 
 bpkg_update () {

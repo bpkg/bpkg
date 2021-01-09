@@ -78,7 +78,7 @@ make_install () {
   local source=$(<$BIN)
   [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN" || install "$BIN" "$PREFIX/bin"
   for cmd in $CMDS; do
-    source=$(<$BIN-$cmd)
+    source=$(<"$BIN-$cmd")
     [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN-$cmd" || install "$BIN-$cmd" "$PREFIX/bin"
   done
   return $?
@@ -108,5 +108,5 @@ make_unlink () {
 }
 
 ## go
-[ $# -eq 0 ] && setup || make_$1
+[ $# -eq 0 ] && setup || "make_$1"
 exit $?

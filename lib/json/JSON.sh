@@ -57,7 +57,7 @@ awk_egrep () {
       print token;
       $0=substr($0, start+RLENGTH);
     }
-  }' pattern=$pattern_string
+  }' pattern="$pattern_string"
 }
 
 tokenize () {

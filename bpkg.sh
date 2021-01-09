@@ -42,7 +42,7 @@ features () {
   for ((i = 0; i < ${#features[@]}; ++i)); do
     local f="${features[$i]}"
     if ! type "${f}"  > /dev/null 2>&1; then
-      error "Missing "${f}" dependency"
+      error "Missing \"${f}\" dependency"
       return 1
     fi
   done

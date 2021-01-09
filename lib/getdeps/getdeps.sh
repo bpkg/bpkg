@@ -37,7 +37,7 @@ bpkg_getdeps () {
   for (( i = 0; i < ${#dependencies[@]} ; ++i )); do
     (
       local package=${dependencies[$i]}
-      bpkg install ${package}
+      bpkg install "${package}"
     )
   done
   return 0

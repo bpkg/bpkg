@@ -57,7 +57,7 @@ term_move () {
   (( _y = y ))
 
   ## write
-  printf "\e[%d;%d;f" ${y} ${x}
+  printf "\e[%d;%d;f" "${y}" "${x}"
   return 0
 }
 
