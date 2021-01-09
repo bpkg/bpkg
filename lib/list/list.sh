@@ -73,7 +73,7 @@ bpkg_list () {
 }
 
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_list
 elif bpkg_validate; then
   bpkg_list "${@}"

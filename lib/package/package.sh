@@ -49,7 +49,7 @@ bpkg_package () {
   return 0
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_package
 else
   bpkg_package "${@}"

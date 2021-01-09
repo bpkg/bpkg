@@ -75,7 +75,7 @@ bpkg_update () {
   done
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_update
 elif bpkg_validate; then
   bpkg_update "${@}"

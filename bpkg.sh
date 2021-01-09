@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## prevent sourcing
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   echo >&2 "error: \`bpkg' cannot be sourced"
   return 1
 fi

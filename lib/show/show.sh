@@ -190,7 +190,7 @@ bpkg_show () {
   return 1
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_show
 elif bpkg_validate; then
   bpkg_show "${@}"

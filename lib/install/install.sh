@@ -480,7 +480,7 @@ bpkg_install_from_remote () {
 }
 
 ## Use as lib or perform install
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_install
 elif validate_parameters; then
   bpkg_install "${@}"
