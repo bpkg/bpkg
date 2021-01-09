@@ -172,7 +172,7 @@ bpkg_show () {
 
     OLDIFS="$IFS"
     IFS=$'\n'
-    for line in $(cat $BPKG_REMOTE_INDEX_FILE); do
+    for line in $(cat "$BPKG_REMOTE_INDEX_FILE"); do
       local name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
       local desc=$(echo "$line" | cut -d\| -f2)
       if [ "$name" == "$pkg" ]; then

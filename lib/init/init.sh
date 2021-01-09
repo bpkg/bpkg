@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## sets optional variable from environment
-opt () { eval "if [ -z "\${$1}" ]; then ${1}='${2}'; fi";  }
+opt () { eval "if [ -z \"\${$1}\" ]; then ${1}='${2}'; fi";  }
 
 ## output usage
 usage () {
@@ -23,7 +23,7 @@ prompt () {
     value="${value//\"/\'}";
   } 2>&1
   if [ ! -z "${value}" ]; then
-    eval "${var}"=\"${value}\"
+    eval "${var}=\"${value}\""
   fi
 }
 
@@ -135,6 +135,7 @@ csv () {
       SCRIPTS="${SCRIPTS//,/ }"
       SCRIPTS="${SCRIPTS//\"/}"
       SCRIPTS="${SCRIPTS//\'/}"
+      # shellcheck disable=SC2086
       SCRIPTS=($(wrap ${SCRIPTS}))
       let len=${#SCRIPTS[@]}
       for (( i = 0; i < len; i++ )); do
