@@ -286,7 +286,7 @@ term () {
 ## detect if being sourced and
 ## export if so else execute
 ## main function with args
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f term
 else
   term "${@}"

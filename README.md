@@ -252,7 +252,7 @@ These are guidelines that we strongly encourage developers to follow.
 It's nice to have a bash package that can be used in the terminal and also be invoked as a command line function. To achieve this the exporting of your functionality *should* follow this pattern:
 
 ```sh
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f my_script
 else
   my_script "${@}"

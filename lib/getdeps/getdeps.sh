@@ -43,7 +43,7 @@ bpkg_getdeps () {
   return 0
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_getdeps
 else
   bpkg_getdeps "${@}"
