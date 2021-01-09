@@ -137,7 +137,7 @@ csv () {
       SCRIPTS="${SCRIPTS//\'/}"
       # shellcheck disable=SC2086
       SCRIPTS=($(wrap ${SCRIPTS}))
-      let len=${#SCRIPTS[@]}
+      (( len=${#SCRIPTS[@]} ))
       for (( i = 0; i < len; i++ )); do
         word=${SCRIPTS[$i]}
         if (( i + 1 != len )); then
