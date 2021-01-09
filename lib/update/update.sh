@@ -6,7 +6,8 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  source $(which bpkg-utils)
+  # shellcheck source=../utils/utils.sh
+  source "$(which bpkg-utils)"
 fi
 
 bpkg_initrc

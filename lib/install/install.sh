@@ -2,6 +2,7 @@
 
 # Include config rc file if found
 CONFIG_FILE="$HOME/.bpkgrc"
+# shellcheck disable=SC1090
 [[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
 
 ## set defaults
