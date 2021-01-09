@@ -24,7 +24,7 @@ term_write () {
   if [ -z "${c}" ]; then
     return 1
   fi
-  printf "\e[${c}"
+  echo -en "\e[${c}"
   return 0
 }
 
@@ -78,19 +78,18 @@ term_transition () {
 ## set terminal color
 term_color () {
   local color="${1}"
-  local fmt="\e[3%dm"
   if [ -z "${color}" ]; then
     return 1
   fi
   case "${color}" in
-    black) printf "${fmt}" "0" ;;
-    red) printf "${fmt}" "1" ;;
-    green) printf "${fmt}" "2" ;;
-    yellow) printf "${fmt}" "3" ;;
-    blue) printf "${fmt}" "4" ;;
-    magenta) printf "${fmt}" "5" ;;
-    cyan) printf "${fmt}" "6" ;;
-    white) printf "${fmt}" "7" ;;
+    black) printf "\e[30m" ;;
+    red) printf "\e[31m" ;;
+    green) printf "\e[32m" ;;
+    yellow) printf "\e[33m" ;;
+    blue) printf "\e[34m" ;;
+    magenta) printf "\e[35m" ;;
+    cyan) printf "\e[36m" ;;
+    white) printf "\e[37m" ;;
     gray|grey) printf "\e[90m" ;;
     *) return 1 ;;
   esac
@@ -100,19 +99,18 @@ term_color () {
 ## set term background color
 term_background () {
   local color="${1}"
-  local fmt="\e[4%dm"
   if [ -z "${color}" ]; then
     return 1
   fi
   case "${color}" in
-    black) printf "${fmt}" "0" ;;
-    red) printf "${fmt}" "1" ;;
-    green) printf "${fmt}" "2" ;;
-    yellow) printf "${fmt}" "3" ;;
-    blue) printf "${fmt}" "4" ;;
-    magenta) printf "${fmt}" "5" ;;
-    cyan) printf "${fmt}" "6" ;;
-    white) printf "${fmt}" "7" ;;
+    black) printf "\e[40m" ;;
+    red) printf "\e[41m" ;;
+    green) printf "\e[42m" ;;
+    yellow) printf "\e[43m" ;;
+    blue) printf "\e[44m" ;;
+    magenta) printf "\e[45m" ;;
+    cyan) printf "\e[46m" ;;
+    white) printf "\e[47m" ;;
     *) return 1 ;;
   esac
   return 0
@@ -156,16 +154,15 @@ term_hidden () {
 ## clear a terminal section by name
 term_clear () {
   local section="${1}"
-  local fmt="\e[%s"
   if [ -z "${section}" ]; then
     return 1
   fi
   case "${section}" in
-    start) printf "${fmt}" "1K";;
-    end) printf "${fmt}" "K";;
-    line) printf "${fmt}" "2K";;
-    screen|up) printf "${fmt}" "1J";;
-    down) printf "${fmt}" "J";;
+    start) printf "\e[1K";;
+    end) printf "\e[K";;
+    line) printf "\e[2K";;
+    screen|up) printf "\e[1J";;
+    down) printf "\e[J";;
     *) return 1 ;;
   esac
   return 0
