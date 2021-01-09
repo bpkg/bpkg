@@ -77,12 +77,12 @@ suggest () {
   ## get total
   count="${#found[@]}"
 
-  if (( ${count} == 1 )); then
+  if (( count == 1 )); then
     echo "${found[0]}"
-  elif (( ${count} > 0 )); then
-    printf "suggest: found %d result(s)\n" ${count}
+  elif (( count > 0 )); then
+    printf "suggest: found %d result(s)\n" "${count}"
     echo
-    for (( i = 0; i < ${count}; ++i )); do
+    for (( i = 0; i < count; ++i )); do
       printf "%d %s\n" $(echo -n ${found[$i]} | wc -c | tr -d ' ') "${found[$i]}"
     done | sort -n | awk '{ print $2 }' | xargs printf '  %s\n'
   else

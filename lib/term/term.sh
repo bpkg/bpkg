@@ -53,8 +53,8 @@ term_move () {
   fi
 
   ## set state
-  (( _x = ${x} ))
-  (( _y = ${y} ))
+  (( _x = x ))
+  (( _y = y ))
 
   ## write
   printf "\e[%d;%d;f" ${y} ${x}
@@ -68,8 +68,8 @@ term_transition () {
     return 1
   fi
 
-  (( x = ${x} + ${_x} ))
-  (( y = ${y} + ${_y} ))
+  (( x = x + _x ))
+  (( y = y + _y ))
 
   term move "${x}" "${y}"
   return 0
