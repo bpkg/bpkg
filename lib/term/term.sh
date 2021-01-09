@@ -269,7 +269,7 @@ term () {
         "${cmd}" "${@}"
         return $?
       else
-        if [ ! -z "${arg}" ]; then
+        if [ -n "${arg}" ]; then
           error "Unknown argument: \`${arg}'"
         fi
         usage
