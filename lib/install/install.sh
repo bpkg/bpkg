@@ -15,9 +15,7 @@ BPKG_USER="${BPKG_USER:-bpkg}"
 ## check parameter consistency
 validate_parameters () {
   if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
-    mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
-    fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
-    error "$fmesg"
+    error "$(printf 'BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array' "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")"
     return 1
   fi
   return 0
@@ -37,7 +35,7 @@ message () {
   fi
 
   shift
-  printf "    ${1}"
+  echo -n "    ${1}"
   shift
 
   if type -f bpkg-term > /dev/null 2>&1; then
