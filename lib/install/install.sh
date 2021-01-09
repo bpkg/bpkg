@@ -404,7 +404,7 @@ bpkg_install_from_remote () {
 
     { (
       ## go to tmp dir
-      cd "$( [[ ! -z "${TMPDIR}" ]] && echo "${TMPDIR}" || echo /tmp)" &&
+      cd "$( [[ -n "${TMPDIR}" ]] && echo "${TMPDIR}" || echo /tmp)" &&
         ## prune existing
       rm -rf "${name}-${version}" &&
         ## shallow clone

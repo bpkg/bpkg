@@ -22,7 +22,7 @@ prompt () {
 
     value="${value//\"/\'}";
   } 2>&1
-  if [ ! -z "${value}" ]; then
+  if [ -n "${value}" ]; then
     eval "${var}=\"${value}\""
   fi
 }
@@ -128,7 +128,7 @@ required () {
 
 ## convert scripts to quoted csv
 csv () {
-  if [ ! -z "${SCRIPTS}" ]; then
+  if [ -n "${SCRIPTS}" ]; then
     RAW_SCRIPTS=${SCRIPTS}
     {
       local TMP=""
@@ -166,7 +166,7 @@ delimit () {
     local lowercase="$(echo ${key} | tr '[:upper:]' '[:lower:]')"
 
     eval local val="\${${key}}"
-    if [ ! -z "${val}" ]; then
+    if [ -n "${val}" ]; then
 
       ## swap leading/trailing quotes for brackets in arrays
       local before="\""
@@ -293,7 +293,7 @@ bpkg_init () {
       ;;
 
     *)
-      if [ ! -z "${arg}" ]; then
+      if [ -n "${arg}" ]; then
         error "Unknown option: \`${arg}'"
         usage
         exit 1
