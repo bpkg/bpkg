@@ -231,7 +231,7 @@ create_shell_file () {
       echo "  ## your code here"
       echo "}"
       echo
-      echo 'if [[ ${BASH_SOURCE[0]} != $0 ]]; then'
+      echo 'if [[ ${BASH_SOURCE[0]} != "$0" ]]; then'
       echo "  export -f $NAME"
       echo 'else'
       echo "  $NAME "'"${@}"'
@@ -325,7 +325,7 @@ bpkg_init () {
 }
 
 ## export or run
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg-init
 else
   bpkg_init "${@}"
