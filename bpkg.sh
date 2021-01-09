@@ -90,7 +90,7 @@ bpkg () {
         {
           declare -a local res=($(commands))
 
-          if [ ! -z "${res}" ]; then
+          if [ -n "${res}" ]; then
             echo
             echo  >&2 "Did you mean one of these?"
             found=0
