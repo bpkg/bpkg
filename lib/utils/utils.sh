@@ -5,8 +5,10 @@
 ## Init local config and set environmental defaults
 bpkg_initrc() {
   local global_config=${BPKG_GLOBAL_CONFIG:-"/etc/bpkgrc"}
+  # shellcheck disable=SC1090
   [ -f "$global_config" ] && source "$global_config"
   local config=${BPKG_CONFIG:-"$HOME/.bpkgrc"}
+  # shellcheck disable=SC1090
   [ -f "$config" ] && source "$config"
   ## set defaults
   if [ ${#BPKG_REMOTES[@]} -eq 0 ]; then
