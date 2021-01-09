@@ -67,7 +67,7 @@ suggest () {
         if [ -z "${res}" ]; then
           continue
         fi
-        res="$(echo ${res} | tr '\n' ' ')"
+        res="$(echo "${res}" | tr '\n' ' ')"
         ## add to found count
         found+=( $(echo -n "${res}") )
       fi
@@ -83,7 +83,7 @@ suggest () {
     printf "suggest: found %d result(s)\n" "${count}"
     echo
     for (( i = 0; i < count; ++i )); do
-      printf "%d %s\n" $(echo -n ${found[$i]} | wc -c | tr -d ' ') "${found[$i]}"
+      printf "%d %s\n" "$(echo -n "${found[$i]}" | wc -c | tr -d ' ')" "${found[$i]}"
     done | sort -n | awk '{ print $2 }' | xargs printf '  %s\n'
   else
     echo "suggest: Couldn't anything to match \`${query}'"
