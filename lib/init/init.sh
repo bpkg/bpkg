@@ -67,7 +67,8 @@ append () {
 appendf () {
   local fmt="$1"
   shift
-  buf+="$(printf "${fmt}" "${@}")"
+  # shellcheck disable=SC2059
+ buf+="$(printf "${fmt}" "${@}")"
 }
 
 ## wraps each argument in quotes
