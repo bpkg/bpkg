@@ -59,8 +59,9 @@ bpkg_list () {
     OLDIFS="$IFS"
     IFS=$'\n'
     for line in $(cat "$BPKG_REMOTE_INDEX_FILE"); do
-      local name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
-      local desc=$(echo "$line" | cut -d\| -f2)
+      local desc name
+      name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
+      desc=$(echo "$line" | cut -d\| -f2)
       local host=$BPKG_REMOTE_HOST
       if [ "$verbose" == "1" ]; then
         echo "$name [$host] - $desc"
