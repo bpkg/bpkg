@@ -100,7 +100,7 @@ show_package () {
     # Show Sources
     OLDIFS="$IFS"
     IFS=$'\n'
-    for src in $(echo "$sources"); do
+    for src in $sources; do
       local content http_code
       http_code=$(eval "curl $auth -sL '$uri/$src?$(date +%s)' -w '%{http_code}' -o /dev/null")
       if (( http_code < 400 )); then
@@ -174,7 +174,8 @@ bpkg_show () {
 
     OLDIFS="$IFS"
     IFS=$'\n'
-    for line in $(cat "$BPKG_REMOTE_INDEX_FILE"); do
+    local line
+    while read -r line; do
       local desc name
       name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
       desc=$(echo "$line" | cut -d\| -f2)
@@ -184,7 +185,8 @@ bpkg_show () {
         IFS=$'\n'
         return 0
       fi
-    done
+    done < "${BPKG_REMOTE_INDEX_FILE}"
+
     IFS="$OLDIFS"
     i=$((i+1))
   done
