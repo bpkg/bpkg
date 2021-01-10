@@ -6,7 +6,8 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  # shellcheck disable=SC2230 shellcheck source=../utils/utils.sh
+  # shellcheck disable=SC2230
+  # shellcheck source=../utils/utils.sh
   source "$(which bpkg-utils)"
 fi
 
