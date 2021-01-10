@@ -10,9 +10,10 @@ usage () {
 
 ## main
 suggest () {
-  declare -a local paths=()
-  declare -a local seen=()
-  declare -a local found=()
+  local found paths seen
+  declare -a paths=()
+  declare -a seen=()
+  declare -a found=()
   local query="${1}"
 
   case "${query}" in

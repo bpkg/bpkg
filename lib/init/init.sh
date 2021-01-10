@@ -101,6 +101,7 @@ options () {
 }
 
 set_global () {
+  # shellcheck disable=SC2034
   GLOBAL=1
 }
 
