@@ -24,7 +24,9 @@ usage () {
 ## commands
 commands () {
   {
-    declare -a local cmds=( $(
+    local cmds
+
+    declare -a cmds=( $(
       bpkg-suggest 'bpkg-' |
       tail -n+2            |
       sed 's/.*\/bpkg-//g' |
@@ -38,7 +40,8 @@ commands () {
 
 ## feature tests
 features () {
-  declare -a local features=(bpkg-json bpkg-suggest)
+  local features
+  declare -a features=(bpkg-json bpkg-suggest)
   for ((i = 0; i < ${#features[@]}; ++i)); do
     local f="${features[$i]}"
     if ! type "${f}"  > /dev/null 2>&1; then
@@ -88,7 +91,8 @@ bpkg () {
       else
         echo >&2 "error: \`${arg}' is not a bpkg command."
         {
-          declare -a local res=($(commands))
+          local res
+          declare -a res=($(commands))
 
           if [ -n "${res}" ]; then
             echo

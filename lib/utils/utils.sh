@@ -93,6 +93,7 @@ bpkg_select_remote () {
   local git_remote=$2
   BPKG_REMOTE_HOST=$(echo "$git_remote" | sed 's/.*:\/\///' | sed 's/\/$//' | tr '/' '_')
   BPKG_REMOTE_INDEX="$BPKG_INDEX/$BPKG_REMOTE_HOST"
+  # shellcheck disable=SC2034
   BPKG_REMOTE_INDEX_FILE="$BPKG_REMOTE_INDEX/index.txt"
   BPKG_OAUTH_TOKEN=""
   BPKG_CURL_AUTH_PARAM=""
@@ -104,9 +105,11 @@ bpkg_select_remote () {
     local remote_parts=($remote)
     IFS="${OLDIFS}"
     BPKG_OAUTH_TOKEN=${remote_parts[1]}
+    # shellcheck disable=SC2034
     BPKG_CURL_AUTH_PARAM="-u $BPKG_OAUTH_TOKEN:x-oauth-basic"
     BPKG_REMOTE=${remote_parts[2]}
     if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${BPKG_OAUTH_TOKEN}* ]]; then
+      # shellcheck disable=SC2034
       BPKG_AUTH_GIT_REMOTE=${git_remote/https:\/\//https:\/\/$BPKG_OAUTH_TOKEN:x-oauth-basic@}
     fi
   else
@@ -122,6 +125,7 @@ bpkg_select_raw_path() {
   if [ "$BPKG_OAUTH_TOKEN" == "" ]; then
     BPKG_RAW_PATH="$BPKG_REMOTE/$user/$name"
   else
+    # shellcheck disable=SC2034
     BPKG_RAW_PATH="$BPKG_REMOTE/$user/$name/raw"
   fi
   return 0

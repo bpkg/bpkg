@@ -226,10 +226,12 @@ bpkg_install_from_remote () {
   local version=''
   local auth_param=''
   local let has_pkg_json=0
-  declare -a local pkg_parts=()
-  declare -a local remote_parts=()
-  declare -a local scripts=()
-  declare -a local files=()
+
+  local files pkg_parts remote_parts scripts
+  declare -a pkg_parts=()
+  declare -a remote_parts=()
+  declare -a scripts=()
+  declare -a files=()
 
   ## get version if available
   {
@@ -467,10 +469,7 @@ bpkg_install_from_remote () {
       ## grab each file and place in correct directory
       for file in "${files[@]}"; do
       (
-          local filename
           if [[ "${file}" ]];then
-            filename="$(echo "${file}" | xargs basename )"
-
             info "fetch" "${url}/${file}"
             info "write" "${cwd}/deps/${name}/${file}"
             save_remote_file "${url}/${file}" "${cwd}/deps/${name}/${file}" "${auth_param}"
