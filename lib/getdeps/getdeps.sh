@@ -9,12 +9,15 @@ usage () {
 
 ## Read a package property
 bpkg_getdeps () {
-  local cwd="$(pwd)"
-  local pkg
+  local cwd pkg
+
+  cwd="$(pwd)"
   pkg="${cwd}/bpkg.json"
+
   if ! test -f "${pkg}"; then
     pkg="${cwd}/package.json"
   fi
+
 
   ## parse flags
   case "$1" in
