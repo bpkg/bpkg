@@ -41,7 +41,7 @@ suggest () {
     IFS=':' read -a paths <<< "${PATH}"
     for (( i = 0; i < ${#paths[@]}; ++i )); do
       local path="${paths[$i]}"
-      local let skip=0
+      local skip=0
 
       ## omit non existent paths
       if ! test -d "${path}"; then

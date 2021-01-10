@@ -37,12 +37,14 @@ bpkg_package () {
     ## output all propertyies if property
     ## is ommited
     {
+      # shellcheck disable=SC2002
       cat "${pkg}" | bpkg-json -b
     }
   else
     ## show value for a specific property
     ## in 'bpkg.json' or 'package.json'
     {
+      # shellcheck disable=SC2002
       cat "${pkg}" | bpkg-json -b | grep "${prop}" | awk '{ $1=""; printf $0 }'
       echo
     }

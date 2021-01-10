@@ -224,6 +224,7 @@ bpkg_install_from_remote () {
   local name=''
   local version=''
   local auth_param=''
+  # shellcheck disable=SC2034
   local let has_pkg_json=0
 
   local files pkg_parts remote_parts scripts
