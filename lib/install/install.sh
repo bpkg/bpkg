@@ -82,13 +82,13 @@ info () {
 
 
 save_remote_file () {
-  local auth_param path url
+  local auth_param dirname path url
 
   url="${1}"
   path="${2}"
   auth_param="${3:-}"
 
-  local dirname="$(dirname "${path}")"
+  dirname="$(dirname "${path}")"
 
   # Make sure directory exists
   if [[ ! -d "${dirname}" ]];then
@@ -208,12 +208,14 @@ bpkg_install () {
 ##   1: the package was not found on the remote
 ##   2: a fatal error occurred
 bpkg_install_from_remote () {
+  local cwd
+
   local pkg=$1
   local remote=$2
   local git_remote=$3
   local let needs_global=$4
 
-  local cwd=$(pwd)
+  cwd=$(pwd)
   local url=''
   local uri=''
   local version=''
@@ -444,8 +446,10 @@ bpkg_install_from_remote () {
     ## grab each script and place in deps directory
     for script in "${scripts[@]}"; do
       (
+        local scriptname
+
         if [[ "${script}" ]];then
-          local scriptname="$(echo "${script}" | xargs basename )"
+          scriptname="$(echo "${script}" | xargs basename )"
 
           info "fetch" "${url}/${script}"
           info "write" "${cwd}/deps/${name}/${script}"
@@ -463,8 +467,9 @@ bpkg_install_from_remote () {
       ## grab each file and place in correct directory
       for file in "${files[@]}"; do
       (
+          local filename
           if [[ "${file}" ]];then
-            local filename="$(echo "${file}" | xargs basename )"
+            filename="$(echo "${file}" | xargs basename )"
 
             info "fetch" "${url}/${file}"
             info "write" "${cwd}/deps/${name}/${file}"

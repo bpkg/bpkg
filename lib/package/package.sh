@@ -9,10 +9,12 @@ usage () {
 
 ## Read a package property
 bpkg_package () {
-  local prop="${1}"
-  local cwd="$(pwd)"
-  local pkg
-  pkg="${cwd}/bpkg.json"
+  local cwd pkg prop
+
+  prop="${1}"
+  cwd="$(pwd)"
+  pkg="${cwd}/package.json"
+
   if ! test -f "${pkg}"; then
     pkg="${cwd}/package.json"
   fi

@@ -153,6 +153,8 @@ csv () {
 
 ## delimit object and key-value pairs
 delimit () {
+  local lowercase
+
   append "{"
 
   for key in      \
@@ -163,7 +165,7 @@ delimit () {
     "INSTALL"     \
     "SCRIPTS"
   do
-    local lowercase="$(echo ${key} | tr '[:upper:]' '[:lower:]')"
+    lowercase="$(echo ${key} | tr '[:upper:]' '[:lower:]')"
 
     eval local val="\${${key}}"
     if [ -n "${val}" ]; then
@@ -272,8 +274,10 @@ create_repo () {
 
 ## main
 bpkg_init () {
+  local cwd
+
   local version="0.1.0"
-  local cwd="$(pwd)"
+  cwd="$(pwd)"
   local buf="" ## output buffer
   local file="${cwd}/bpkg.json" ## output file
   local arg="$1"
