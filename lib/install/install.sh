@@ -236,6 +236,7 @@ bpkg_install_from_remote () {
   {
     OLDIFS="${IFS}"
     IFS="@"
+    # shellcheck disable=SC2206
     pkg_parts=(${pkg})
     IFS="${OLDIFS}"
   }
@@ -255,6 +256,7 @@ bpkg_install_from_remote () {
   {
     OLDIFS="${IFS}"
     IFS='/'
+    # shellcheck disable=SC2206
     pkg_parts=(${pkg})
     IFS="${OLDIFS}"
   }
@@ -281,6 +283,7 @@ bpkg_install_from_remote () {
     info 'Using OAUTH basic with content requests'
     OLDIFS="${IFS}"
     IFS="'|'"
+    # shellcheck disable=SC2206
     local remote_parts=($remote)
     IFS="${OLDIFS}"
     local token=${remote_parts[1]}
@@ -365,6 +368,7 @@ bpkg_install_from_remote () {
       ## create array by splitting on newline
       OLDIFS="${IFS}"
       IFS=$'\n'
+      # shellcheck disable=SC2206
       scripts=(${scripts[@]})
       IFS="${OLDIFS}"
     }
@@ -376,6 +380,7 @@ bpkg_install_from_remote () {
       ## create array by splitting on newline
       OLDIFS="${IFS}"
       IFS=$'\n'
+      # shellcheck disable=SC2206
       files=(${files[@]})
       IFS="${OLDIFS}"
     }

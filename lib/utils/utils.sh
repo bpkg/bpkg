@@ -102,6 +102,7 @@ bpkg_select_remote () {
   if [ "${remote:0:10}" == "raw-oauth|" ]; then
     OLDIFS="${IFS}"
     IFS="|"
+    # shellcheck disable=SC2206
     local remote_parts=($remote)
     IFS="${OLDIFS}"
     BPKG_OAUTH_TOKEN=${remote_parts[1]}
