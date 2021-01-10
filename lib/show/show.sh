@@ -7,7 +7,7 @@ if ! type -f bpkg-utils &>/dev/null; then
   exit 1
 else
   # shellcheck disable=SC2230
-  # shellcheck source=../utils/utils.sh
+  # shellcheck source=lib/utils/utils.sh
   source "$(which bpkg-utils)"
 fi
 
@@ -41,7 +41,6 @@ show_package () {
   local desc=$2
   local show_readme=$3
   local show_sources=$4
-  local host=$BPKG_REMOTE_HOST
   local remote=$BPKG_REMOTE
   local git_remote=$BPKG_GIT_REMOTE
   local auth=""
@@ -65,7 +64,7 @@ show_package () {
   fi
   readme=$(eval "curl $auth -sL '$uri/README.md?$(date +%s)'")
 
-  local author description install_sh pkg_desc readme_len sources version
+  local author install_sh pkg_desc readme_len sources version
 
   readme_len=$(echo "$readme" | wc -l | tr -d ' ')
 
@@ -73,7 +72,6 @@ show_package () {
   author=$(echo "$json" | bpkg-json -b | grep '"author"' | sed 's/.*author"\]\s*//' | tr -d '\t' | tr -d '"')
   pkg_desc=$(echo "$json" | bpkg-json -b | grep '"description"' | sed 's/.*description"\]\s*//' | tr -d '\t' | tr -d '"')
   sources=$(echo "$json" | bpkg-json -b | grep '"scripts"' | cut -f 2 | tr -d '"' )
-  description=$(echo "$json" | bpkg-json -b | grep '"description"')
   install_sh=$(echo "$json" | bpkg-json -b | grep '"install"' | sed 's/.*install"\]\s*//' | tr -d '\t' | tr -d '"')
 
   if [ "$pkg_desc" != "" ]; then

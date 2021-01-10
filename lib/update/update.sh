@@ -7,7 +7,7 @@ if ! type -f bpkg-utils &>/dev/null; then
   exit 1
 else
   # shellcheck disable=SC2230
-  # shellcheck source=../utils/utils.sh
+  # shellcheck source=lib/utils/utils.sh
   source "$(which bpkg-utils)"
 fi
 
@@ -23,7 +23,6 @@ bpkg_update_remote() {
   local remote=$1
   local git_remote=$2
   local wiki_url=""
-  local wiki=""
 
   bpkg_select_remote "$remote" "$git_remote"
 
@@ -68,6 +67,7 @@ bpkg_update () {
     esac
   done
 
+  # shellcheck disable=SC2034
   local let i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
