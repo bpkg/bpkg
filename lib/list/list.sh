@@ -58,7 +58,8 @@ bpkg_list () {
     fi
     OLDIFS="$IFS"
     IFS=$'\n'
-    for line in $(cat "$BPKG_REMOTE_INDEX_FILE"); do
+    local line
+    while read -r line; do
       local desc name
       name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
       desc=$(echo "$line" | cut -d\| -f2)
@@ -68,7 +69,8 @@ bpkg_list () {
       else
         echo "$name"
       fi
-    done
+    done < "${BPKG_REMOTE_INDEX_FILE}"
+
     IFS="$OLDIFS"
     i=$((i+1))
   done

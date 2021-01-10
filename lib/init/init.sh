@@ -92,7 +92,7 @@ intro () {
 }
 
 options () {
-  opt NAME "$(basename $(pwd))"
+  opt NAME "$(basename "$(pwd)")"
   opt VERSION "0.1.0"
   opt DESCRIPTION ""
   opt GLOBAL ""
@@ -107,6 +107,7 @@ set_global () {
 
 prompts () {
   prompt NAME "name: (${NAME}) "
+  # shellcheck disable=SC2153
   prompt VERSION "version: (${VERSION}) "
   prompt DESCRIPTION "description: "
   prompt INSTALL "install: (${INSTALL})"
@@ -122,6 +123,7 @@ required () {
     "SCRIPTS"
   do
     eval local val="\${${key}}"
+    # shellcheck disable=SC2154
     [ -z "${val}" ] && error "Missing \`
     ${key}' property"
   done
@@ -206,43 +208,44 @@ clobber () {
 
 create_shell_file () {
   if [ "${NAME}.sh" == "${RAW_SCRIPTS}" ] && [ ! -f "${NAME}.sh" ]; then
-    {
-      echo "#!/bin/bash"
-      echo
-      echo "VERSION=$VERSION"
-      echo
-      echo "usage () {"
-      echo "  echo \"$NAME [-hV]\""
-      echo "  echo"
-      echo "  echo \"Options:\""
-      echo "  echo \"  -h|--help      Print this help dialogue and exit\""
-      echo "  echo \"  -V|--version   Print the current version and exit\""
-      echo '}'
-      echo
-      echo "${NAME} () {"
-      echo "  for opt in \"\${@}\"; do"
-      echo "    case \"\$opt\" in"
-      echo "      -h|--help)"
-      echo "        usage"
-      echo "        return 0"
-      echo "        ;;"
-      echo "      -V|--version)"
-      echo "        echo \"\$VERSION\""
-      echo "        return 0"
-      echo "        ;;"
-      echo "    esac"
-      echo "  done"
-      echo
-      echo "  ## your code here"
-      echo "}"
-      echo
-      echo 'if [[ ${BASH_SOURCE[0]} != "$0" ]]; then'
-      echo "  export -f $NAME"
-      echo 'else'
-      echo "  $NAME "'"${@}"'
-      echo '  exit $?'
-      echo 'fi'
-    } > "${NAME}.sh"
+      cat << EOF > "${NAME}.sh"
+#!/bin/bash
+
+VERSION=${VERSION}
+
+usage () {
+  echo "${NAME} [-hV]"
+  echo
+  echo "Options:"
+  echo "  -h|--help      Print this help dialogue and exit"
+  echo "  -V|--version   Print the current version and exit"
+}
+
+${NAME} () {
+  for opt in "\${@}"; do
+    case "\${opt}" in
+      -h|--help)
+        usage
+        return 0
+        ;;
+      -V|--version)
+        echo "\${VERSION}"
+        return 0
+        ;;
+    esac
+  done
+
+  ## your code here
+}
+
+if [[ \${BASH_SOURCE[0]} != "\$0" ]]; then
+  export -f ${NAME}
+else
+  ${NAME} "\${@}"
+  exit $?
+fi
+
+EOF
     chmod 755 "${NAME}.sh"
   fi
 }

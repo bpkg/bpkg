@@ -112,7 +112,7 @@ parse_array () {
       done
       ;;
   esac
-  [ "$BRIEF" -eq 0 ] && value=`printf '[%s]' "$ary"` || value=
+  [ "$BRIEF" -eq 0 ] && value=$(printf '[%s]' "$ary") || value=
   :
 }
 
@@ -147,7 +147,7 @@ parse_object () {
       done
     ;;
   esac
-  [ "$BRIEF" -eq 0 ] && value=`printf '{%s}' "$obj"` || value=
+  [ "$BRIEF" -eq 0 ] && value=$(printf '{%s}' "$obj") || value=
   :
 }
 
@@ -185,7 +185,7 @@ parse () {
 
 parse_options "$@"
 
-if ([ "$0" = "$BASH_SOURCE" ] || ! [ -n "$BASH_SOURCE" ]);
+if [ "$0" = "${BASH_SOURCE}" ] || [ -z "${BASH_SOURCE}" ];
 then
   tokenize | parse
 fi

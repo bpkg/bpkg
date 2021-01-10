@@ -398,7 +398,7 @@ bpkg_install_from_remote () {
 
     if [[ -z "${build}" ]]; then
       warn 'Missing build script'
-      warn 'Trying `make install`...'
+      warn 'Trying "make install"...'
       build='make install'
     fi
 
