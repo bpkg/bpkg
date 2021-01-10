@@ -72,10 +72,12 @@ fi
 CMDS="json install package term suggest init utils update list show getdeps"
 
 make_install () {
+  local source
+
   make_uninstall
   echo "  info: Installing $PREFIX/bin/$BIN..."
   install -d "$PREFIX/bin"
-  local source=$(<$BIN)
+  source=$(<$BIN)
   [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN" || install "$BIN" "$PREFIX/bin"
   for cmd in $CMDS; do
     source=$(<"$BIN-$cmd")
