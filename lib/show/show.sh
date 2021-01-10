@@ -65,14 +65,16 @@ show_package () {
   fi
   readme=$(eval "curl $auth -sL '$uri/README.md?$(date +%s)'")
 
-  local readme_len=$(echo "$readme" | wc -l | tr -d ' ')
+  local author description install_sh pkg_desc readme_len sources version
 
-  local version=$(echo "$json" | bpkg-json -b | grep '"version"' | sed 's/.*version"\]\s*//' | tr -d '\t' | tr -d '"')
-  local author=$(echo "$json" | bpkg-json -b | grep '"author"' | sed 's/.*author"\]\s*//' | tr -d '\t' | tr -d '"')
-  local pkg_desc=$(echo "$json" | bpkg-json -b | grep '"description"' | sed 's/.*description"\]\s*//' | tr -d '\t' | tr -d '"')
-  local sources=$(echo "$json" | bpkg-json -b | grep '"scripts"' | cut -f 2 | tr -d '"' )
-  local description=$(echo "$json" | bpkg-json -b | grep '"description"')
-  local install_sh=$(echo "$json" | bpkg-json -b | grep '"install"' | sed 's/.*install"\]\s*//' | tr -d '\t' | tr -d '"')
+  readme_len=$(echo "$readme" | wc -l | tr -d ' ')
+
+  version=$(echo "$json" | bpkg-json -b | grep '"version"' | sed 's/.*version"\]\s*//' | tr -d '\t' | tr -d '"')
+  author=$(echo "$json" | bpkg-json -b | grep '"author"' | sed 's/.*author"\]\s*//' | tr -d '\t' | tr -d '"')
+  pkg_desc=$(echo "$json" | bpkg-json -b | grep '"description"' | sed 's/.*description"\]\s*//' | tr -d '\t' | tr -d '"')
+  sources=$(echo "$json" | bpkg-json -b | grep '"scripts"' | cut -f 2 | tr -d '"' )
+  description=$(echo "$json" | bpkg-json -b | grep '"description"')
+  install_sh=$(echo "$json" | bpkg-json -b | grep '"install"' | sed 's/.*install"\]\s*//' | tr -d '\t' | tr -d '"')
 
   if [ "$pkg_desc" != "" ]; then
     desc="$pkg_desc"
@@ -101,9 +103,10 @@ show_package () {
     OLDIFS="$IFS"
     IFS=$'\n'
     for src in $(echo "$sources"); do
-      local http_code=$(eval "curl $auth -sL '$uri/$src?$(date +%s)' -w '%{http_code}' -o /dev/null")
+      local content http_code
+      http_code=$(eval "curl $auth -sL '$uri/$src?$(date +%s)' -w '%{http_code}' -o /dev/null")
       if (( http_code < 400 )); then
-        local content=$(eval "curl $auth -sL '$uri/$src?$(date +%s)'")
+        content=$(eval "curl $auth -sL '$uri/$src?$(date +%s)'")
         echo "#[$src]"
         echo "$content"
         echo "#[/$src]"
@@ -174,8 +177,9 @@ bpkg_show () {
     OLDIFS="$IFS"
     IFS=$'\n'
     for line in $(cat "$BPKG_REMOTE_INDEX_FILE"); do
-      local name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
-      local desc=$(echo "$line" | cut -d\| -f2)
+      local desc name
+      name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
+      desc=$(echo "$line" | cut -d\| -f2)
       if [ "$name" == "$pkg" ]; then
         IFS="$OLDIFS"
         show_package "$pkg" "$desc" "$readme" "$sources"
