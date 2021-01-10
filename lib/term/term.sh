@@ -63,6 +63,7 @@ term_move () {
 
 term_transition () {
   local let x="${1}"
+  # shellcheck disable=SC2034
   local let y="${2}"
   if [ -z "${x}" ] || [ -z "${y}" ]; then
     return 1

@@ -33,8 +33,10 @@ bpkg_getdeps () {
     return 1
   fi
 
+  # shellcheck disable=SC2002
   dependencies=$(cat "${pkg}" | bpkg-json -b | grep '\[\"dependencies' | sed "s/\[\"dependencies\",//" | sed "s/\"\]$(printf '\t')\"/@/" | tr -d '"')
-  dependencies=($(echo ${dependencies[@]}))
+  # shellcheck disable=SC2206
+  dependencies=(${dependencies[@]})
 
   ## run bpkg install for each dependency
   for (( i = 0; i < ${#dependencies[@]} ; ++i )); do
