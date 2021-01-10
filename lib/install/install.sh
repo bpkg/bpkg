@@ -104,7 +104,7 @@ save_remote_file () {
 
 
 url_exists () {
-    local auth_param exists url
+    local auth_param exists status url
 
     url="${1}"
     auth_param="${2:-}"
@@ -219,7 +219,6 @@ bpkg_install_from_remote () {
   local url=''
   local uri=''
   local version=''
-  local status=''
   local json=''
   local user=''
   local name=''
