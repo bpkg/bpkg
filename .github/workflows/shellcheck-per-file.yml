@@ -1,0 +1,54 @@
+---
+# The idea here is to run Shellcheck for each file, so violations can be fixed
+# incrementally. As soon as a file has been fixed to pass shellcheck, it should
+# no longer be allowed to fail.
+#
+# Once all files have been fixed, the jobs can all be replaced by one single run
+# that checks all files at once.
+#
+# For discussion and further details see: https://github.com/bpkg/bpkg/issues/78
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  allowed_to_fail:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        file:
+          - bpkg.sh
+          - setup.sh
+          - lib/init/init.sh
+          - lib/install/install.sh
+          - lib/json/JSON.sh
+          - lib/suggest/suggest.sh
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pipeline-components/shellcheck@v0.6.1
+        continue-on-error: true
+        with:
+          directory: ${{ matrix.file }}
+          options: -f gcc -x lib/utils/utils.sh
+
+  must_pass:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        file:
+          - lib/getdeps/getdeps.sh
+          - lib/list/list.sh
+          - lib/package/package.sh
+          - lib/show/show.sh
+          - lib/term/term.sh
+          - lib/update/update.sh
+          - lib/utils/utils.sh
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pipeline-components/shellcheck@v0.6.1
+        with:
+          directory: ${{ matrix.file }}
+          options: -f gcc -x lib/utils/utils.sh
