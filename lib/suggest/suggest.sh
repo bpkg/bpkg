@@ -38,7 +38,7 @@ suggest () {
   ## search path
   {
     local res=""
-    IFS=':' read -a paths <<< "${PATH}"
+    IFS=':' read -ar paths <<< "${PATH}"
     for (( i = 0; i < ${#paths[@]}; ++i )); do
       local path="${paths[$i]}"
       local skip=0
