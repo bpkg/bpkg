@@ -7,7 +7,7 @@ if ! type -f bpkg-utils &>/dev/null; then
   exit 1
 else
   # shellcheck disable=SC2230
-  # shellcheck source=../utils/utils.sh
+  # shellcheck source=lib/utils/utils.sh
   source "$(which bpkg-utils)"
 fi
 
