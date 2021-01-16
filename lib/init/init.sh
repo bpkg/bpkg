@@ -35,7 +35,7 @@ prompt_if () {
     y|Y|yes|YES|Yes)
       shift
       shift
-      $func $@
+      "$func" "$@"
       return 0
   esac
   return 1
