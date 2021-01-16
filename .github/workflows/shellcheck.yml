@@ -8,5 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ludeeus/action-shellcheck@master
+        with:
+          severity: error
         env:
           SHELLCHECK_OPTS: "-f gcc -x lib/utils/utils.sh"
