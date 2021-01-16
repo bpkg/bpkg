@@ -17,7 +17,7 @@ You can install shell scripts globally (on `/usr/local/bin`) or use them on a _p
 	* [Packages With Dependencies](#packages-with-dependencies)
 	* [Retrieving package info](#retrieving-package-info)
 * [Package details](#package-details)
-* [package.json](#packagejson)
+* [bpkg.json](#bpkgjson)
 	* [name](#name)
 	* [version (optional)](#version-optional)
 	* [description](#description)
@@ -109,17 +109,16 @@ $ bpkg install jwerle/suggest.sh@0.0.1 -g
 
 **Note:** to do that the packages **must be tagged releases** on the repository.
 
-You can also *install packages without a `package.json`*.
+You can also *install packages without a `bpkg.json` (or `package.json`)*.
 As long as there is a `Makefile` in the repository it will try to invoke `make install` as long as the `-g` or `--global` flags are set when invoking `bpkg install`.
 
-For example you could install [git-standup](https://github.com/stephenmathieson/git-standup) with an omitted `package.json` because of the `Makefile` and the `install` target found in it.
+For example you could install [git-standup](https://github.com/stephenmathieson/git-standup) with an omitted `bpkg.json` (or `package.json`) because of the `Makefile` and the `install` target found in it.
 
 ```sh
 $ bpkg install stephenmathieson/git-standup -g
 
-    info: Using latest (master)
-    warn: Package doesn't exist
-    warn: Missing build script
+    warn: bpkg.json doesn`t exist
+    warn: package.json doesn`t exist
     warn: Trying `make install'...
     info: install: `make install'
 cp -f git-standup /usr/local/bin
@@ -157,11 +156,12 @@ $ bpkg package
 
 Here we lay down some info on the structure of a package.
 
-## package.json
+## bpkg.json
 
-Every package must have a file called `package.json`; it specifies package metadata on the [JSON format][json].
+Every package must have a file called `bpkg.json` (for backward-compatibility 
+`package.json` can also be used); it specifies package metadata on the [JSON format][json].
 
-Here's an example of a well-formed `package.json`:
+Here's an example of a well-formed `bpkg.json`:
 
 ```json
 {

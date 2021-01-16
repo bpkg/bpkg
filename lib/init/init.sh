@@ -78,21 +78,21 @@ wrap () {
 
 intro () {
   echo
-  echo "This will walk you through initializing the bpkg \`package.json' file."
+  echo "This will walk you through initializing the 'bpkg.json' file."
   echo "It will prompt you for the bare minimum that is needed and provide"
   echo "defaults."
   echo
   echo "See github.com/bpkg/bpkg for more information on defining the bpkg"
-  echo "\`package.json' file."
+  echo "\`bpkg.json' file."
   echo
-  echo "You can press ^C anytime to quit this prompt. The \`package.json' file"
+  echo "You can press ^C anytime to quit this prompt. The 'bpkg.json' file"
   echo "will only be written upon completion."
   echo
 }
 
 options () {
   opt NAME "$(basename $(pwd))"
-  opt VERSION "0.0.1"
+  opt VERSION "0.1.0"
   opt DESCRIPTION ""
   opt GLOBAL ""
   opt INSTALL "install -b ${NAME}.sh \${PREFIX:-/usr/local}/bin/${NAME}"
@@ -195,7 +195,7 @@ validate () {
 ## if package file already exists, ensure user wants to clobber
 clobber () {
   if test -f "${file}"; then
-    prompt_if "A \`package.json' already exists. Would you like to replace it?" rm -f "${file}"
+    prompt_if "A 'bpkg.json' already exists. Would you like to replace it?" rm -f "${file}"
   fi
 }
 
@@ -270,10 +270,10 @@ create_repo () {
 
 ## main
 bpkg_init () {
-  local version="0.0.1"
+  local version="0.1.0"
   local cwd="$(pwd)"
   local buf="" ## output buffer
-  local file="${cwd}/package.json" ## output file
+  local file="${cwd}/bpkg.json" ## output file
   local arg="$1"
   shift
 

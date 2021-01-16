@@ -11,7 +11,11 @@ usage () {
 bpkg_package () {
   local prop="${1}"
   local cwd="$(pwd)"
-  local pkg="${cwd}/package.json"
+  local pkg
+  pkg="${cwd}/bpkg.json"
+  if ! test -f "${pkg}"; then
+    pkg="${cwd}/package.json"
+  fi
 
   ## parse flags
   case "${prop}" in
@@ -23,7 +27,7 @@ bpkg_package () {
 
   ## ensure there is a package to read
   if ! test -f "${pkg}"; then
-    echo 2>&1 "error: Unable to find \`package.json' in $(pwd)"
+    echo 2>&1 "error: Unable to find 'bpkg.json' or 'package.json' in $(pwd)"
     return 1
   fi
 
@@ -35,7 +39,7 @@ bpkg_package () {
     }
   else
     ## show value for a specific property
-    ## in 'package.json'
+    ## in 'bpkg.json' or 'package.json'
     {
       cat "${pkg}" | bpkg-json -b | grep "${prop}" | awk '{ $1=""; printf $0 }'
       echo
