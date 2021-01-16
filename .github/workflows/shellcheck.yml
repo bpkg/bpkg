@@ -9,7 +9,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ludeeus/action-shellcheck@master
         with:
-          ignore: lib/term/example.sh
           severity: error
         env:
           SHELLCHECK_OPTS: "--format=gcc --external-sources"
