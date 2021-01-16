@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: pipeline-components/shellcheck@v0.6.1
-        with:
-          options: -f gcc -x lib/utils/utils.sh
+      - uses: ludeeus/action-shellcheck@master
+        env:
+          SHELLCHECK_OPTS: "-f gcc -x lib/utils/utils.sh"
