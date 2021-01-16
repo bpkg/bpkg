@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## sets optional variable from environment
-opt () { eval "if [ -z "\${$1}" ]; then ${1}='${2}'; fi";  }
+opt () { eval "if [ -z \"\${$1}\" ]; then ${1}='${2}'; fi";  }
 
 ## output usage
 usage () {
@@ -22,8 +22,8 @@ prompt () {
 
     value="${value//\"/\'}";
   } 2>&1
-  if [ ! -z "${value}" ]; then
-    eval "${var}"=\"${value}\"
+  if [ -n "${value}" ]; then
+    eval "${var}=\"${value}\""
   fi
 }
 
@@ -67,7 +67,8 @@ append () {
 appendf () {
   local fmt="$1"
   shift
-  buf+="$(printf "${fmt}" "${@}")"
+  # shellcheck disable=SC2059
+ buf+="$(printf "${fmt}" "${@}")"
 }
 
 ## wraps each argument in quotes
@@ -91,7 +92,7 @@ intro () {
 }
 
 options () {
-  opt NAME "$(basename $(pwd))"
+  opt NAME "$(basename "$(pwd)")"
   opt VERSION "0.1.0"
   opt DESCRIPTION ""
   opt GLOBAL ""
@@ -100,11 +101,13 @@ options () {
 }
 
 set_global () {
+  # shellcheck disable=SC2034
   GLOBAL=1
 }
 
 prompts () {
   prompt NAME "name: (${NAME}) "
+  # shellcheck disable=SC2153
   prompt VERSION "version: (${VERSION}) "
   prompt DESCRIPTION "description: "
   prompt INSTALL "install: (${INSTALL})"
@@ -120,6 +123,7 @@ required () {
     "SCRIPTS"
   do
     eval local val="\${${key}}"
+    # shellcheck disable=SC2154
     [ -z "${val}" ] && error "Missing \`
     ${key}' property"
   done
@@ -127,15 +131,16 @@ required () {
 
 ## convert scripts to quoted csv
 csv () {
-  if [ ! -z "${SCRIPTS}" ]; then
+  if [ -n "${SCRIPTS}" ]; then
     RAW_SCRIPTS=${SCRIPTS}
     {
       local TMP=""
       SCRIPTS="${SCRIPTS//,/ }"
       SCRIPTS="${SCRIPTS//\"/}"
       SCRIPTS="${SCRIPTS//\'/}"
+      # shellcheck disable=SC2086
       SCRIPTS=($(wrap ${SCRIPTS}))
-      let len=${#SCRIPTS[@]}
+      (( len=${#SCRIPTS[@]} ))
       for (( i = 0; i < len; i++ )); do
         word=${SCRIPTS[$i]}
         if (( i + 1 != len )); then
@@ -151,6 +156,8 @@ csv () {
 
 ## delimit object and key-value pairs
 delimit () {
+  local lowercase
+
   append "{"
 
   for key in      \
@@ -161,10 +168,10 @@ delimit () {
     "INSTALL"     \
     "SCRIPTS"
   do
-    local lowercase="$(echo ${key} | tr '[:upper:]' '[:lower:]')"
+    lowercase="$(echo ${key} | tr '[:upper:]' '[:lower:]')"
 
     eval local val="\${${key}}"
-    if [ ! -z "${val}" ]; then
+    if [ -n "${val}" ]; then
 
       ## swap leading/trailing quotes for brackets in arrays
       local before="\""
@@ -201,43 +208,44 @@ clobber () {
 
 create_shell_file () {
   if [ "${NAME}.sh" == "${RAW_SCRIPTS}" ] && [ ! -f "${NAME}.sh" ]; then
-    {
-      echo "#!/bin/bash"
-      echo
-      echo "VERSION=$VERSION"
-      echo
-      echo "usage () {"
-      echo "  echo \"$NAME [-hV]\""
-      echo "  echo"
-      echo "  echo \"Options:\""
-      echo "  echo \"  -h|--help      Print this help dialogue and exit\""
-      echo "  echo \"  -V|--version   Print the current version and exit\""
-      echo '}'
-      echo
-      echo "${NAME} () {"
-      echo "  for opt in \"\${@}\"; do"
-      echo "    case \"\$opt\" in"
-      echo "      -h|--help)"
-      echo "        usage"
-      echo "        return 0"
-      echo "        ;;"
-      echo "      -V|--version)"
-      echo "        echo \"\$VERSION\""
-      echo "        return 0"
-      echo "        ;;"
-      echo "    esac"
-      echo "  done"
-      echo
-      echo "  ## your code here"
-      echo "}"
-      echo
-      echo 'if [[ ${BASH_SOURCE[0]} != $0 ]]; then'
-      echo "  export -f $NAME"
-      echo 'else'
-      echo "  $NAME "'"${@}"'
-      echo '  exit $?'
-      echo 'fi'
-    } > "${NAME}.sh"
+      cat << EOF > "${NAME}.sh"
+#!/bin/bash
+
+VERSION=${VERSION}
+
+usage () {
+  echo "${NAME} [-hV]"
+  echo
+  echo "Options:"
+  echo "  -h|--help      Print this help dialogue and exit"
+  echo "  -V|--version   Print the current version and exit"
+}
+
+${NAME} () {
+  for opt in "\${@}"; do
+    case "\${opt}" in
+      -h|--help)
+        usage
+        return 0
+        ;;
+      -V|--version)
+        echo "\${VERSION}"
+        return 0
+        ;;
+    esac
+  done
+
+  ## your code here
+}
+
+if [[ \${BASH_SOURCE[0]} != "\$0" ]]; then
+  export -f ${NAME}
+else
+  ${NAME} "\${@}"
+  exit $?
+fi
+
+EOF
     chmod 755 "${NAME}.sh"
   fi
 }
@@ -270,8 +278,10 @@ create_repo () {
 
 ## main
 bpkg_init () {
+  local cwd
+
   local version="0.1.0"
-  local cwd="$(pwd)"
+  cwd="$(pwd)"
   local buf="" ## output buffer
   local file="${cwd}/bpkg.json" ## output file
   local arg="$1"
@@ -291,7 +301,7 @@ bpkg_init () {
       ;;
 
     *)
-      if [ ! -z "${arg}" ]; then
+      if [ -n "${arg}" ]; then
         error "Unknown option: \`${arg}'"
         usage
         exit 1
@@ -325,7 +335,7 @@ bpkg_init () {
 }
 
 ## export or run
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg-init
 else
   bpkg_init "${@}"

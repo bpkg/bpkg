@@ -4,8 +4,8 @@
 VERSION="0.0.1"
 
 ## coords
-let _x=0
-let _y=0
+(( _x=0 ))
+(( _y=0 ))
 
 ## output error to stderr
 error () {
@@ -24,7 +24,7 @@ term_write () {
   if [ -z "${c}" ]; then
     return 1
   fi
-  printf "\e[${c}"
+  echo -en "\e[${c}"
   return 0
 }
 
@@ -53,23 +53,24 @@ term_move () {
   fi
 
   ## set state
-  (( _x = ${x} ))
-  (( _y = ${y} ))
+  (( _x = x ))
+  (( _y = y ))
 
   ## write
-  printf "\e[%d;%d;f" ${y} ${x}
+  printf "\e[%d;%d;f" "${y}" "${x}"
   return 0
 }
 
 term_transition () {
   local let x="${1}"
+  # shellcheck disable=SC2034
   local let y="${2}"
   if [ -z "${x}" ] || [ -z "${y}" ]; then
     return 1
   fi
 
-  (( x = ${x} + ${_x} ))
-  (( y = ${y} + ${_y} ))
+  (( x = x + _x ))
+  (( y = y + _y ))
 
   term move "${x}" "${y}"
   return 0
@@ -78,19 +79,18 @@ term_transition () {
 ## set terminal color
 term_color () {
   local color="${1}"
-  local fmt="\e[3%dm"
   if [ -z "${color}" ]; then
     return 1
   fi
   case "${color}" in
-    black) printf "${fmt}" "0" ;;
-    red) printf "${fmt}" "1" ;;
-    green) printf "${fmt}" "2" ;;
-    yellow) printf "${fmt}" "3" ;;
-    blue) printf "${fmt}" "4" ;;
-    magenta) printf "${fmt}" "5" ;;
-    cyan) printf "${fmt}" "6" ;;
-    white) printf "${fmt}" "7" ;;
+    black) printf "\e[30m" ;;
+    red) printf "\e[31m" ;;
+    green) printf "\e[32m" ;;
+    yellow) printf "\e[33m" ;;
+    blue) printf "\e[34m" ;;
+    magenta) printf "\e[35m" ;;
+    cyan) printf "\e[36m" ;;
+    white) printf "\e[37m" ;;
     gray|grey) printf "\e[90m" ;;
     *) return 1 ;;
   esac
@@ -100,19 +100,18 @@ term_color () {
 ## set term background color
 term_background () {
   local color="${1}"
-  local fmt="\e[4%dm"
   if [ -z "${color}" ]; then
     return 1
   fi
   case "${color}" in
-    black) printf "${fmt}" "0" ;;
-    red) printf "${fmt}" "1" ;;
-    green) printf "${fmt}" "2" ;;
-    yellow) printf "${fmt}" "3" ;;
-    blue) printf "${fmt}" "4" ;;
-    magenta) printf "${fmt}" "5" ;;
-    cyan) printf "${fmt}" "6" ;;
-    white) printf "${fmt}" "7" ;;
+    black) printf "\e[40m" ;;
+    red) printf "\e[41m" ;;
+    green) printf "\e[42m" ;;
+    yellow) printf "\e[43m" ;;
+    blue) printf "\e[44m" ;;
+    magenta) printf "\e[45m" ;;
+    cyan) printf "\e[46m" ;;
+    white) printf "\e[47m" ;;
     *) return 1 ;;
   esac
   return 0
@@ -156,16 +155,15 @@ term_hidden () {
 ## clear a terminal section by name
 term_clear () {
   local section="${1}"
-  local fmt="\e[%s"
   if [ -z "${section}" ]; then
     return 1
   fi
   case "${section}" in
-    start) printf "${fmt}" "1K";;
-    end) printf "${fmt}" "K";;
-    line) printf "${fmt}" "2K";;
-    screen|up) printf "${fmt}" "1J";;
-    down) printf "${fmt}" "J";;
+    start) printf "\e[1K";;
+    end) printf "\e[K";;
+    line) printf "\e[2K";;
+    screen|up) printf "\e[1J";;
+    down) printf "\e[J";;
     *) return 1 ;;
   esac
   return 0
@@ -272,7 +270,7 @@ term () {
         "${cmd}" "${@}"
         return $?
       else
-        if [ ! -z "${arg}" ]; then
+        if [ -n "${arg}" ]; then
           error "Unknown argument: \`${arg}'"
         fi
         usage
@@ -286,7 +284,7 @@ term () {
 ## detect if being sourced and
 ## export if so else execute
 ## main function with args
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f term
 else
   term "${@}"

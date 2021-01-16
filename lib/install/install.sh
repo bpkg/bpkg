@@ -2,6 +2,7 @@
 
 # Include config rc file if found
 CONFIG_FILE="$HOME/.bpkgrc"
+# shellcheck disable=SC1090
 [[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
 
 ## set defaults
@@ -14,9 +15,7 @@ BPKG_USER="${BPKG_USER:-bpkg}"
 ## check parameter consistency
 validate_parameters () {
   if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
-    mesg='BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array'
-    fmesg=$(printf "$mesg" "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")
-    error "$fmesg"
+    error "$(printf 'BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array' "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")"
     return 1
   fi
   return 0
@@ -36,7 +35,7 @@ message () {
   fi
 
   shift
-  printf "    ${1}"
+  echo -n "    ${1}"
   shift
 
   if type -f bpkg-term > /dev/null 2>&1; then
@@ -83,13 +82,13 @@ info () {
 
 
 save_remote_file () {
-  local auth_param path url
+  local auth_param dirname path url
 
   url="${1}"
   path="${2}"
   auth_param="${3:-}"
 
-  local dirname="$(dirname "${path}")"
+  dirname="$(dirname "${path}")"
 
   # Make sure directory exists
   if [[ ! -d "${dirname}" ]];then
@@ -105,7 +104,7 @@ save_remote_file () {
 
 
 url_exists () {
-    local auth_param exists url
+    local auth_param exists status url
 
     url="${1}"
     auth_param="${2:-}"
@@ -209,31 +208,36 @@ bpkg_install () {
 ##   1: the package was not found on the remote
 ##   2: a fatal error occurred
 bpkg_install_from_remote () {
+  local cwd
+
   local pkg=$1
   local remote=$2
   local git_remote=$3
   local let needs_global=$4
 
-  local cwd=$(pwd)
+  cwd=$(pwd)
   local url=''
   local uri=''
   local version=''
-  local status=''
   local json=''
   local user=''
   local name=''
   local version=''
   local auth_param=''
+  # shellcheck disable=SC2034
   local let has_pkg_json=0
-  declare -a local pkg_parts=()
-  declare -a local remote_parts=()
-  declare -a local scripts=()
-  declare -a local files=()
+
+  local files pkg_parts remote_parts scripts
+  declare -a pkg_parts=()
+  declare -a remote_parts=()
+  declare -a scripts=()
+  declare -a files=()
 
   ## get version if available
   {
     OLDIFS="${IFS}"
     IFS="@"
+    # shellcheck disable=SC2206
     pkg_parts=(${pkg})
     IFS="${OLDIFS}"
   }
@@ -253,6 +257,7 @@ bpkg_install_from_remote () {
   {
     OLDIFS="${IFS}"
     IFS='/'
+    # shellcheck disable=SC2206
     pkg_parts=(${pkg})
     IFS="${OLDIFS}"
   }
@@ -279,6 +284,7 @@ bpkg_install_from_remote () {
     info 'Using OAUTH basic with content requests'
     OLDIFS="${IFS}"
     IFS="'|'"
+    # shellcheck disable=SC2206
     local remote_parts=($remote)
     IFS="${OLDIFS}"
     local token=${remote_parts[1]}
@@ -363,6 +369,7 @@ bpkg_install_from_remote () {
       ## create array by splitting on newline
       OLDIFS="${IFS}"
       IFS=$'\n'
+      # shellcheck disable=SC2206
       scripts=(${scripts[@]})
       IFS="${OLDIFS}"
     }
@@ -374,6 +381,7 @@ bpkg_install_from_remote () {
       ## create array by splitting on newline
       OLDIFS="${IFS}"
       IFS=$'\n'
+      # shellcheck disable=SC2206
       files=(${files[@]})
       IFS="${OLDIFS}"
     }
@@ -390,7 +398,7 @@ bpkg_install_from_remote () {
 
     if [[ -z "${build}" ]]; then
       warn 'Missing build script'
-      warn 'Trying `make install`...'
+      warn 'Trying "make install"...'
       build='make install'
     fi
 
@@ -405,7 +413,7 @@ bpkg_install_from_remote () {
 
     { (
       ## go to tmp dir
-      cd "$( [[ ! -z "${TMPDIR}" ]] && echo "${TMPDIR}" || echo /tmp)" &&
+      cd "$( [[ -n "${TMPDIR}" ]] && echo "${TMPDIR}" || echo /tmp)" &&
         ## prune existing
       rm -rf "${name}-${version}" &&
         ## shallow clone
@@ -414,7 +422,7 @@ bpkg_install_from_remote () {
         (
       ## move into directory
       cd "${name}-${version}" &&
-      git checkout ${version} &&
+      git checkout "${version}" &&
         ## build
       info "Performing install: \`${build}'"
       build_output=$(eval "${build}")
@@ -445,8 +453,10 @@ bpkg_install_from_remote () {
     ## grab each script and place in deps directory
     for script in "${scripts[@]}"; do
       (
+        local scriptname
+
         if [[ "${script}" ]];then
-          local scriptname="$(echo "${script}" | xargs basename )"
+          scriptname="$(echo "${script}" | xargs basename )"
 
           info "fetch" "${url}/${script}"
           info "write" "${cwd}/deps/${name}/${script}"
@@ -465,8 +475,6 @@ bpkg_install_from_remote () {
       for file in "${files[@]}"; do
       (
           if [[ "${file}" ]];then
-            local filename="$(echo "${file}" | xargs basename )"
-
             info "fetch" "${url}/${file}"
             info "write" "${cwd}/deps/${name}/${file}"
             save_remote_file "${url}/${file}" "${cwd}/deps/${name}/${file}" "${auth_param}"
@@ -479,7 +487,7 @@ bpkg_install_from_remote () {
 }
 
 ## Use as lib or perform install
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_install
 elif validate_parameters; then
   bpkg_install "${@}"

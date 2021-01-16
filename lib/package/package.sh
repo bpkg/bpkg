@@ -9,10 +9,12 @@ usage () {
 
 ## Read a package property
 bpkg_package () {
-  local prop="${1}"
-  local cwd="$(pwd)"
-  local pkg
-  pkg="${cwd}/bpkg.json"
+  local cwd pkg prop
+
+  prop="${1}"
+  cwd="$(pwd)"
+  pkg="${cwd}/package.json"
+
   if ! test -f "${pkg}"; then
     pkg="${cwd}/package.json"
   fi
@@ -35,12 +37,14 @@ bpkg_package () {
     ## output all propertyies if property
     ## is ommited
     {
+      # shellcheck disable=SC2002
       cat "${pkg}" | bpkg-json -b
     }
   else
     ## show value for a specific property
     ## in 'bpkg.json' or 'package.json'
     {
+      # shellcheck disable=SC2002
       cat "${pkg}" | bpkg-json -b | grep "${prop}" | awk '{ $1=""; printf $0 }'
       echo
     }
@@ -49,7 +53,7 @@ bpkg_package () {
   return 0
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_package
 else
   bpkg_package "${@}"

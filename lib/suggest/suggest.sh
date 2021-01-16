@@ -10,9 +10,10 @@ usage () {
 
 ## main
 suggest () {
-  declare -a local paths=()
-  declare -a local seen=()
-  declare -a local found=()
+  local found paths seen
+  declare -a paths=()
+  declare -a seen=()
+  declare -a found=()
   local query="${1}"
 
   case "${query}" in
@@ -37,10 +38,10 @@ suggest () {
   ## search path
   {
     local res=""
-    IFS=':' read -a paths <<< "${PATH}"
+    IFS=':' read -ar paths <<< "${PATH}"
     for (( i = 0; i < ${#paths[@]}; ++i )); do
       local path="${paths[$i]}"
-      local let skip=0
+      local skip=0
 
       ## omit non existent paths
       if ! test -d "${path}"; then
@@ -67,7 +68,7 @@ suggest () {
         if [ -z "${res}" ]; then
           continue
         fi
-        res="$(echo ${res} | tr '\n' ' ')"
+        res="$(echo "${res}" | tr '\n' ' ')"
         ## add to found count
         found+=( $(echo -n "${res}") )
       fi
@@ -77,13 +78,13 @@ suggest () {
   ## get total
   count="${#found[@]}"
 
-  if (( ${count} == 1 )); then
+  if (( count == 1 )); then
     echo "${found[0]}"
-  elif (( ${count} > 0 )); then
-    printf "suggest: found %d result(s)\n" ${count}
+  elif (( count > 0 )); then
+    printf "suggest: found %d result(s)\n" "${count}"
     echo
-    for (( i = 0; i < ${count}; ++i )); do
-      printf "%d %s\n" $(echo -n ${found[$i]} | wc -c | tr -d ' ') "${found[$i]}"
+    for (( i = 0; i < count; ++i )); do
+      printf "%d %s\n" "$(echo -n "${found[$i]}" | wc -c | tr -d ' ')" "${found[$i]}"
     done | sort -n | awk '{ print $2 }' | xargs printf '  %s\n'
   else
     echo "suggest: Couldn't anything to match \`${query}'"
@@ -93,7 +94,7 @@ suggest () {
 }
 
 ## export or run
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f suggest
 else
   suggest "$@"

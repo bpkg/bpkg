@@ -6,7 +6,9 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  source $(which bpkg-utils)
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/utils/utils.sh
+  source "$(which bpkg-utils)"
 fi
 
 bpkg_initrc
@@ -56,23 +58,26 @@ bpkg_list () {
     fi
     OLDIFS="$IFS"
     IFS=$'\n'
-    for line in $(cat $BPKG_REMOTE_INDEX_FILE); do
-      local name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
-      local desc=$(echo "$line" | cut -d\| -f2)
+    local line
+    while read -r line; do
+      local desc name
+      name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
+      desc=$(echo "$line" | cut -d\| -f2)
       local host=$BPKG_REMOTE_HOST
       if [ "$verbose" == "1" ]; then
         echo "$name [$host] - $desc"
       else
-        echo $name
+        echo "$name"
       fi
-    done
+    done < "${BPKG_REMOTE_INDEX_FILE}"
+
     IFS="$OLDIFS"
     i=$((i+1))
   done
 }
 
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_list
 elif bpkg_validate; then
   bpkg_list "${@}"

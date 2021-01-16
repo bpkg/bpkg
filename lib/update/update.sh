@@ -6,7 +6,9 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  source $(which bpkg-utils)
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/utils/utils.sh
+  source "$(which bpkg-utils)"
 fi
 
 bpkg_initrc
@@ -21,7 +23,6 @@ bpkg_update_remote() {
   local remote=$1
   local git_remote=$2
   local wiki_url=""
-  local wiki=""
 
   bpkg_select_remote "$remote" "$git_remote"
 
@@ -39,11 +40,11 @@ bpkg_update_remote() {
   fi
 
   #echo "curl -slo- $auth '$wiki_url' | grep -o '\[.*\](.*).*'"
-  repo_list=$(curl -sLo- $auth "$wiki_url" | grep -o '\[.*\](.*).*' | sed 's/\[\(.*\)\](.*)[ \-]*/\1|/' )
+  repo_list=$(curl -sLo- "$auth" "$wiki_url" | grep -o '\[.*\](.*).*' | sed 's/\[\(.*\)\](.*)[ \-]*/\1|/' )
 
   num_repos=$(echo "$repo_list" | wc -l | tr -d ' ')
   bpkg_info "indexing ${num_repos} repos from $BPKG_REMOTE_HOST to $index_file"
-  echo "$repo_list" > $index_file
+  echo "$repo_list" > "$index_file"
 }
 
 bpkg_update () {
@@ -66,6 +67,7 @@ bpkg_update () {
     esac
   done
 
+  # shellcheck disable=SC2034
   local let i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
@@ -74,7 +76,7 @@ bpkg_update () {
   done
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_update
 elif bpkg_validate; then
   bpkg_update "${@}"

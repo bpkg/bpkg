@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## prevent sourcing
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   echo >&2 "error: \`bpkg' cannot be sourced"
   return 1
 fi
@@ -24,7 +24,9 @@ usage () {
 ## commands
 commands () {
   {
-    declare -a local cmds=( $(
+    local cmds
+
+    declare -a cmds=( $(
       bpkg-suggest 'bpkg-' |
       tail -n+2            |
       sed 's/.*\/bpkg-//g' |
@@ -38,11 +40,12 @@ commands () {
 
 ## feature tests
 features () {
-  declare -a local features=(bpkg-json bpkg-suggest)
+  local features
+  declare -a features=(bpkg-json bpkg-suggest)
   for ((i = 0; i < ${#features[@]}; ++i)); do
     local f="${features[$i]}"
     if ! type "${f}"  > /dev/null 2>&1; then
-      error "Missing "${f}" dependency"
+      error "Missing \"${f}\" dependency"
       return 1
     fi
   done
@@ -88,9 +91,10 @@ bpkg () {
       else
         echo >&2 "error: \`${arg}' is not a bpkg command."
         {
-          declare -a local res=($(commands))
+          local res
+          declare -a res=($(commands))
 
-          if [ ! -z "${res}" ]; then
+          if [ -n "${res}" ]; then
             echo
             echo  >&2 "Did you mean one of these?"
             found=0

@@ -6,7 +6,9 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  source $(which bpkg-utils)
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/utils/utils.sh
+  source "$(which bpkg-utils)"
 fi
 
 bpkg_initrc
@@ -39,7 +41,6 @@ show_package () {
   local desc=$2
   local show_readme=$3
   local show_sources=$4
-  local host=$BPKG_REMOTE_HOST
   local remote=$BPKG_REMOTE
   local git_remote=$BPKG_GIT_REMOTE
   local auth=""
@@ -63,14 +64,15 @@ show_package () {
   fi
   readme=$(eval "curl $auth -sL '$uri/README.md?$(date +%s)'")
 
-  local readme_len=$(echo "$readme" | wc -l | tr -d ' ')
+  local author install_sh pkg_desc readme_len sources version
 
-  local version=$(echo "$json" | bpkg-json -b | grep '"version"' | sed 's/.*version"\]\s*//' | tr -d '\t' | tr -d '"')
-  local author=$(echo "$json" | bpkg-json -b | grep '"author"' | sed 's/.*author"\]\s*//' | tr -d '\t' | tr -d '"')
-  local pkg_desc=$(echo "$json" | bpkg-json -b | grep '"description"' | sed 's/.*description"\]\s*//' | tr -d '\t' | tr -d '"')
-  local sources=$(echo "$json" | bpkg-json -b | grep '"scripts"' | cut -f 2 | tr -d '"' )
-  local description=$(echo "$json" | bpkg-json -b | grep '"description"')
-  local install_sh=$(echo "$json" | bpkg-json -b | grep '"install"' | sed 's/.*install"\]\s*//' | tr -d '\t' | tr -d '"')
+  readme_len=$(echo "$readme" | wc -l | tr -d ' ')
+
+  version=$(echo "$json" | bpkg-json -b | grep '"version"' | sed 's/.*version"\]\s*//' | tr -d '\t' | tr -d '"')
+  author=$(echo "$json" | bpkg-json -b | grep '"author"' | sed 's/.*author"\]\s*//' | tr -d '\t' | tr -d '"')
+  pkg_desc=$(echo "$json" | bpkg-json -b | grep '"description"' | sed 's/.*description"\]\s*//' | tr -d '\t' | tr -d '"')
+  sources=$(echo "$json" | bpkg-json -b | grep '"scripts"' | cut -f 2 | tr -d '"' )
+  install_sh=$(echo "$json" | bpkg-json -b | grep '"install"' | sed 's/.*install"\]\s*//' | tr -d '\t' | tr -d '"')
 
   if [ "$pkg_desc" != "" ]; then
     desc="$pkg_desc"
@@ -98,10 +100,11 @@ show_package () {
     # Show Sources
     OLDIFS="$IFS"
     IFS=$'\n'
-    for src in $(echo "$sources"); do
-      local http_code=$(eval "curl $auth -sL '$uri/$src?$(date +%s)' -w '%{http_code}' -o /dev/null")
+    for src in $sources; do
+      local content http_code
+      http_code=$(eval "curl $auth -sL '$uri/$src?$(date +%s)' -w '%{http_code}' -o /dev/null")
       if (( http_code < 400 )); then
-        local content=$(eval "curl $auth -sL '$uri/$src?$(date +%s)'")
+        content=$(eval "curl $auth -sL '$uri/$src?$(date +%s)'")
         echo "#[$src]"
         echo "$content"
         echo "#[/$src]"
@@ -171,16 +174,19 @@ bpkg_show () {
 
     OLDIFS="$IFS"
     IFS=$'\n'
-    for line in $(cat $BPKG_REMOTE_INDEX_FILE); do
-      local name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
-      local desc=$(echo "$line" | cut -d\| -f2)
+    local line
+    while read -r line; do
+      local desc name
+      name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
+      desc=$(echo "$line" | cut -d\| -f2)
       if [ "$name" == "$pkg" ]; then
         IFS="$OLDIFS"
         show_package "$pkg" "$desc" "$readme" "$sources"
         IFS=$'\n'
         return 0
       fi
-    done
+    done < "${BPKG_REMOTE_INDEX_FILE}"
+
     IFS="$OLDIFS"
     i=$((i+1))
   done
@@ -189,7 +195,7 @@ bpkg_show () {
   return 1
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
+if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_show
 elif bpkg_validate; then
   bpkg_show "${@}"
