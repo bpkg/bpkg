@@ -73,7 +73,7 @@ bpkg () {
       echo "Here are some commands available in your path:"
       echo
       local cmds=($(commands))
-      for cmd in ${cmds[@]}; do
+      for cmd in "${cmds[@]}"; do
         echo "    ${cmd}"
       done
       return 0
