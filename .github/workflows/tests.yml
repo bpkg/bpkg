@@ -15,7 +15,7 @@ jobs:
         sudo apt install -qq libcurl4-gnutls-dev
     - name: Run Tests
       run: |
-        make
+        make install
         sudo make test
 
   macos:
@@ -30,7 +30,7 @@ jobs:
         tar xzf curl-*
         cd curl-*
         ./configure --with-darwinssl
-        make
+        make install
         sudo make install
     - name: Run Tests
       run: |
@@ -53,8 +53,8 @@ jobs:
         tar xzf curl-*
         CURL_SRC=curl-*
         ./dockcross-windows-x64 bash -c 'cd '"$CURL_SRC"' && ./configure --prefix="/work/deps/curl" --host=x86_64-w64-mingw32.static --with-winssl --disable-dependency-tracking --disable-pthreads --disable-pthreads --enable-threaded-resolver'
-        ./dockcross-windows-x64 bash -c 'cd '"$CURL_SRC"' && make'
         ./dockcross-windows-x64 bash -c 'cd '"$CURL_SRC"' && make install'
+        ./dockcross-windows-x64 bash -c 'cd '"$CURL_SRC"' && make test'
     - name: Run Tests
       run: |
         ## if builds pass then its passing for now
