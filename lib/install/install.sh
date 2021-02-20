@@ -245,7 +245,7 @@ bpkg_install_from_remote () {
     name="${pkg_parts[0]}"
     version="${pkg_parts[1]}"
   else
-     error 'Error parsing package version'
+    error 'Error parsing package version'
     return 1
   fi
 
@@ -272,7 +272,6 @@ bpkg_install_from_remote () {
   ## versions and slashes
   name=${name/@*//}
   name=${name////}
-
 
   ## check to see if remote is raw with oauth (GHE)
   if [[ "${remote:0:10}" == "raw-oauth|" ]]; then

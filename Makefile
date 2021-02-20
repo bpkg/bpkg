@@ -10,3 +10,8 @@ default:
 $(COMMANDS):
 	@$(SETUP) $@
 
+setup:
+	$(SETUP)
+
+test:
+	./test.sh
