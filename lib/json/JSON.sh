@@ -57,7 +57,7 @@ awk_egrep () {
       print token;
       $0=substr($0, start+RLENGTH);
     }
-  }' pattern=$pattern_string
+  }' pattern="$pattern_string"
 }
 
 tokenize () {
@@ -65,14 +65,14 @@ tokenize () {
   local ESCAPE
   local CHAR
 
-  if echo "test string" | egrep -ao --color=never "test" &>/dev/null
+  if echo "test string" | grep -aoE --color=never "test" &>/dev/null
   then
-    GREP='egrep -ao --color=never'
+    GREP='grep -aoE --color=never'
   else
-    GREP='egrep -ao'
+    GREP='grep -aoE'
   fi
 
-  if echo "test string" | egrep -o "test" &>/dev/null
+  if echo "test string" | grep -oE "test" &>/dev/null
   then
     ESCAPE='(\\[^u[:cntrl:]]|\\u[0-9a-fA-F]{4})'
     CHAR='[^[:cntrl:]"\\]'
@@ -87,7 +87,7 @@ tokenize () {
   local KEYWORD='null|false|true'
   local SPACE='[[:space:]]+'
 
-  $GREP "$STRING|$NUMBER|$KEYWORD|$SPACE|." | egrep -v "^$SPACE$"
+  $GREP "$STRING|$NUMBER|$KEYWORD|$SPACE|." | grep -vE "^$SPACE$"
 }
 
 parse_array () {
@@ -112,7 +112,7 @@ parse_array () {
       done
       ;;
   esac
-  [ "$BRIEF" -eq 0 ] && value=`printf '[%s]' "$ary"` || value=
+  [ "$BRIEF" -eq 0 ] && value=$(printf '[%s]' "$ary") || value=
   :
 }
 
@@ -147,7 +147,7 @@ parse_object () {
       done
     ;;
   esac
-  [ "$BRIEF" -eq 0 ] && value=`printf '{%s}' "$obj"` || value=
+  [ "$BRIEF" -eq 0 ] && value=$(printf '{%s}' "$obj") || value=
   :
 }
 
@@ -185,7 +185,7 @@ parse () {
 
 parse_options "$@"
 
-if ([ "$0" = "$BASH_SOURCE" ] || ! [ -n "$BASH_SOURCE" ]);
+if [ "$0" = "${BASH_SOURCE}" ] || [ -z "${BASH_SOURCE}" ];
 then
   tokenize | parse
 fi

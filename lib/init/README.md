@@ -1,7 +1,7 @@
 bpkg-init
 =========
 
-Interactively generate a `package.json` for your [bpkg][bp]. Code, format,
+Interactively generate a `bpkg.json` for your [bpkg][bp]. Code, format,
 and instructions based heavily on [jwerle's][jw] [clib-init][cb].
 
 [bp]: https://github.com/bpkg/bpkg/
@@ -29,30 +29,30 @@ usage
 -----
 
 Simply invoke `bpkg init` and you wil be prompted with a series
-of questions about the generation of your `package.json`. Most options
+of questions about the generation of your `bpkg.json`. Most options
 have sane defaults.
 
-This will walk you through initializing the bpkg `package.json` file.
+This will walk you through initializing the bpkg `bpkg.json` file.
 It will prompt you for the bare minimum that is needed and provide
 defaults.
 
 See github.com/bpkg/bpkg for more information on defining the bpkg
-`package.json` file.
+`bpkg.json` file.
 
-You can press `^C` anytime to quit this prompt. The `package.json` file
+You can press `^C` anytime to quit this prompt. The `bpkg.json` file
 will only be written upon completion.
 
 ```sh
 $ bpkg init
 
-This will walk you through initializing the bpkg `package.json` file.
+This will walk you through initializing the bpkg `bpkg.json` file.
 It will prompt you for the bare minimum that is needed and provide
 defaults.
 
 See github.com/bpkg/bpkg for more information on defining the bpkg
-`package.json` file.
+`bpkg.json` file.
 
-You can press ^C anytime to quit this prompt. The `package.json` file
+You can press ^C anytime to quit this prompt. The `bpkg.json` file
 will only be written upon completion.
 
 name: (bpkg-init)
