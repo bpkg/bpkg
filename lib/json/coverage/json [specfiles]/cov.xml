@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<!DOCTYPE coverage SYSTEM 'http://cobertura.sourceforge.net/xml/coverage-04.dtd'>
+<coverage line-rate="0.689" lines-covered="82" lines-valid="119" branch-rate="1.0" branches-covered="1.0" branches-rate="1.0" complexity="1.0" version="1.9" timestamp="1616941944">
+	<sources>
+		<source>/mnt/c/Users/koichi/workspace/bpkg/lib/json/JSON.sh/</source>
+	</sources>
+	<packages>
+		<package name="shellspec spec" line-rate="0.689" lines-covered="82" lines-valid="119" branch-rate="1.0" complexity="1.0">
+			<classes>
+				<class name="JSON_sh" filename="/mnt/c/Users/koichi/workspace/bpkg/lib/json/JSON.sh" branch-rate="1.0" complexity="1.0" line-rate="0.689">
+					<lines>
+						<line number="4" hits="22"/>
+						<line number="5" hits="22"/>
+						<line number="8" hits="37"/>
+						<line number="9" hits="37"/>
+						<line number="10" hits="37"/>
+						<line number="13" hits="0"/>
+						<line number="14" hits="0"/>
+						<line number="15" hits="0"/>
+						<line number="16" hits="0"/>
+						<line number="17" hits="0"/>
+						<line number="18" hits="0"/>
+						<line number="19" hits="0"/>
+						<line number="20" hits="0"/>
+						<line number="24" hits="37"/>
+						<line number="25" hits="37"/>
+						<line number="26" hits="37"/>
+						<line number="28" hits="0"/>
+						<line number="29" hits="0"/>
+						<line number="30" hits="0"/>
+						<line number="32" hits="0"/>
+						<line number="33" hits="0"/>
+						<line number="34" hits="0"/>
+						<line number="36" hits="0"/>
+						<line number="38" hits="0"/>
+						<line number="40" hits="0"/>
+						<line number="41" hits="0"/>
+						<line number="42" hits="0"/>
+						<line number="45" hits="0"/>
+						<line number="46" hits="0"/>
+						<line number="51" hits="0"/>
+						<line number="53" hits="0"/>
+						<line number="54" hits="0"/>
+						<line number="55" hits="0"/>
+						<line number="56" hits="0"/>
+						<line number="57" hits="0"/>
+						<line number="58" hits="0"/>
+						<line number="60" hits="0"/>
+						<line number="64" hits="60"/>
+						<line number="65" hits="60"/>
+						<line number="66" hits="60"/>
+						<line number="68" hits="120"/>
+						<line number="70" hits="60"/>
+						<line number="72" hits="0"/>
+						<line number="75" hits="120"/>
+						<line number="77" hits="60"/>
+						<line number="78" hits="60"/>
+						<line number="80" hits="0"/>
+						<line number="81" hits="0"/>
+						<line number="82" hits="0"/>
+						<line number="85" hits="60"/>
+						<line number="86" hits="60"/>
+						<line number="87" hits="60"/>
+						<line number="88" hits="60"/>
+						<line number="90" hits="120"/>
+						<line number="94" hits="13"/>
+						<line number="95" hits="13"/>
+						<line number="96" hits="13"/>
+						<line number="97" hits="13"/>
+						<line number="98" hits="0"/>
+						<line number="100" hits="28"/>
+						<line number="102" hits="28"/>
+						<line number="103" hits="26"/>
+						<line number="104" hits="26"/>
+						<line number="105" hits="26"/>
+						<line number="106" hits="26"/>
+						<line number="107" hits="7"/>
+						<line number="108" hits="18"/>
+						<line number="109" hits="1"/>
+						<line number="111" hits="18"/>
+						<line number="115" hits="30"/>
+						<line number="116" hits="10"/>
+						<line number="120" hits="28"/>
+						<line number="121" hits="28"/>
+						<line number="122" hits="28"/>
+						<line number="123" hits="28"/>
+						<line number="124" hits="0"/>
+						<line number="126" hits="38"/>
+						<line number="128" hits="38"/>
+						<line number="129" hits="31"/>
+						<line number="130" hits="7"/>
+						<line number="132" hits="31"/>
+						<line number="133" hits="31"/>
+						<line number="134" hits="0"/>
+						<line number="135" hits="1"/>
+						<line number="137" hits="30"/>
+						<line number="138" hits="30"/>
+						<line number="139" hits="29"/>
+						<line number="140" hits="29"/>
+						<line number="141" hits="29"/>
+						<line number="142" hits="12"/>
+						<line number="143" hits="16"/>
+						<line number="144" hits="1"/>
+						<line number="146" hits="16"/>
+						<line number="150" hits="54"/>
+						<line number="151" hits="18"/>
+						<line number="155" hits="97"/>
+						<line number="156" hits="97"/>
+						<line number="157" hits="28"/>
+						<line number="158" hits="13"/>
+						<line number="160" hits="11"/>
+						<line number="161" hits="45"/>
+						<line number="162" hits="45"/>
+						<line number="163" hits="45"/>
+						<line number="166" hits="73"/>
+						<line number="167" hits="219"/>
+						<line number="168" hits="73"/>
+						<line number="169" hits="146"/>
+						<line number="170" hits="73"/>
+						<line number="172" hits="146"/>
+						<line number="173" hits="73"/>
+						<line number="177" hits="39"/>
+						<line number="178" hits="39"/>
+						<line number="179" hits="18"/>
+						<line number="180" hits="18"/>
+						<line number="181" hits="0"/>
+						<line number="182" hits="1"/>
+						<line number="186" hits="37"/>
+						<line number="188" hits="39"/>
+						<line number="190" hits="70"/>
+					</lines>
+				</class>
+			</classes>
+		</package>
+	</packages>
+</coverage>
