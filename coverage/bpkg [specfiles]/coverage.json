@@ -1,0 +1,25 @@
+{
+  "files": [
+    {"file": "/home/koichi/workspace/bpkg/lib/term/example.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "48"},
+    {"file": "/home/koichi/workspace/bpkg/lib/utils/utils.sh", "percent_covered": "20.55", "covered_lines": "15", "total_lines": "73"},
+    {"file": "/home/koichi/workspace/bpkg/setup.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "57"},
+    {"file": "/home/koichi/workspace/bpkg/lib/update/update.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "43"},
+    {"file": "/home/koichi/workspace/bpkg/lib/suggest/suggest.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "48"},
+    {"file": "/home/koichi/workspace/bpkg/lib/term/term.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "147"},
+    {"file": "/home/koichi/workspace/bpkg/lib/package/package.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "21"},
+    {"file": "/home/koichi/workspace/bpkg/lib/getdeps/getdeps.sh", "percent_covered": "86.36", "covered_lines": "19", "total_lines": "22"},
+    {"file": "/home/koichi/workspace/bpkg/lib/init/init.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "183"},
+    {"file": "/home/koichi/workspace/bpkg/lib/show/show.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "129"},
+    {"file": "/home/koichi/workspace/bpkg/lib/install/install.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "241"},
+    {"file": "/home/koichi/workspace/bpkg/lib/json/JSON.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "119"},
+    {"file": "/home/koichi/workspace/bpkg/bpkg.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "64"},
+    {"file": "/home/koichi/workspace/bpkg/lib/list/list.sh", "percent_covered": "0.00", "covered_lines": "0", "total_lines": "47"}
+  ],
+  "percent_covered": "2.74",
+  "covered_lines": 34,
+  "total_lines": 1242,
+  "percent_low": 25,
+  "percent_high": 75,
+  "command": "shellspec lib/json/spec spec",
+  "date": "2021-03-28 23:31:54"
+}

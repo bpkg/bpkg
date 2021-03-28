@@ -1,0 +1,5 @@
+/.shellspec-local
+/.shellspec-quick.log
+/report/
+/coverage/
+/lib/json/coverage/

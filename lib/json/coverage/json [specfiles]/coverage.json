@@ -1,0 +1,12 @@
+{
+  "files": [
+    {"file": "/home/koichi/workspace/bpkg/lib/json/JSON.sh", "percent_covered": "68.91", "covered_lines": "82", "total_lines": "119"}
+  ],
+  "percent_covered": "68.91",
+  "covered_lines": 82,
+  "total_lines": 119,
+  "percent_low": 25,
+  "percent_high": 75,
+  "command": "shellspec spec",
+  "date": "2021-03-28 23:32:24"
+}
