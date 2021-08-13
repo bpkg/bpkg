@@ -49,7 +49,7 @@ Our install script is the simplest way. It takes care of everything for you, pla
 Paste the following on your shell and you're good to go:
 
 ```sh
-$ curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
+curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
 ```
 
 ### 2. clib
@@ -57,7 +57,7 @@ $ curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
 [clib][clib] is a package manager for C projects. If you already have it, installing `bpkg` is a simple matter of:
 
 ```sh
-$ clib install bpkg/bpkg
+clib install bpkg/bpkg
 ```
 
 ### 3. Source Code
@@ -65,11 +65,11 @@ $ clib install bpkg/bpkg
 To directly install `bpkg` from its source code you have to clone its repository and run the `setup.sh` script:
 
 ```sh
-$ git clone https://github.com/bpkg/bpkg.git
-$ cd bpkg
-$ ./setup.sh                             # Will install bpkg in $HOME/.local/bin
-$ sudo ./setup.sh                        # Will install bpkg in /usr/local/bin.
-$ PREFIX=/my/custom/directory ./setup.sh # Will install bpkg in a custom directory.
+git clone https://github.com/bpkg/bpkg.git
+cd bpkg
+./setup.sh                             # Will install bpkg in $HOME/.local/bin
+sudo ./setup.sh                        # Will install bpkg in /usr/local/bin.
+PREFIX=/my/custom/directory ./setup.sh # Will install bpkg in a custom directory.
 ```
 
 ## Usage
@@ -84,15 +84,15 @@ Packages can either be global (on `/usr/local/bin` if installed as root or
 For example, here's a **global install for the current user** of the [term package][term]:
 
 ```sh
-$ bpkg install term -g
-$ term
+bpkg install term -g
+term
 ```
 
 And the same package as a **local install**:
 
 ```sh
-$ bpkg install term
-$ ./deps/term/term.sh
+bpkg install term
+./deps/term/term.sh
 ```
 
 After a local install the `term.sh` script is copied as `term` to the `deps/bin` directory, you can add this directory to the `PATH` with
@@ -104,7 +104,7 @@ export PATH=$PATH:/path_to_bkpg/deps/bin
 As a bonus, you can specify a **specific version**:
 
 ```sh
-$ bpkg install jwerle/suggest.sh@0.0.1 -g
+bpkg install jwerle/suggest.sh@0.0.1 -g
 ```
 
 **Note:** to do that the packages **must be tagged releases** on the repository.
@@ -115,7 +115,7 @@ As long as there is a `Makefile` in the repository it will try to invoke `make i
 For example you could install [git-standup](https://github.com/stephenmathieson/git-standup) with an omitted `package.json` because of the `Makefile` and the `install` target found in it.
 
 ```sh
-$ bpkg install stephenmathieson/git-standup -g
+bpkg install stephenmathieson/git-standup -g
 
     info: Using latest (master)
     warn: Package doesn't exist
@@ -140,12 +140,12 @@ Supposing you're on the root of a package directory, the following commands show
 
 ```sh
 # Asking for single information
-$ bpkg package name
+bpkg package name
  "bpkg"
-$ bpkg package version
+bpkg package version
  "0.0.5"
 # Dumping all the metadata
-$ bpkg package
+bpkg package
 ["name"]        "bpkg"
 ["version"]     "0.0.5"
 ["description"] "Lightweight bash package manager"
@@ -264,10 +264,10 @@ This allows a user to `source` your script or invoke as a script.
 
 ```sh
 # Running as a script
-$ ./my_script.sh some args --blah
+./my_script.sh some args --blah
 # Sourcing the script
-$ source my_script.sh
-$ my_script some more args --blah
+source my_script.sh
+my_script some more args --blah
 ```
 
 ## Sponsors
@@ -289,7 +289,7 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/bpkg/sponsor/7/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/bpkg/sponsor/8/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/bpkg/sponsor/9/website" target="_blank"><img src="https://opencollective.com/bpkg/sponsor/9/avatar.svg"></a>
-
+Editing bpkg/README.md at master · bpkg/bpkg
 
 ### Contributors
 
