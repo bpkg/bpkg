@@ -107,6 +107,22 @@ As a bonus, you can specify a **specific version**:
 bpkg install jwerle/suggest.sh@0.0.1 -g
 ```
 
+Install from github directly
+```sh
+bpkg install "https://github.com/{user}/{project}"
+```
+
+Install from self hosted gitlab directly
+```sh
+bpkg install "https://{gitlabhost}/{group}/{project}"
+bpkg install "https://{gitlabhost}/{group}/{subgroup}/{project}"
+```
+
+Install from coding.net directly
+```sh
+bpkg install "https://coding.net/u/{user}/p/{project}"
+```
+
 **Note:** to do that the packages **must be tagged releases** on the repository.
 
 You can also *install packages without a `package.json`*.

@@ -69,13 +69,14 @@ if [ -z "$PREFIX" ]; then
 fi
 
 # All 'bpkg' supported commands
-CMDS="json install package term suggest init utils update list show getdeps"
+CMDS="json install package term suggest init utils update list show getdeps logging utils-url uninstall"
 
 make_install () {
   make_uninstall
   echo "  info: Installing $PREFIX/bin/$BIN..."
   install -d "$PREFIX/bin"
   local source=$(<$BIN)
+  
   [ -f "$source" ] && install "$source" "$PREFIX/bin/$BIN" || install "$BIN" "$PREFIX/bin"
   for cmd in $CMDS; do
     source=$(<$BIN-$cmd)
