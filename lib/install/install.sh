@@ -401,13 +401,18 @@ bpkg_install_from_remote () {
       info "Cloning ${repo_url} to ${name}-${version}"
       git clone "${repo_url}" "${name}-${version}" &&
         (
-      ## move into directory
-      cd "${name}-${version}" &&
-      git checkout ${version} &&
+        ## move into directory
+        cd "${name}-${version}" &&
+          (
+          ## checkout to branch version
+          git checkout ${version} ||
+          ## checkout into branch 'main' just in case 'master' was renamed
+          [ "${version}" = "master" ] && git checkout main
+          ) &&
         ## build
-      info "Performing install: \`${build}'"
-      build_output=$(eval "${build}")
-      echo "${build_output}"
+        info "Performing install: \`${build}'"
+        build_output=$(eval "${build}")
+        echo "${build_output}"
       ) &&
         ## clean up
       rm -rf "${name}-${version}"
