@@ -11,6 +11,7 @@ if [[ ${#BPKG_REMOTES[@]} -eq 0 ]]; then
   BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
 fi
 BPKG_USER="${BPKG_USER:-bpkg}"
+BPKG_DEPS="${BPKG_DEPS:-deps}"
 
 ## check parameter consistency
 validate_parameters () {
@@ -436,17 +437,17 @@ bpkg_install_from_remote () {
   ## perform local install otherwise
   else
     ## copy 'bpkg.json' or 'package.json' over
-    save_remote_file "$url/$package_file" "$cwd/deps/$name/$package_file" "$auth_param"
+    save_remote_file "$url/$package_file" "$cwd/$BPKG_DEPS/$name/$package_file" "$auth_param"
 
-    ## make 'deps/' directory if possible
-    mkdir -p "$cwd/deps/$name"
+    ## make '$BPKG_DEPS/' directory if possible
+    mkdir -p "$cwd/$BPKG_DEPS/$name"
 
-    ## make 'deps/bin' directory if possible
-    mkdir -p "$cwd/deps/bin"
+    ## make '$BPKG_DEPS/bin' directory if possible
+    mkdir -p "$cwd/$BPKG_DEPS/bin"
 
     # install package dependencies
     info "Install dependencies for $name"
-    (cd "$cwd/deps/$name" && bpkg getdeps)
+    (cd "$cwd/$BPKG_DEPS/$name" && bpkg getdeps)
 
     ## grab each script and place in deps directory
     for script in "${scripts[@]}"; do
@@ -455,13 +456,13 @@ bpkg_install_from_remote () {
           local scriptname="$(echo "$script" | xargs basename )"
 
           info "fetch" "$url/$script"
-          info "write" "$cwd/deps/$name/$script"
-          save_remote_file "$url/$script" "$cwd/deps/$name/$script" "$auth_param"
+          info "write" "$cwd/$BPKG_DEPS/$name/$script"
+          save_remote_file "$url/$script" "$cwd/$BPKG_DEPS/$name/$script" "$auth_param"
 
           scriptname="${scriptname%.*}"
-          info "$scriptname to PATH" "$cwd/deps/bin/$scriptname"
-          ln -si "$cwd/deps/$name/$script" "$cwd/deps/bin/$scriptname"
-          chmod u+x "$cwd/deps/bin/$scriptname"
+          info "$scriptname to PATH" "$cwd/$BPKG_DEPS/bin/$scriptname"
+          ln -si "$cwd/$BPKG_DEPS/$name/$script" "$cwd/$BPKG_DEPS/bin/$scriptname"
+          chmod u+x "$cwd/$BPKG_DEPS/bin/$scriptname"
         fi
       )
     done
@@ -472,8 +473,8 @@ bpkg_install_from_remote () {
       (
           if [[ "$file" ]];then
             info "fetch" "$url/$file"
-            info "write" "$cwd/deps/$name/$file"
-            save_remote_file "$url/$file" "$cwd/deps/$name/$file" "$auth_param"
+            info "write" "$cwd/$BPKG_DEPS/$name/$file"
+            save_remote_file "$url/$file" "$cwd/$BPKG_DEPS/$name/$file" "$auth_param"
           fi
         )
       done

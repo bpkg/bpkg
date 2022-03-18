@@ -4,7 +4,7 @@ _JavaScript has npm, Ruby has Gems, Python has pip and now Shell has bpkg!_
 
 `bpkg` is a lightweight bash package manager. It takes care of fetching the shell scripts, installing them appropriately, setting the execution permission and more.
 
-You can install shell scripts globally (on `/usr/local/bin`) or use them on a _per-project basis_ (on `./deps/`), as a lazy-man "copy and paste".
+You can install shell scripts globally (on `${PREFIX:-/usr/local/bin}`) or use them on a _per-project basis_ (on `${BPKG_DEPS:-./deps/}`), as a lazy-man "copy and paste".
 
 <!-- BEGIN-MARKDOWN-TOC -->
 * [Install](#install)
@@ -78,8 +78,8 @@ You use `bpkg` by simply sending commands, pretty much like `npm` or `pip`.
 
 ### Installing packages
 
-Packages can either be global (on `/usr/local/bin` if installed as root or
- `$HOME/.local/bin` otherwize) or local (under `./deps`).
+Packages can either be global (on `${PREFIX:-/usr/local/bin}` if installed as root or
+ `${PREFIX:-$HOME/.local/bin}` otherwize) or local (under `${BPKG_DEPS:-./deps}`).
 
 For example, here's a **global install for the current user** of the [term package][term]:
 
