@@ -43,13 +43,13 @@ setup () {
   ## build
   {
     echo
-    cd "${TMPDIR}"
+    cd "${TMPDIR}" || exit
     echo "  info: Creating temporary files..."
     test -d "${DEST}" && { echo "  warn: Already exists: '${DEST}'"; }
     rm -rf "${DEST}"
     echo "  info: Fetching latest 'bpkg'..."
     git clone --depth=1 "${REMOTE}" "${DEST}" > /dev/null 2>&1
-    cd "${DEST}"
+    cd "${DEST}" || exit
     echo "  info: Installing..."
     echo
     make_install
@@ -69,7 +69,7 @@ if [ -z "$PREFIX" ]; then
 fi
 
 # All 'bpkg' supported commands
-CMDS="json install package term suggest init utils update list show getdeps"
+CMDS="json install package term suggest init utils update list show getdeps run"
 
 make_install () {
   local source
