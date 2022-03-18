@@ -420,7 +420,7 @@ bpkg_install_from_remote () {
 
       ## shallow clone
       info "Cloning $repo_url to $(pwd)/$name-$version"
-      git clone "$repo_url" "$name-$version" && (
+      (test -d "$name-$version" || git clone "$repo_url" "$name-$version") && (
           ## move into directory
           cd "$name-$version" && (
             ## checkout to branch version or checkout into

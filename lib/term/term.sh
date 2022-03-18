@@ -286,6 +286,19 @@ term () {
 ## main function with args
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f term
+  export -f term_dim
+  export -f term_move
+  export -f term_reset
+  export -f term_write
+  export -f term_clear
+  export -f term_color
+  export -f term_blink
+  export -f term_cursor
+  export -f term_bright
+  export -f term_reverse
+  export -f term_underline
+  export -f term_transition
+  export -f term_background
 else
   term "${@}"
 fi

@@ -38,9 +38,14 @@ usage () {
 
 bpkg_run () {
   pushd . >/dev/null || return $?
+
+  local should_emit_source=0
+  local should_source=0
+  local should_clean=0
   local ignore_args=0
   local needs_name=0
   local package=''
+  local dest=''
   local name=''
 
   for opt in "$@"; do
@@ -54,9 +59,22 @@ bpkg_run () {
 
       -s|--source)
         if (( 0 == ignore_args )); then
-          # shellcheck disable=SC1090
-          source "$(which "$name")"
-          return $?
+          should_source=1
+          shift
+        fi
+        ;;
+
+      --emit-source)
+        if (( 0 == ignore_args )); then
+          should_emit_source=1
+          shift
+        fi
+        ;;
+
+      -c|--clean)
+        if (( 0 == ignore_args )); then
+          should_clean=1
+          shift
         fi
         ;;
 
@@ -78,7 +96,12 @@ bpkg_run () {
     esac
   done
 
-  local dest=$(bpkg_install --no-prune -g "$1" 2>/dev/null | grep 'info: Cloning' | sed 's/.* to //g' | xargs echo)
+  if (( 0 == should_clean )); then
+    dest=$(bpkg_install --no-prune -g "$1" 2>/dev/null | grep 'info: Cloning' | sed 's/.* to //g' | xargs echo)
+  else
+    dest=$(bpkg_install -g "$1" 2>/dev/null | grep 'info: Cloning' | sed 's/.* to //g' | xargs echo)
+  fi
+
 
   if [ -z "$dest" ]; then return $?; fi
 
@@ -90,7 +113,18 @@ bpkg_run () {
 
   shift
   popd >/dev/null || return $?
-  eval "$(which "$name")" $@
+
+  if (( 1 == should_emit_source )); then
+    which "$name"
+  else
+    if (( 1 == should_source )); then
+      # shellcheck disable=SC1090
+      source "$(which "$name")"
+    else
+      eval "$(which "$name")" $@
+    fi
+  fi
+
   return $?
 }
 
