@@ -27,7 +27,7 @@ usage () {
 bpkg_list () {
   local verbose=0
   for opt in "${@}"; do
-    case "$opt" in 
+    case "$opt" in
       -V|--version)
         echo "${VERSION}"
         return 0
@@ -51,19 +51,21 @@ bpkg_list () {
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote="${BPKG_GIT_REMOTES[$i]}"
     bpkg_select_remote "$remote" "$git_remote"
+
     if [ ! -f "$BPKG_REMOTE_INDEX_FILE" ]; then
       bpkg_warn "no index file found for remote: ${remote}"
       bpkg_warn "You should run \`bpkg update' before running this command."
       continue
     fi
+
     OLDIFS="$IFS"
     IFS=$'\n'
-    local line
-    while read -r line; do
-      local desc name
-      name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
-      desc=$(echo "$line" | cut -d\| -f2)
+
+    for line in $(cat "$BPKG_REMOTE_INDEX_FILE"); do
+      local name=$(echo "$line" | cut -d\| -f1 | tr -d ' ')
+      local desc=$(echo "$line" | cut -d\| -f2)
       local host=$BPKG_REMOTE_HOST
+
       if [ "$verbose" == "1" ]; then
         echo "$name [$host] - $desc"
       else
@@ -75,7 +77,6 @@ bpkg_list () {
     i=$((i+1))
   done
 }
-
 
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_list

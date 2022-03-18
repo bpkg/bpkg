@@ -158,7 +158,7 @@ Here we lay down some info on the structure of a package.
 
 ## bpkg.json
 
-Every package must have a file called `bpkg.json` (for backward-compatibility 
+Every package must have a file called `bpkg.json` (for backward-compatibility
 `package.json` can also be used); it specifies package metadata on the [JSON format][json].
 
 Here's an example of a well-formed `bpkg.json`:

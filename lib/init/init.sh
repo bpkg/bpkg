@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## sets optional variable from environment
-opt () { eval "if [ -z \"\${$1}\" ]; then ${1}='${2}'; fi";  }
+opt () { eval "if [ -z "\${"$1"}" ]; then $1='$2'; fi";  }
 
 ## output usage
 usage () {
@@ -22,8 +22,8 @@ prompt () {
 
     value="${value//\"/\'}";
   } 2>&1
-  if [ -n "${value}" ]; then
-    eval "${var}=\"${value}\""
+  if [ -n "$value" ]; then
+    eval "$var=\"$value\""
   fi
 }
 
@@ -84,7 +84,7 @@ intro () {
   echo "defaults."
   echo
   echo "See github.com/bpkg/bpkg for more information on defining the bpkg"
-  echo "\`bpkg.json' file."
+  echo "'bpkg.json' file."
   echo
   echo "You can press ^C anytime to quit this prompt. The 'bpkg.json' file"
   echo "will only be written upon completion."
@@ -138,9 +138,8 @@ csv () {
       SCRIPTS="${SCRIPTS//,/ }"
       SCRIPTS="${SCRIPTS//\"/}"
       SCRIPTS="${SCRIPTS//\'/}"
-      # shellcheck disable=SC2086
-      SCRIPTS=($(wrap ${SCRIPTS}))
-      (( len=${#SCRIPTS[@]} ))
+      SCRIPTS=($(wrap "${SCRIPTS}"))
+      let len=${#SCRIPTS[@]}
       for (( i = 0; i < len; i++ )); do
         word=${SCRIPTS[$i]}
         if (( i + 1 != len )); then
@@ -275,7 +274,6 @@ create_repo () {
   fi
 }
 
-
 ## main
 bpkg_init () {
   local cwd
@@ -341,4 +339,3 @@ else
   bpkg_init "${@}"
   exit $?
 fi
-

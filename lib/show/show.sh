@@ -43,6 +43,7 @@ show_package () {
   local show_sources=$4
   local remote=$BPKG_REMOTE
   local git_remote=$BPKG_GIT_REMOTE
+  local nonce="$(date +%s)"
   local auth=""
   local json=""
   local readme=""
@@ -58,11 +59,16 @@ show_package () {
     uri=$BPKG_REMOTE/$pkg/raw/master
   fi
 
-  json=$(eval "curl $auth -sL '$uri/bpkg.json?$(date +%s)'")
+  json=$(eval "curl $auth -sL '$uri/bpkg.json?$nonce'" 2>/dev/null)
   if [ "${json}" = '404: Not Found' ];then
-    json=$(eval "curl $auth -sL '$uri/package.json?$(date +%s)'")
+    json=$(eval "curl $auth -sL '$uri/package.json?$nonce'" 2>/dev/null)
   fi
-  readme=$(eval "curl $auth -sL '$uri/README.md?$(date +%s)'")
+
+  if [ -z "$json" ]; then
+    echo 1>&2 "error: Failed to load package JSON"
+  fi
+
+  readme=$(eval "curl $auth -sL '$uri/README.md?$nonce'")
 
   local author install_sh pkg_desc readme_len sources version
 
@@ -174,6 +180,7 @@ bpkg_show () {
 
     OLDIFS="$IFS"
     IFS=$'\n'
+
     local line
     while read -r line; do
       local desc name

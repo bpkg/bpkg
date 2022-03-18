@@ -1,12 +1,12 @@
 #! /usr/bin/env bash
 
-cd ${0%/*}
+cd "${0%/*}" || exit
 
 # make test output TAP compatible
 # http://en.wikipedia.org/wiki/Test_Anything_Protocol
 
 fails=0
-tests=`ls invalid/* -1 | wc -l`
+tests=$(ls invalid/* -1 | wc -l)
 
 echo "1..${tests##* }"
 for input in invalid/*
@@ -22,7 +22,7 @@ do
     fails=$((fails+1))
   else
     echo "ok $i - $input was rejected"
-    echo "#" `cat /tmp/JSON.sh_errlog`
+    echo "#" $(cat /tmp/JSON.sh_errlog)
   fi
 done
 echo "$fails test(s) failed"

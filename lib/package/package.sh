@@ -9,15 +9,10 @@ usage () {
 
 ## Read a package property
 bpkg_package () {
-  local cwd pkg prop
-
-  prop="${1}"
-  cwd="$(pwd)"
-  pkg="${cwd}/package.json"
-
-  if ! test -f "${pkg}"; then
-    pkg="${cwd}/package.json"
-  fi
+  local cwd="$(pwd)"
+  local prop="${1}"
+  local pkgs=("$cwd/bpkg.json"  "${cwd}/package.json")
+  local npkgs="${#pkgs[@]}"
 
   ## parse flags
   case "${prop}" in
@@ -27,30 +22,28 @@ bpkg_package () {
       ;;
   esac
 
-  ## ensure there is a package to read
-  if ! test -f "${pkg}"; then
-    echo 2>&1 "error: Unable to find 'bpkg.json' or 'package.json' in $(pwd)"
-    return 1
-  fi
+  ## attempt to find JSON manifest and query it
+  for (( i = 0; i < npkgs; i++ )); do
+    local pkg="${pkgs[$i]}"
 
-  if [ -z "${prop}" ]; then
-    ## output all propertyies if property
-    ## is ommited
-    {
-      # shellcheck disable=SC2002
-      cat "${pkg}" | bpkg-json -b
-    }
-  else
-    ## show value for a specific property
-    ## in 'bpkg.json' or 'package.json'
-    {
-      # shellcheck disable=SC2002
-      cat "${pkg}" | bpkg-json -b | grep "${prop}" | awk '{ $1=""; printf $0 }'
-      echo
-    }
-  fi
+    if test -f "$pkg"; then
+      if [ -z "$prop" ]; then
+        ## output all propertyies if property
+        ## is ommited
+        cat "$pkg" | bpkg-json -b
+      else
+        ## show value for a specific property
+        ## in 'bpkg.json' or 'package.json'
+        cat "$pkg" | bpkg-json -b | grep "$prop" | awk '{ $1=""; printf $0 }' | tr -d '"'
+        echo
+      fi
 
-  return 0
+      return 0
+    fi
+  done
+
+  echo 2>&1 "error: Unable to find \`bpkg.json' or \`package.json' in $cwd"
+  return 1
 }
 
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
