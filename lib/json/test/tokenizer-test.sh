@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-cd ${0%/*}
+cd "${0%/*}" || exit
 . ../JSON.sh
 
 i=0
@@ -44,10 +44,10 @@ ttest '[ null   ,  -110e10, "null" ]' \
 ttest '{"e": false}'     '{' '"e"' ':' 'false' '}'
 ttest '{"e": "string"}'  '{' '"e"' ':' '"string"' '}'
 
-if ! cat ../package.json | tokenize >/dev/null
+if ! cat ../bpkg.json | tokenize >/dev/null
 then
   fails=$((fails+1))
-  echo "Tokenizing package.json failed!"
+  echo "Tokenizing bpkg.json failed!"
 fi
 
 echo "$fails test(s) failed"

@@ -9,15 +9,8 @@ usage () {
 
 ## Read a package property
 bpkg_getdeps () {
-  local cwd pkg
-
-  cwd="$(pwd)"
-  pkg="${cwd}/bpkg.json"
-
-  if ! test -f "${pkg}"; then
-    pkg="${cwd}/package.json"
-  fi
-
+  local cwd="$(pwd)"
+  local pkg="${cwd}/bpkg.json"
 
   ## parse flags
   case "$1" in
@@ -29,8 +22,11 @@ bpkg_getdeps () {
 
   ## ensure there is a package to read
   if ! test -f "${pkg}"; then
-    echo 2>&1 "error: Unable to find 'bpkg.json' or 'package.json' in $(pwd)"
-    return 1
+    pkg="${cwd}/package.json"
+    if ! test -f "${pkg}"; then
+    echo 2>&1 "error: Unable to find \`bpkg.json' or \`package.json' in $cwd"
+      return 1
+    fi
   fi
 
   # shellcheck disable=SC2002

@@ -1,0 +1,4 @@
+## Allow unsued variables
+disable=SC2034
+## Allow declare and assign separately to avoid masking return values
+disable=SC2155

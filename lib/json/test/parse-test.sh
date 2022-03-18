@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-cd ${0%/*}
+cd "${0%/*}" || exit
 
 . ../JSON.sh
 
@@ -14,7 +14,7 @@ echo "1..4"
 for input in '"oooo"  ' '[true, 1, [0, {}]]  ' '{"true": 1}'
 do
   i=$((i+1))
-  if echo "$input" | ptest 
+  if echo "$input" | ptest
   then
     echo "ok $i - $input"
   else
@@ -23,12 +23,12 @@ do
   fi
 done
 
-if ! ptest < ../package.json
+if ! ptest < ../bpkg.json
 then
-  echo "not ok 4 - Parsing package.json failed!"
+  echo "not ok 4 - Parsing bpkg.json failed!"
   fails=$((fails+1))
 else 
-  echo "ok $i - package.json"
+  echo "ok $i - bpkg.json"
 fi
 
 echo "$fails test(s) failed"
