@@ -130,6 +130,10 @@ You can install a packages dependencies with the `bpkg getdeps` command. These w
 
 _Note: There is no protection against circular dependencies, so be careful!_
 
+### Running packages with `bpkg`
+
+You can run a package script with `bpkg run` which will install your
+package globally and execute it as a command
 
 ### Retrieving package info
 
@@ -242,7 +246,6 @@ This is a hash of dependencies. The keys are the package names, and the values a
   }
 ```
 
-
 ## Packaging best practices
 
 These are guidelines that we strongly encourage developers to follow.
@@ -295,14 +298,11 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
 <a href="graphs/contributors"><img src="https://opencollective.com/bpkg/contributors.svg?width=890&button=false" /></a>
 
-
 ### Backers
 
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/bpkg#backer)]
 
 <a href="https://opencollective.com/bpkg#backers" target="_blank"><img src="https://opencollective.com/bpkg/backers.svg?width=890"></a>
-
-
 
 ## License
 

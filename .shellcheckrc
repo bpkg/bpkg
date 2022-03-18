@@ -2,3 +2,5 @@
 disable=SC2034
 ## Allow declare and assign separately to avoid masking return values
 disable=SC2155
+## Double quote array expansions to avoid re-splitting elements.
+disable=SC2068

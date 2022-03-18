@@ -13,6 +13,8 @@ fi
 BPKG_USER="${BPKG_USER:-bpkg}"
 BPKG_DEPS="${BPKG_DEPS:-deps}"
 
+let prevent_prune=0
+
 ## check parameter consistency
 validate_parameters () {
   if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
@@ -174,6 +176,10 @@ bpkg_install () {
       -g|--global)
         shift
         needs_global=1
+        ;;
+      --no-prune)
+        shift
+        prevent_prune=1
         ;;
 
       *)
@@ -410,10 +416,10 @@ bpkg_install_from_remote () {
       ## go to tmp dir
       cd "$([[ -n "$TMPDIR" ]] && echo "$TMPDIR" || echo /tmp)" &&
       ## prune existing
-      rm -rf "$name-$version" &&
+      ( (( 0 == prevent_prune )) && rm -rf "$name-$version" || true) &&
 
       ## shallow clone
-      info "Cloning $repo_url to $name-$version"
+      info "Cloning $repo_url to $(pwd)/$name-$version"
       git clone "$repo_url" "$name-$version" && (
           ## move into directory
           cd "$name-$version" && (
@@ -432,7 +438,9 @@ bpkg_install_from_remote () {
       )
 
       ## clean up
-      rm -rf "$name-$version"
+      if (( 0 == prevent_prune )); then
+        rm -rf "$name-$version"
+      fi
     )}
   ## perform local install otherwise
   else

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+BPKG_JSON="$(which bpkg-json)"
+
+if [ -z "$BPKG_JSON" ]; then
+  BPKG_JSON="$(realpath "$0/../JSON/JSON.sh")"
+else
+  BPKG_JSON="$(realpath "$BPKG_JSON")"
+fi
+
 ## output usage
 usage () {
   echo "usage: bpkg-package [-h|--help]"
@@ -30,11 +38,11 @@ bpkg_package () {
       if [ -z "$prop" ]; then
         ## output all propertyies if property
         ## is ommited
-        cat "$pkg" | bpkg-json -b
+        cat "$pkg" | "$BPKG_JSON" -b
       else
         ## show value for a specific property
         ## in 'bpkg.json' or 'package.json'
-        cat "$pkg" | bpkg-json -b | grep "$prop" | awk '{ $1=""; printf $0 }' | tr -d '"'
+        cat "$pkg" | "$BPKG_JSON" -b | grep "$prop" | awk '{ $1=""; printf $0 }' | tr -d '"' | sed 's/^ *//;s/ *$//'
         echo
       fi
 
@@ -46,9 +54,13 @@ bpkg_package () {
   return 1
 }
 
-if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
-  export -f bpkg_package
+if [ -z "$BPKG_JSON" ]; then
+  echo 1>&2 "error: Failed to load 'bpkg-json'"
 else
-  bpkg_package "${@}"
-  exit $?
+  if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
+    export -f bpkg_package
+  else
+    bpkg_package "${@}"
+    exit $?
+  fi
 fi
