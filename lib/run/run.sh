@@ -97,11 +97,10 @@ bpkg_run () {
   done
 
   if (( 0 == should_clean )); then
-    dest=$(bpkg_install --no-prune -g "$1" 2>/dev/null | grep 'info: Cloning' | sed 's/.* to //g' | xargs echo)
+    dest=$(bpkg_install --no-prune -g "$1" 2>/dev/null | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
   else
-    dest=$(bpkg_install -g "$1" 2>/dev/null | grep 'info: Cloning' | sed 's/.* to //g' | xargs echo)
+    dest=$(bpkg_install -g "$1" 2>/dev/null | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
   fi
-
 
   if [ -z "$dest" ]; then return $?; fi
 

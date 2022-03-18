@@ -414,20 +414,20 @@ bpkg_install_from_remote () {
 
     {(
       ## go to tmp dir
-      cd "$([[ -n "$TMPDIR" ]] && echo "$TMPDIR" || echo /tmp)" &&
+      cd "$([[ -n "$TMPDIR" ]] && echo "$TMPDIR" || echo /tmp)" || return $?
       ## prune existing
-      ( (( 0 == prevent_prune )) && rm -rf "$name-$version" || true) &&
+      ( (( 0 == prevent_prune )) && rm -rf "$name-$version")
 
       ## shallow clone
       info "Cloning $repo_url to $(pwd)/$name-$version"
-      (test -d "$name-$version" || git clone "$repo_url" "$name-$version") && (
+      (test -d "$name-$version" || git clone "$repo_url" "$name-$version" 2>/dev/null) && (
           ## move into directory
           cd "$name-$version" && (
             ## checkout to branch version or checkout into
             ## branch 'main' just in case 'master' was renamed
-            git checkout "$version" ||
+            git checkout "$version" 2>/dev/null ||
               ([ "$version" = "master" ] && git checkout main 2>/dev/null) ||
-              (git checkout master)
+              (git checkout master 2>/dev/null)
           )
 
           ## build
