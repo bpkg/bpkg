@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## sets optional variable from environment
-opt () { eval "if [ -z "\${"$1"}" ]; then $1='$2'; fi";  }
+opt () { eval "if [ -z \"\$$1\" ]; then $1='$2'; fi";  }
 
 ## output usage
 usage () {
@@ -139,6 +139,7 @@ csv () {
       SCRIPTS="${SCRIPTS//\"/}"
       SCRIPTS="${SCRIPTS//\'/}"
       SCRIPTS=($(wrap "${SCRIPTS}"))
+      # shellcheck disable=2219
       let len=${#SCRIPTS[@]}
       for (( i = 0; i < len; i++ )); do
         word=${SCRIPTS[$i]}
@@ -148,7 +149,7 @@ csv () {
           TMP+="${word}"
         fi
       done
-      SCRIPTS="${TMP}"
+      SCRIPTS=("${TMP}")
     }
   fi
 }

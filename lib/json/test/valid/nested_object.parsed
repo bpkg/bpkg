@@ -1,5 +1,0 @@
-["object","key"]	"value"
-["object","empty"]	{}
-["object"]	{"key":"value","empty":{}}
-["number"]	5
-[]	{"object":{"key":"value","empty":{}},"number":5}

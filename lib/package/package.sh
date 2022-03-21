@@ -38,11 +38,11 @@ bpkg_package () {
       if [ -z "$prop" ]; then
         ## output all propertyies if property
         ## is ommited
-        cat "$pkg" | "$BPKG_JSON" -b
+        cat < "$pkg" | "$BPKG_JSON" -b
       else
         ## show value for a specific property
         ## in 'bpkg.json' or 'package.json'
-        cat "$pkg" | "$BPKG_JSON" -b | grep "$prop" | awk '{ $1=""; printf $0 }' | tr -d '"' | sed 's/^ *//;s/ *$//'
+        cat < "$pkg" | "$BPKG_JSON" -b | grep "$prop" | awk '{ $1=""; printf $0 }' | tr -d '"' | sed 's/^ *//;s/ *$//'
         echo
       fi
 

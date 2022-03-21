@@ -204,8 +204,7 @@ bpkg_install () {
   local let i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
-    bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global
-    if [[ "$?" == '0' ]]; then
+    if bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global; then
       return 0
     elif [[ "$?" == '2' ]]; then
       error 'fatal error occurred during install'
@@ -250,7 +249,7 @@ bpkg_install_from_remote () {
   {
     OLDIFS="$IFS"
     IFS="@"
-    pkg_parts=($pkg)
+    pkg_parts=("$pkg")
     IFS="$OLDIFS"
   }
 
@@ -269,7 +268,7 @@ bpkg_install_from_remote () {
   {
     OLDIFS="$IFS"
     IFS='/'
-    pkg_parts=($pkg)
+    pkg_parts=("$pkg")
     IFS="$OLDIFS"
   }
 
@@ -367,7 +366,7 @@ bpkg_install_from_remote () {
 
     ## construct scripts array
     {
-      scripts=$(echo -n "$json" | bpkg-json -b | grep '\["scripts' | awk '{ print $2 }' | tr -d '"')
+      scripts=($(echo -n "$json" | bpkg-json -b | grep '\["scripts' | awk '{ print $2 }' | tr -d '"'))
 
       ## create array by splitting on newline
       OLDIFS="$IFS"

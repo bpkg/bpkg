@@ -185,7 +185,8 @@ parse () {
 
 parse_options "$@"
 
-if [ "$0" = "${BASH_SOURCE}" ] || [ -z "${BASH_SOURCE}" ];
+# shellcheck disable=2128
+if [ "$0" = "${BASH_SOURCE[0]}" ] || [ -z "$BASH_SOURCE" ];
 then
   tokenize | parse
 fi
