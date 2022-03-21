@@ -249,7 +249,7 @@ bpkg_install_from_remote () {
   {
     OLDIFS="$IFS"
     IFS="@"
-    pkg_parts=("$pkg")
+    pkg_parts=($pkg)
     IFS="$OLDIFS"
   }
 
@@ -268,7 +268,7 @@ bpkg_install_from_remote () {
   {
     OLDIFS="$IFS"
     IFS='/'
-    pkg_parts=("$pkg")
+    pkg_parts=($pkg)
     IFS="$OLDIFS"
   }
 
@@ -324,7 +324,7 @@ bpkg_install_from_remote () {
   }
 
   ## build url
-  url="$remote$uri"
+  url="$remote/$uri"
   repo_url="$git_remote/$user/$name.git"
   local nonce="$(date +%s)"
 

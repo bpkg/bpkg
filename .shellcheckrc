@@ -10,6 +10,9 @@ disable=SC2068
 ## Allow: Declare and assign separately to avoid masking return values
 disable=SC2155
 
+## Allow: Quote to prevent word splitting/globbing, or split robustly with mapfile or read -a.
+disable=SC2206
+
 ## Allow: Prefer mapfile or read -a to split command output (or quote to avoid splitting)
 disable=SC2207
 
