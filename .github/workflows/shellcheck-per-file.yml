@@ -27,7 +27,7 @@ jobs:
           - lib/suggest/suggest.sh
     steps:
       - uses: actions/checkout@v2
-      - uses: pipeline-components/shellcheck@v0.7.1
+      - uses: pipeline-components/shellcheck@v0.6.1
         continue-on-error: true
         with:
           directory: ${{ matrix.file }}
