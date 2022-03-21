@@ -277,6 +277,8 @@ my_script some more args --blah
 
 **bpkg** wouldn't be where it is today without the help of its authors, contributors, and sponsors:
 
+* [@socketsupply](https://github.com/socketsupply) ([socketsupply.co](https://socketsupply.co))
+* [@little-core-labs](https://github.com/little-core-labs)
 * [@littlstar](https://github.com/littlstar) ([littlstar.com](https://littlstar.com))
 * [@spotify](https://github.com/spotify) ([spotify.com](https://spotify.com))
 
