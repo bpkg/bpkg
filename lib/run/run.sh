@@ -104,6 +104,10 @@ bpkg_run () {
       export BPKG_SCRIPT_SOURCES
     fi
 
+    export BPKG_NAME="$(bpkg_package name)"
+    export BPKG_REPO="$(bpkg_package repo)"
+    export BPKG_VERSION="$(bpkg_package version)"
+
     shift
     # shellcheck disable=SC2068
     eval "$cmd" $@
@@ -144,6 +148,10 @@ bpkg_run () {
         BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
         export BPKG_SCRIPT_SOURCES
       fi
+
+      export BPKG_NAME="$(bpkg_package name)"
+      export BPKG_REPO="$(bpkg_package repo)"
+      export BPKG_VERSION="$(bpkg_package version)"
 
       if [ -n "$cmd" ]; then
         shift
