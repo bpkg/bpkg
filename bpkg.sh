@@ -7,7 +7,7 @@ if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
 fi
 
 ## bpkg version
-VERSION="1.0.4"
+VERSION="1.0.5"
 
 ## output error to stderr
 error () {
