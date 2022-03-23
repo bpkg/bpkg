@@ -98,9 +98,12 @@ bpkg_run () {
 
   local cmd="$(bpkg_package commands "$1")"
 
-  BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
-  export BPKG_SCRIPT_SOURCES
   if [ -n "$cmd" ]; then
+    if test -f bpkg.json || test -f package.json; then
+      BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
+      export BPKG_SCRIPT_SOURCES
+    fi
+
     shift
     # shellcheck disable=SC2068
     eval "$cmd" $@
@@ -127,8 +130,7 @@ bpkg_run () {
 
   cmd="$(bpkg_package commands "$1")"
   shift
-  BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
-  export BPKG_SCRIPT_SOURCES
+
   popd >/dev/null || return $?
 
   if (( 1 == should_emit_source )); then
@@ -138,6 +140,11 @@ bpkg_run () {
       # shellcheck disable=SC1090
       source "$(which "$name")"
     else
+      if test -f bpkg.json || test -f package.json; then
+        BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
+        export BPKG_SCRIPT_SOURCES
+      fi
+
       if [ -n "$cmd" ]; then
         shift
         # shellcheck disable=SC2068
