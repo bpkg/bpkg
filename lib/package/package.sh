@@ -16,6 +16,12 @@ usage () {
 }
 
 expand_grep_args () {
+  local strict_ending=$(echo "$@" | grep '\-\-strict')
+
+  if [ -n "$strict_ending" ]; then
+    shift
+  fi
+
   local n=$#
 
 	if (( n > 0 )); then
@@ -35,7 +41,11 @@ expand_grep_args () {
   done
 
 	if (( n > 0 )); then
-    printf '\]?'
+    if [ -n "$strict_ending" ]; then
+      printf '\]'
+    else
+      printf '\]?'
+    fi
   fi
 
   return 0
@@ -68,11 +78,16 @@ bpkg_package () {
         ## show value for a specific property
         ## in 'bpkg.json' or 'package.json'
         declare -a results
+        declare -a peek
+
+        # shellcheck disable=SC2068
+        IFS=$'\n' read -r -d '' -a peek <<< "$(cat < "$pkg" | "$BPKG_JSON" -b | grep -E "$(expand_grep_args --strict "$@")")"
+
         # shellcheck disable=SC2068
         IFS=$'\n' read -r -d '' -a results <<< "$(cat < "$pkg" | "$BPKG_JSON" -b | grep -E "$(expand_grep_args $@)")"
 
         if (( ${#results[@]} == 1 )); then
-          if (( $# > 1 )); then
+          if (( ${#peek[@]} > 0 )); then
             echo "${results[@]}" | awk '{ $1=""; printf $0 }' | tr -d '"' | sed 's/^ *//;s/ *$//'
           else
             echo "${results[@]}"
