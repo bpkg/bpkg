@@ -15,15 +15,40 @@ usage () {
   echo "   or: bpkg-package"
 }
 
+expand_grep_args () {
+  local n=$#
+
+	if (( n > 0 )); then
+    printf '\['
+  fi
+
+  while (( $# > 0 )); do
+    if [[ "$1" =~ ^[0-9]+$ ]]; then
+      printf '%s' "$1"
+    else
+      printf '"%s"' "$1"
+    fi
+    shift
+    if (( $# > 0)); then
+      printf ','
+    fi
+  done
+
+	if (( n > 0 )); then
+    printf '\]?'
+  fi
+
+  return 0
+}
+
 ## Read a package property
 bpkg_package () {
   local cwd="$(pwd)"
-  local prop="${1}"
   local pkgs=("$cwd/bpkg.json"  "${cwd}/package.json")
   local npkgs="${#pkgs[@]}"
 
   ## parse flags
-  case "${prop}" in
+  case "$1" in
     -h|--help)
       usage
       return 0
@@ -35,15 +60,29 @@ bpkg_package () {
     local pkg="${pkgs[$i]}"
 
     if test -f "$pkg"; then
-      if [ -z "$prop" ]; then
+      if [ -z "$1" ]; then
         ## output all propertyies if property
         ## is ommited
         cat < "$pkg" | "$BPKG_JSON" -b
       else
         ## show value for a specific property
         ## in 'bpkg.json' or 'package.json'
-        cat < "$pkg" | "$BPKG_JSON" -b | grep "$prop" | awk '{ $1=""; printf $0 }' | tr -d '"' | sed 's/^ *//;s/ *$//'
-        echo
+        declare -a results
+        # shellcheck disable=SC2068
+        IFS=$'\n' read -r -d '' -a results <<< "$(cat < "$pkg" | "$BPKG_JSON" -b | grep -E "$(expand_grep_args $@)")"
+
+        if (( ${#results[@]} == 1 )); then
+          if (( $# > 1 )); then
+            echo "${results[@]}" | awk '{ $1=""; printf $0 }' | tr -d '"' | sed 's/^ *//;s/ *$//'
+          else
+            echo "${results[@]}"
+          fi
+        else
+          for (( j = 0; j < ${#results[@]}; j++ )); do
+            echo "${results[j]}"
+          done
+        fi
+        shift
       fi
 
       return 0

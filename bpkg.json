@@ -4,5 +4,8 @@
   "description": "Lightweight bash package manager",
   "global": true,
   "repo": "bpkg/bpkg",
-  "install": "bash setup.sh"
+  "install": "bash setup.sh",
+  "commands": {
+    "lint": "shellcheck $BPKG_SCRIPT_SOURCES"
+  }
 }

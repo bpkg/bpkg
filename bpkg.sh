@@ -73,7 +73,7 @@ bpkg () {
       echo "Here are some commands available in your path:"
       echo
       local cmds=($(commands))
-      for cmd in ${cmds[@]}; do
+      for cmd in "${cmds[@]}"; do
         echo "    ${cmd}"
       done
       return 0
@@ -94,7 +94,7 @@ bpkg () {
           local res
           declare -a res=($(commands))
 
-          if [ -n "${res}" ]; then
+          if [ -n "${res[*]}" ]; then
             echo
             echo  >&2 "Did you mean one of these?"
             found=0
