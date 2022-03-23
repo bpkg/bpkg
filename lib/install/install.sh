@@ -235,6 +235,7 @@ bpkg_install_from_remote () {
   local json=''
   local user=''
   local name=''
+  local repo=''
   local version=''
   local auth_param=''
   local has_pkg_json=0
@@ -329,7 +330,6 @@ bpkg_install_from_remote () {
 
   ## build url
   url="$remote/$uri"
-  repo_url="$git_remote/$user/$name.git"
   local nonce="$(date +%s)"
 
   if url_exists "$url/bpkg.json?$nonce" "$auth_param"; then
@@ -363,6 +363,16 @@ bpkg_install_from_remote () {
       tr -d ' '
     )"
 
+    ## get package name from 'bpkg.json' or 'package.json'
+    repo="$(
+      echo -n "$json" |
+      bpkg-json -b |
+      grep -m 1 '"repo"' |
+      awk '{ $1=""; print $0 }' |
+      tr -d '\"' |
+      tr -d ' '
+    )"
+
     ## check if forced global
     if [[ "$(echo -n "$json" | bpkg-json -b | grep '\["global"\]' | awk '{ print $2 }' | tr -d '"')" == 'true' ]]; then
       needs_global=1
@@ -390,6 +400,12 @@ bpkg_install_from_remote () {
       files=("${files[@]}")
       IFS="$OLDIFS"
     }
+  fi
+
+  if [ -n "$repo" ]; then
+    repo_url="$git_remote/$repo.git"
+  else
+    repo_url="$git_remote/$user/$name.git"
   fi
 
   ## build global if needed
