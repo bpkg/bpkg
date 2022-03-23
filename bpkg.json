@@ -1,6 +1,6 @@
 {
   "name": "bpkg",
-  "version": "v1",
+  "version": "1.0.0",
   "description": "Lightweight bash package manager",
   "global": true,
   "repo": "bpkg/bpkg",
