@@ -24,7 +24,7 @@ bpkg_getdeps () {
   if ! test -f "${pkg}"; then
     pkg="${cwd}/package.json"
     if ! test -f "${pkg}"; then
-    echo 2>&1 "error: Unable to find \`bpkg.json' or \`package.json' in $cwd"
+      echo 1>&2 "error: Unable to find \`bpkg.json' or \`package.json' in $cwd"
       return 1
     fi
   fi

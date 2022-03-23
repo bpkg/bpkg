@@ -89,7 +89,7 @@ bpkg_package () {
     fi
   done
 
-  echo 2>&1 "error: Unable to find \`bpkg.json' or \`package.json' in $cwd"
+  echo 1>&2 "error: Unable to find \`bpkg.json' or \`package.json' in $cwd"
   return 1
 }
 

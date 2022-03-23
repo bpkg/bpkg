@@ -184,7 +184,7 @@ bpkg_install () {
 
       *)
         if [[ '-' = "${opt:0:1}" ]]; then
-          echo 2>&1 "error: Unknown argument \`$1'"
+          echo 1>&2 "error: Unknown argument \`$1'"
           usage
           return 1
         fi
