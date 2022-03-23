@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s extglob
+
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
@@ -32,19 +34,17 @@ bpkg_initrc
 ## outut usage
 usage () {
   echo 'usage: bpkg-run [-h|--help]'
-  echo '   or: bpkg-run [-s|--source] <package>'
-  echo '   or: bpkg-run [-s|--source] <user>/<package>'
+  echo '   or: bpkg-run [-h|--help] [command]'
+  echo '   or: bpkg-run [-s|--source] <package> [command]'
+  echo '   or: bpkg-run [-s|--source] <user>/<package> [command]'
 }
 
 bpkg_run () {
-  pushd . >/dev/null || return $?
-
   local should_emit_source=0
   local should_source=0
   local should_clean=0
   local ignore_args=0
   local needs_name=0
-  local package=''
   local dest=''
   local name=''
 
@@ -96,13 +96,28 @@ bpkg_run () {
     esac
   done
 
+  local cmd="$(bpkg_package commands "$1")"
+
+  BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
+  export BPKG_SCRIPT_SOURCES
+  if [ -n "$cmd" ]; then
+    shift
+    # shellcheck disable=SC2068
+    eval "$cmd" $@
+    return $?
+  fi
+
+  pushd . >/dev/null || return $?
+
   if (( 0 == should_clean )); then
     dest=$(bpkg_install --no-prune -g "$1" 2>/dev/null | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
   else
     dest=$(bpkg_install -g "$1" 2>/dev/null | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
   fi
 
-  if [ -z "$dest" ]; then return $?; fi
+  if [ -z "$dest" ]; then
+    return $?
+  fi
 
   cd "$dest" || return $?
 
@@ -110,7 +125,10 @@ bpkg_run () {
     name="$(bpkg_package name)"
   fi
 
+  cmd="$(bpkg_package commands "$1")"
   shift
+  BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
+  export BPKG_SCRIPT_SOURCES
   popd >/dev/null || return $?
 
   if (( 1 == should_emit_source )); then
@@ -120,6 +138,14 @@ bpkg_run () {
       # shellcheck disable=SC1090
       source "$(which "$name")"
     else
+      if [ -n "$cmd" ]; then
+        shift
+        # shellcheck disable=SC2068
+        eval "$cmd" $@
+        return $?
+      fi
+
+      # shellcheck disable=SC2068
       eval "$(which "$name")" $@
     fi
   fi

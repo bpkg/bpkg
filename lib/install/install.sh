@@ -156,7 +156,7 @@ fetch () {
 ## Install a bash package
 bpkg_install () {
   local pkg=''
-  local let needs_global=0
+  local needs_global=0
 
   for opt in "$@"; do
     if [[ '-' = "${opt:0:1}" ]]; then
@@ -201,7 +201,7 @@ bpkg_install () {
   echo
 
   ## Check each remote in order
-  local let i=0
+  local i=0
   for remote in "${BPKG_REMOTES[@]}"; do
     local git_remote=${BPKG_GIT_REMOTES[$i]}
     if bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global; then
@@ -227,9 +227,8 @@ bpkg_install_from_remote () {
   local pkg=$1
   local remote=$2
   local git_remote=$3
-  local let needs_global=$4
+  local needs_global=$4
 
-  cwd=$(pwd)
   local url=''
   local uri=''
   local version=''
@@ -238,17 +237,21 @@ bpkg_install_from_remote () {
   local name=''
   local version=''
   local auth_param=''
-  local let has_pkg_json=0
+  local has_pkg_json=0
   local package_file=''
-  declare -a local pkg_parts=()
-  declare -a local remote_parts=()
-  declare -a local scripts=()
-  declare -a local files=()
+
+  declare -a pkg_parts=()
+  declare -a remote_parts=()
+  declare -a scripts=()
+  declare -a files=()
+
+  cwd=$(pwd)
 
   ## get version if available
   {
     OLDIFS="$IFS"
     IFS="@"
+    # shellcheck disable=SC2206
     pkg_parts=($pkg)
     IFS="$OLDIFS"
   }
@@ -268,6 +271,7 @@ bpkg_install_from_remote () {
   {
     OLDIFS="$IFS"
     IFS='/'
+    # shellcheck disable=SC2206
     pkg_parts=($pkg)
     IFS="$OLDIFS"
   }

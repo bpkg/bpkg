@@ -1,20 +1,16 @@
+# shellcheck disable=SC2034
+
 ## Allow: To read lines rather than words, pipe/redirect to a 'while read' loop
 disable=SC2013
 
-## Allow: Unsued variables
-disable=SC2034
-
-## Allow: Double quote array expansions to avoid re-splitting elements
-disable=SC2068
-
 ## Allow: Declare and assign separately to avoid masking return values
 disable=SC2155
-
-## Allow: Quote to prevent word splitting/globbing, or split robustly with mapfile or read -a.
-disable=SC2206
 
 ## Allow: Prefer mapfile or read -a to split command output (or quote to avoid splitting)
 disable=SC2207
 
 ## Allow: Instead of 'let expr', prefer (( expr ))
 disable=SC2219
+
+## Allow: Not following source
+disable=SC1091

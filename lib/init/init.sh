@@ -35,6 +35,7 @@ prompt_if () {
     y|Y|yes|YES|Yes)
       shift
       shift
+      # shellcheck disable=SC2068
       $func $@
       return 0
   esac

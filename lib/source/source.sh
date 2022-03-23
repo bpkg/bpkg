@@ -10,6 +10,7 @@ else
 fi
 
 bpkg_source () {
+  # shellcheck disable=SC2068
   bpkg_run --emit-source $@
   return $?
 }
