@@ -31,7 +31,7 @@ fi
 
 bpkg_initrc
 
-## outut usage
+## output usage
 usage () {
   echo 'usage: bpkg-run [-h|--help]'
   echo '   or: bpkg-run [-h|--help] [command]'
