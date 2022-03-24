@@ -18,10 +18,7 @@ bpkg_source () {
 ## Use as lib or perform install
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_source
-elif validate_parameters; then
-  bpkg_source "$@"
-  exit $?
 else
-  #param validation failed
+  bpkg_source "$@"
   exit $?
 fi

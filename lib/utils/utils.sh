@@ -14,14 +14,22 @@ bpkg_initrc() {
   if [ ${#BPKG_REMOTES[@]} -eq 0 ]; then
     BPKG_REMOTES[0]=${BPKG_REMOTE-https://raw.githubusercontent.com}
     BPKG_GIT_REMOTES[0]=${BPKG_GIT_REMOTE-https://github.com}
+
+    export BPKG_REMOTES
+    export BPKG_GIT_REMOTE
+    export BPKG_GIT_REMOTES
   fi
-  BPKG_USER="${BPKG_USER:-"bpkg"}"
-  BPKG_INDEX=${BPKG_INDEX:-"$HOME/.bpkg/index"}
+
+  export BPKG_PACKAGE_USER="${BPKG_PACKAGE_USER:-"bpkg"}"
+  export BPKG_INDEX=${BPKG_INDEX:-"$HOME/.bpkg/index"}
+
+  bpkg_validate
+
+  return $?
 }
 
 ## check parameter consistency
 bpkg_validate () {
-  bpkg_initrc
   if [ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]; then
     error "$(printf 'BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array' "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")"
     return 1
@@ -91,43 +99,43 @@ bpkg_info () {
 bpkg_select_remote () {
   local remote=$1
   local git_remote=$2
-  BPKG_REMOTE_HOST=$(echo "$git_remote" | sed 's/.*:\/\///' | sed 's/\/$//' | tr '/' '_')
-  BPKG_REMOTE_INDEX="$BPKG_INDEX/$BPKG_REMOTE_HOST"
+  export BPKG_REMOTE_HOST=$(echo "$git_remote" | sed 's/.*:\/\///' | sed 's/\/$//' | tr '/' '_')
+  export BPKG_REMOTE_INDEX="$BPKG_INDEX/$BPKG_REMOTE_HOST"
   # shellcheck disable=SC2034
-  BPKG_REMOTE_INDEX_FILE="$BPKG_REMOTE_INDEX/index.txt"
-  BPKG_OAUTH_TOKEN=""
-  BPKG_CURL_AUTH_PARAM=""
-  BPKG_GIT_REMOTE=$git_remote
-  BPKG_AUTH_GIT_REMOTE=$git_remote
+  export BPKG_REMOTE_INDEX_FILE="$BPKG_REMOTE_INDEX/index.txt"
+  export BPKG_OAUTH_TOKEN=""
+  export BPKG_CURL_AUTH_PARAM=""
+  export BPKG_GIT_REMOTE=$git_remote
+  export BPKG_AUTH_GIT_REMOTE=$git_remote
   if [ "${remote:0:10}" == "raw-oauth|" ]; then
     OLDIFS="${IFS}"
     IFS="|"
     # shellcheck disable=SC2206
     local remote_parts=($remote)
     IFS="${OLDIFS}"
-    BPKG_OAUTH_TOKEN=${remote_parts[1]}
+    export BPKG_OAUTH_TOKEN=${remote_parts[1]}
     # shellcheck disable=SC2034
-    BPKG_CURL_AUTH_PARAM="-u $BPKG_OAUTH_TOKEN:x-oauth-basic"
-    BPKG_REMOTE=${remote_parts[2]}
+    export BPKG_CURL_AUTH_PARAM="-u $BPKG_OAUTH_TOKEN:x-oauth-basic"
+    export BPKG_REMOTE=${remote_parts[2]}
     if [[ "$git_remote" == https://* ]] && [[ "$git_remote" != *x-oauth-basic* ]] && [[ "$git_remote" != *${BPKG_OAUTH_TOKEN}* ]]; then
       # shellcheck disable=SC2034
-      BPKG_AUTH_GIT_REMOTE=${git_remote/https:\/\//https:\/\/$BPKG_OAUTH_TOKEN:x-oauth-basic@}
+      export BPKG_AUTH_GIT_REMOTE=${git_remote/https:\/\//https:\/\/$BPKG_OAUTH_TOKEN:x-oauth-basic@}
     fi
   else
-    BPKG_REMOTE=$remote
+    export BPKG_REMOTE="$remote"
   fi
 }
 
-## given a user and name, sets BPKG_RAW_PATH using the available
+## given a user and name, sets BPKG_REMOTE_RAW_PATH using the available
 ## BPKG_REMOTE and BPKG_OAUTH_TOKEN details
 bpkg_select_raw_path() {
   local user=$1
   local name=$2
   if [ "$BPKG_OAUTH_TOKEN" == "" ]; then
-    BPKG_RAW_PATH="$BPKG_REMOTE/$user/$name"
+    export BPKG_REMOTE_RAW_PATH="$BPKG_REMOTE/$user/$name"
   else
     # shellcheck disable=SC2034
-    BPKG_RAW_PATH="$BPKG_REMOTE/$user/$name/raw"
+    Export BPKG_REMOTE_RAW_PATH="$BPKG_REMOTE/$user/$name/raw"
   fi
   return 0
 }

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-shopt -s extglob
-
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
@@ -9,6 +7,15 @@ else
   # shellcheck disable=SC2230
   # shellcheck source=lib/utils/utils.sh
   source "$(which bpkg-utils)"
+fi
+
+if ! type -f bpkg-env &>/dev/null; then
+  echo "error: bpkg-env not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/env/env.sh
+  source "$(which bpkg-env)"
 fi
 
 if ! type -f bpkg-install &>/dev/null; then
@@ -96,21 +103,30 @@ bpkg_run () {
     esac
   done
 
-  local cmd="$(bpkg_package commands "$1")"
+  local cmd="$(bpkg_package commands "$1" 2>/dev/null)"
 
   if [ -n "$cmd" ]; then
-    if test -f bpkg.json || test -f package.json; then
-      BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
-      export BPKG_SCRIPT_SOURCES
-    fi
+    # shellcheck disable=SC2230
+    # shellcheck source=lib/env/env.sh
+    source "$(which bpkg-env)"
 
-    export BPKG_NAME="$(bpkg_package name)"
-    export BPKG_REPO="$(bpkg_package repo)"
-    export BPKG_VERSION="$(bpkg_package version)"
+    local parts=()
+    # shellcheck disable=SC2086
+    read -r -a parts <<< $cmd
+    local args=()
+    local prefix="${parts[0]}"
+
+    for (( i = 1; i < ${#parts[@]}; i++ )); do
+      if [[ "${parts[$i]}" =~ \*.\* ]]; then
+        args+=($(find . -wholename "${parts[$i]}"))
+      else
+        args+=("${parts[$i]}")
+      fi
+    done
 
     shift
     # shellcheck disable=SC2068
-    eval "$cmd" $@
+    eval "$prefix" ${args[@]} $@
     return $?
   fi
 
@@ -129,10 +145,10 @@ bpkg_run () {
   cd "$dest" || return $?
 
   if [ -z "$name" ]; then
-    name="$(bpkg_package name)"
+    name="$(bpkg_package name 2>/dev/null)"
   fi
 
-  cmd="$(bpkg_package commands "$1")"
+  cmd="$(bpkg_package commands "$1" 2>/dev/null)"
   shift
 
   popd >/dev/null || return $?
@@ -144,20 +160,26 @@ bpkg_run () {
       # shellcheck disable=SC1090
       source "$(which "$name")"
     else
-      if test -f bpkg.json || test -f package.json; then
-        BPKG_SCRIPT_SOURCES=$(find . -name '*.sh')
-        export BPKG_SCRIPT_SOURCES
-      fi
-
-      export BPKG_NAME="$(bpkg_package name)"
-      export BPKG_REPO="$(bpkg_package repo)"
-      export BPKG_VERSION="$(bpkg_package version)"
+      # shellcheck disable=SC2230
+      # shellcheck source=lib/env/env.sh
+      source "$(which bpkg-env)"
 
       if [ -n "$cmd" ]; then
+        local parts=()
+        # shellcheck disable=SC2086
+        read -r -a parts <<< $cmd
+        local args=()
+        local prefix="${parts[0]}"
+
+        for (( i = 1; i < ${#parts[@]}; i++ )); do
+          if [[ "${parts[$i]}" =~ \*.\* ]]; then
+            args+=($(find . -wholename "${parts[$i]}"))
+          fi
+        done
+
         shift
         # shellcheck disable=SC2068
-        eval "$cmd" $@
-        return $?
+        eval "$prefix" ${args[@]} $@
       fi
 
       # shellcheck disable=SC2068
@@ -171,10 +193,7 @@ bpkg_run () {
 ## Use as lib or perform install
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_run
-elif validate_parameters; then
-  bpkg_run "$@"
-  exit $?
 else
-  #param validation failed
+  bpkg_run "$@"
   exit $?
 fi

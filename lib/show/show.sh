@@ -1,4 +1,9 @@
 #!/bin/bash
+# Include config rc file if found
+CONFIG_FILE="$HOME/.bpkgrc"
+# shellcheck disable=SC1090
+[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
+
 
 VERSION="0.1.0"
 
@@ -127,7 +132,7 @@ bpkg_show () {
   local readme=0
   local sources=0
   local pkg=""
-  for opt in "${@}"; do
+  for opt in "$@"; do
     case "$opt" in
       -V|--version)
         echo "${VERSION}"
@@ -192,7 +197,7 @@ bpkg_show () {
         IFS=$'\n'
         return 0
       fi
-    done < "${BPKG_REMOTE_INDEX_FILE}"
+    done < "$BPKG_REMOTE_INDEX_FILE"
 
     IFS="$OLDIFS"
     i=$((i+1))
@@ -205,5 +210,5 @@ bpkg_show () {
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_show
 elif bpkg_validate; then
-  bpkg_show "${@}"
+  bpkg_show "$@"
 fi
