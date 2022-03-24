@@ -46,6 +46,9 @@ jobs:
           - lib/term/term.sh
           - lib/update/update.sh
           - lib/utils/utils.sh
+          - lib/env/env.sh
+          - lib/run/run.sh
+          - lib/source/source.sh
     steps:
       - uses: actions/checkout@v2
       - uses: pipeline-components/shellcheck@v0.6.1
