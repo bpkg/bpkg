@@ -6,6 +6,7 @@
   "repo": "bpkg/bpkg",
   "install": "bash setup.sh",
   "commands": {
-    "lint": "shellcheck $BPKG_SCRIPT_SOURCES"
+    "lint": "command shellcheck **/*.sh",
+    "list-sources": "echo ${BPKG_SCRIPT_SOURCES[@]} | sed 's/ /\n/g'"
   }
 }

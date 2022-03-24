@@ -69,7 +69,7 @@ if [ -z "$PREFIX" ]; then
 fi
 
 # All 'bpkg' supported commands
-CMDS="json install package term suggest init utils update list show getdeps run source"
+CMDS="json install package term suggest init utils update list show getdeps run source env"
 
 make_install () {
   local source
