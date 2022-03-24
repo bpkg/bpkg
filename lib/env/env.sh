@@ -35,7 +35,7 @@ export BPKG_INDEX="$BPKG_INDEX"
 export BPKG_OS="$(uname)"
 export BPKG_CWD="$(pwd)"
 export BPKG_BIN="$(which bpkg)"
-export BPKG_USER="$(uname)"
+export BPKG_USER="$USER"
 
 ## package
 export BPKG_PACKAGE_USER
@@ -70,7 +70,7 @@ usage () {
   echo 'BPKG_PACKAGE_DESCRIPTION="Lightweight bash package manager"'
   echo 'BPKG_PACKAGE_NAME="bpkg"'
   echo 'BPKG_PACKAGE_REPO="bpkg/bpkg"'
-  echo 'BPKG_PACKAGE_USER="Linux"'
+  echo 'BPKG_PACKAGE_USER="bpkg"'
   echo 'BPKG_PACKAGE_VERSION="1.0.7"'
 }
 
