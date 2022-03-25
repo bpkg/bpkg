@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## prevent sourcing
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then

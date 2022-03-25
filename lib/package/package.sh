@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 BPKG_JSON="$(which bpkg-json)"
 

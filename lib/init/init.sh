@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## sets optional variable from environment
 opt () { eval "if [ -z \"\$$1\" ]; then $1='$2'; fi";  }

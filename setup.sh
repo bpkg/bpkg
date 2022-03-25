@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # #             #
 # #mmm   mmmm   #   m   mmmm
@@ -11,7 +11,7 @@
 
 REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
 TMPDIR=${TMPDIR:-/tmp}
-DEST=${DEST:-${TMPDIR}/bpkg-master}
+DEST=${DEST:-$TMPDIR/bpkg-master}
 
 ## test if command exists
 ftest () {
