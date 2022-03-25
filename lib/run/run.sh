@@ -118,7 +118,7 @@ bpkg_run () {
 
     for (( i = 1; i < ${#parts[@]}; i++ )); do
       if [[ "${parts[$i]}" =~ \*.\* ]]; then
-        args+=($(find . -wholename "${parts[$i]}"))
+        args+=($(find . -path "${parts[$i]}"))
       else
         args+=("${parts[$i]}")
       fi
