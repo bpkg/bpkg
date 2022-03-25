@@ -1,9 +1,4 @@
-#!/bin/bash
-# Include config rc file if found
-CONFIG_FILE="$HOME/.bpkgrc"
-# shellcheck disable=SC1090
-[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
-
+#!/usr/bin/env bash
 
 VERSION="0.1.0"
 
@@ -14,6 +9,15 @@ else
   # shellcheck disable=SC2230
   # shellcheck source=lib/utils/utils.sh
   source "$(which bpkg-utils)"
+fi
+
+if ! type -f bpkg-env &>/dev/null; then
+  echo "error: bpkg-env not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/env/env.sh
+  source "$(which bpkg-env)"
 fi
 
 bpkg_initrc

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if ! type -f bpkg-run &>/dev/null; then
   echo "error: bpkg-run not found, aborting"

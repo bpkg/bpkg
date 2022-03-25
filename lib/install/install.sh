@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 if ! type -f bpkg-env &>/dev/null; then
   echo "error: bpkg-env not found, aborting"
   exit 1
