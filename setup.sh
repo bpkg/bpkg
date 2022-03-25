@@ -69,7 +69,21 @@ if [ -z "$PREFIX" ]; then
 fi
 
 # All 'bpkg' supported commands
-CMDS="json install package term suggest init utils update list show getdeps run source env"
+declare -a CMDS=()
+CMDS+=("env")
+CMDS+=("getdeps")
+CMDS+=("init")
+CMDS+=("install")
+CMDS+=("json")
+CMDS+=("list")
+CMDS+=("package")
+CMDS+=("run")
+CMDS+=("show")
+CMDS+=("source")
+CMDS+=("suggest")
+CMDS+=("term")
+CMDS+=("update")
+CMDS+=("utils")
 
 make_install () {
   local source
@@ -87,7 +101,7 @@ make_install () {
       install "$BIN" "$PREFIX/bin"
   fi
 
-  for cmd in $CMDS; do
+  for cmd in "${CMDS[@]}"; do
     source=$(<"$BIN-$cmd")
 
     if [ -f "$source" ]; then
@@ -103,7 +117,7 @@ make_install () {
 make_uninstall () {
   echo "  info: Uninstalling $PREFIX/bin/$BIN..."
   rm -f "$PREFIX/bin/$BIN"
-  for cmd in $CMDS; do
+  for cmd in "${CMDS[@]}"; do
     rm -f "$PREFIX/bin/$BIN-$cmd"
   done
   return $?
@@ -113,7 +127,7 @@ make_link () {
   make_uninstall
   echo "  info: Linking $PREFIX/bin/$BIN..."
   ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
-  for cmd in $CMDS; do
+  for cmd in "${CMDS[@]}"; do
     ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin"
   done
   return $?
