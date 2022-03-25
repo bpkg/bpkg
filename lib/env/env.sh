@@ -61,17 +61,20 @@ fi
 
 ## output usage
 usage () {
-  echo 'usage: bpkg-env [-h|--help]'
-  echo '   or: bpkg-env <key|pattern> [--value]'
-  echo
-  echo 'example:'
-  echo '$ bpkg-env BPKG_PACKAGE*'
-  echo 'BPKG_PACKAGE_DEPS="deps"'
-  echo 'BPKG_PACKAGE_DESCRIPTION="Lightweight bash package manager"'
-  echo 'BPKG_PACKAGE_NAME="bpkg"'
-  echo 'BPKG_PACKAGE_REPO="bpkg/bpkg"'
-  echo 'BPKG_PACKAGE_USER="bpkg"'
-  echo 'BPKG_PACKAGE_VERSION="1.0.7"'
+  cat <<USAGE
+usage: bpkg-env [-h|--help]
+  or: bpkg-env <key|pattern> [--value]
+
+example:
+
+  $ bpkg-env BPKG_PACKAGE*
+  BPKG_PACKAGE_DEPS="deps"
+  BPKG_PACKAGE_NAME="bpkg"
+  BPKG_PACKAGE_DESCRIPTION="Lightweight bash package manager"
+  BPKG_PACKAGE_REPO="bpkg/bpkg"
+  BPKG_PACKAGE_USER="bpkg"
+  BPKG_PACKAGE_VERSION="1.0.7"
+USAGE
 }
 
 bpkg_env () {
@@ -109,7 +112,7 @@ bpkg_env () {
     sed 's/^\s*//g'      |   \
     sort                 |   \
     {
-      did_emit=0
+      local did_emit=0
 
       while read -r line; do
         local kv=("" "")
@@ -157,9 +160,9 @@ bpkg_env () {
 
         printf '%s' "${kv[1]}"
 
-        l=${#kv[1]}
-        lm1=$(( l - 1 ))
-        lm2=$(( l - 2 ))
+        local l=${#kv[1]}
+        local lm1=$(( l - 1 ))
+        local lm2=$(( l - 2 ))
 
         if [ "${kv[1]:$lm1:1}" != '"' ] && [ "${kv[1]:$lm2:1}" != '"' ] && [ "${kv[1]:$lm1:1}" != ';' ] ; then
           printf '"'
