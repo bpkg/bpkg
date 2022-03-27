@@ -12,4 +12,4 @@ jobs:
       - name: Run Shellcheck
         run: |
           shellcheck --version
-          find . -type f -name "*.sh" -exec shellcheck --format=gcc --external-sources "{}" ";"
+          find . -type f -name "*.sh" -exec shellcheck --format=gcc --external-sources "{}" "+"
