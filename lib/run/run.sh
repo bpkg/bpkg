@@ -50,7 +50,6 @@ bpkg_run () {
   local should_emit_source=0
   local should_source=0
   local should_clean=0
-  local ignore_args=0
   local needs_name=0
   local dest=''
   local name=''
@@ -58,47 +57,37 @@ bpkg_run () {
   for opt in "$@"; do
     case "$opt" in
       -h|--help)
-        if (( 0 == ignore_args )); then
-          usage
-          return 0
-        fi
+        usage
+        return 0
         ;;
 
       -s|--source)
-        if (( 0 == ignore_args )); then
-          should_source=1
-          shift
-        fi
+        should_source=1
+        shift
         ;;
 
       --emit-source)
-        if (( 0 == ignore_args )); then
-          should_emit_source=1
-          shift
-        fi
+        should_emit_source=1
+        shift
         ;;
 
       -c|--clean)
-        if (( 0 == ignore_args )); then
-          should_clean=1
-          shift
-        fi
+        should_clean=1
+        shift
         ;;
 
       -t|--target|--name)
-        if (( 0 == ignore_args )); then
-          shift
-          needs_name=1
-        fi
+        needs_name=1
+        shift
         ;;
 
       *)
-        ignore_args=1
         if (( 1 == needs_name )); then
           name="$opt"
           shift
-          needs_name=0
         fi
+
+        break
         ;;
     esac
   done
@@ -132,22 +121,22 @@ bpkg_run () {
     fi
   fi
 
+  if which "$name" 2>/dev/null; then
+    return 0
+  fi
+
   if ! pushd . >/dev/null; then
     bpkg_error "Failed to 'pushd' to current working directory."
     return 1
   fi
 
   if (( 0 == should_clean )); then
-    dest=$(bpkg_install --no-prune -g "$1" 2>/dev/null | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
+    dest=$(bpkg_install --no-prune -g "$name" | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
   else
-    dest=$(bpkg_install -g "$1" 2>/dev/null | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
+    dest=$(bpkg_install -g "$name" | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
   fi
 
   if [ -z "$dest" ]; then
-    if which "$name" 2>/dev/null; then
-      return 0
-    fi
-
     if (( 1 == should_emit_source )); then
       bpkg_error "The source '$name' was not found locally in a 'bpkg.json' or published as a package."
     else
@@ -161,20 +150,19 @@ bpkg_run () {
     return 1
   fi
 
-  if [ -z "$name" ]; then
-    name="$(bpkg_package name 2>/dev/null)"
-  fi
-
-  cmd="$(bpkg_package commands "$1" 2>/dev/null)"
-  shift
-
-  if ! popd >/dev/null; then
-    bpkg_error "Failed to 'popd' to previous working directory."
-    return 1
+  local pkgname="$(bpkg_package name 2>/dev/null)"
+  if [ -n "$pkgname" ]; then
+    name="$pkgname"
   fi
 
   if (( 1 == should_emit_source )); then
-    which "$name"
+    if which "$name" 2>/dev/null; then
+      :
+    elif test -f "$1"; then
+      realpath "$1"
+    elif [ -n "$1" ] && which "$1" 2>/dev/null; then
+      :
+    fi
   else
     if (( 1 == should_source )); then
       # shellcheck disable=SC1090
@@ -183,6 +171,8 @@ bpkg_run () {
       # shellcheck disable=SC2230
       # shellcheck source=lib/env/env.sh
       source "$(which bpkg-env)"
+
+      cmd="$(bpkg_package commands "$1" 2>/dev/null)"
 
       if [ -n "$cmd" ]; then
         local parts=()
@@ -205,6 +195,11 @@ bpkg_run () {
       # shellcheck disable=SC2068
       "$(which "$name")" $@
     fi
+  fi
+
+  if ! popd >/dev/null; then
+    bpkg_error "Failed to 'popd' to previous working directory."
+    return 1
   fi
 
   return $?
