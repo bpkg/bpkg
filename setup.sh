@@ -115,9 +115,11 @@ make_install () {
 }
 
 make_uninstall () {
-  echo "  info: Uninstalling $PREFIX/bin/$BIN..."
+  echo "  info: Uninstalling $PREFIX/bin/$BIN*"
+  echo "    rm: $PREFIX/bin/$BIN'"
   rm -f "$PREFIX/bin/$BIN"
   for cmd in "${CMDS[@]}"; do
+    echo "    rm: $PREFIX/bin/$BIN-$cmd'"
     rm -f "$PREFIX/bin/$BIN-$cmd"
   done
   return $?
@@ -125,10 +127,12 @@ make_uninstall () {
 
 make_link () {
   make_uninstall
-  echo "  info: Linking $PREFIX/bin/$BIN..."
+  echo "  info: Linking $PREFIX/bin/$BIN*"
+  echo "  link: '$PWD/$BIN' -> '$PREFIX/bin/$BIN'"
   ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
   for cmd in "${CMDS[@]}"; do
-    ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin"
+    echo "  link: '$PWD/$BIN-$cmd' -> '$PREFIX/bin/$BIN-$cmd'"
+    ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin/$BIN-$cmd"
   done
   return $?
 }
