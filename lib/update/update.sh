@@ -6,7 +6,6 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  # shellcheck disable=SC2230
   # shellcheck source=lib/utils/utils.sh
   source "$(which bpkg-utils)"
 fi
@@ -81,4 +80,3 @@ if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
 elif bpkg_validate; then
   bpkg_update "${@}"
 fi
-
