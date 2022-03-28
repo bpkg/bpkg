@@ -126,11 +126,14 @@ bpkg_run () {
 
     shift
     # shellcheck disable=SC2068
-    eval "$prefix" ${args[@]} $@
+    "$prefix" ${args[@]} $@
     return $?
   fi
 
-  pushd . >/dev/null || return $?
+  if ! pushd .; then
+    bpkg_error "Failed to 'pushd' to current working directory."
+    return 1
+  fi
 
   if (( 0 == should_clean )); then
     dest=$(bpkg_install --no-prune -g "$1" 2>/dev/null | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
@@ -139,10 +142,14 @@ bpkg_run () {
   fi
 
   if [ -z "$dest" ]; then
-    return $?
+    bpkg_error "The command '$1' was not found locally in a 'bpkg.json' or published as a package."
+    return 1
   fi
 
-  cd "$dest" || return $?
+  if ! cd "$dest"; then
+    bpkg_error "Failed to change directory to package: '$dest'."
+    return 1
+  fi
 
   if [ -z "$name" ]; then
     name="$(bpkg_package name 2>/dev/null)"
@@ -151,7 +158,10 @@ bpkg_run () {
   cmd="$(bpkg_package commands "$1" 2>/dev/null)"
   shift
 
-  popd >/dev/null || return $?
+  if ! popd; then
+    bpkg_error "Failed to 'popd' to previous working directory."
+    return 1
+  fi
 
   if (( 1 == should_emit_source )); then
     which "$name"
@@ -179,11 +189,11 @@ bpkg_run () {
 
         shift
         # shellcheck disable=SC2068
-        eval "$prefix" ${args[@]} $@
+        "$prefix" ${args[@]} $@
       fi
 
       # shellcheck disable=SC2068
-      eval "$(which "$name")" $@
+      "$(which "$name")" $@
     fi
   fi
 
