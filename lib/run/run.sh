@@ -131,14 +131,14 @@ bpkg_run () {
   fi
 
   if (( 0 == should_clean )); then
-    dest=$(bpkg_install --no-prune -g "$name" | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
+    dest=$(bpkg_install --no-prune -g "${name:-$1}" | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
   else
-    dest=$(bpkg_install -g "$name" | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
+    dest=$(bpkg_install -g "${name:-$1}" | grep 'Cloning' | sed 's/.* to //g' | xargs echo)
   fi
 
   if [ -z "$dest" ]; then
     if (( 1 == should_emit_source )); then
-      bpkg_error "The source '$name' was not found locally in a 'bpkg.json' or published as a package."
+      bpkg_error "The source '${name:-1}' was not found locally in a 'bpkg.json' or published as a package."
     else
       bpkg_error "The command '$1' was not found locally in a 'bpkg.json' or published as a package."
     fi
@@ -164,6 +164,8 @@ bpkg_run () {
       :
     fi
   else
+    shift
+
     if (( 1 == should_source )); then
       # shellcheck disable=SC1090
       source "$(which "$name")"
