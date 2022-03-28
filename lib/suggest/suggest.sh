@@ -35,7 +35,7 @@ suggest () {
       ;;
   esac
 
-  if find --help 2>/dev/null | grep 'maxdepth'; then
+  if find --help 2>/dev/null | grep 'maxdepth' >/dev/null 2>&1; then
     find_supports_maxdepth=1
   else
     find_supports_maxdepth=0
