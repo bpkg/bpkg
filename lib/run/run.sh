@@ -103,31 +103,33 @@ bpkg_run () {
     esac
   done
 
-  local cmd="$(bpkg_package commands "$1" 2>/dev/null)"
+  if [ -n "$1" ]; then
+    local cmd="$(bpkg_package commands "$1" 2>/dev/null)"
 
-  if [ -n "$cmd" ]; then
-    # shellcheck disable=SC2230
-    # shellcheck source=lib/env/env.sh
-    source "$(which bpkg-env)"
+    if [ -n "$cmd" ]; then
+      # shellcheck disable=SC2230
+      # shellcheck source=lib/env/env.sh
+      source "$(which bpkg-env)"
 
-    local parts=()
-    # shellcheck disable=SC2086
-    read -r -a parts <<< $cmd
-    local args=()
-    local prefix="${parts[0]}"
+      local parts=()
+      # shellcheck disable=SC2086
+      read -r -a parts <<< $cmd
+      local args=()
+      local prefix="${parts[0]}"
 
-    for (( i = 1; i < ${#parts[@]}; i++ )); do
-      if [[ "${parts[$i]}" =~ \*.\* ]]; then
-        args+=($(find . -path "${parts[$i]}"))
-      else
-        args+=("${parts[$i]}")
-      fi
-    done
+      for (( i = 1; i < ${#parts[@]}; i++ )); do
+        if [[ "${parts[$i]}" =~ \*.\* ]]; then
+          args+=($(find . -path "${parts[$i]}"))
+        else
+          args+=("${parts[$i]}")
+        fi
+      done
 
-    shift
-    # shellcheck disable=SC2068
-    "$prefix" ${args[@]} $@
-    return $?
+      shift
+      # shellcheck disable=SC2068
+      "$prefix" ${args[@]} $@
+      return $?
+    fi
   fi
 
   if ! pushd . >/dev/null; then
@@ -142,7 +144,15 @@ bpkg_run () {
   fi
 
   if [ -z "$dest" ]; then
-    bpkg_error "The command '$1' was not found locally in a 'bpkg.json' or published as a package."
+    if which "$name" 2>/dev/null; then
+      return 0
+    fi
+
+    if (( 1 == should_emit_source )); then
+      bpkg_error "The source '$name' was not found locally in a 'bpkg.json' or published as a package."
+    else
+      bpkg_error "The command '$1' was not found locally in a 'bpkg.json' or published as a package."
+    fi
     return 1
   fi
 

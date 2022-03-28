@@ -11,7 +11,7 @@ fi
 
 bpkg_source () {
   # shellcheck disable=SC2068
-  bpkg_run --emit-source $@
+  bpkg_run --emit-source --target "$1" ${@:2}
   return $?
 }
 
