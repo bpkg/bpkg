@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
 
-if ! type -f bpkg-utils &>/dev/null; then
-  echo "error: bpkg-utils not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/utils/utils.sh
-  source "$(which bpkg-utils)"
-fi
-
 if ! type -f bpkg-package &>/dev/null; then
   echo "error: bpkg-package not found, aborting"
   exit 1
@@ -17,8 +8,6 @@ else
   # shellcheck source=lib/package/package.sh
   source "$(which bpkg-package)"
 fi
-
-bpkg_initrc
 
 # Include config rc file if found
 BPKG_USER_CONFIG_FILE="$HOME/.bpkgrc"
@@ -29,13 +18,18 @@ BPKG_LOCAL_CONFIG_FILE="$(pwd)/.bpkgrc"
 ## meta
 export BPKG_DATE="$(date)"
 export BPKG_HOME="${BPKG_HOME:-$HOME}"
-export BPKG_INDEX="$BPKG_INDEX"
+export BPKG_INDEX
 
 ## os
 export BPKG_OS="$(uname)"
 export BPKG_CWD="$(pwd)"
-export BPKG_BIN="$(which bpkg)"
-export BPKG_USER="$USER"
+export BPKG_BIN="${BPKG_BIN:-$(which bpkg)}"
+export BPKG_USER="${BPKG_USER:-$USER}"
+
+## git
+export BPKG_REMOTES
+export BPKG_GIT_REMOTE
+export BPKG_GIT_REMOTES
 
 ## package
 export BPKG_PACKAGE_USER
@@ -44,12 +38,13 @@ export BPKG_PACKAGE_REPO="$(bpkg_package repo 2>/dev/null)"
 export BPKG_PACKAGE_DEPS="${BPKG_PACKAGE_DEPS:-deps}"
 export BPKG_PACKAGE_VERSION="$(bpkg_package version 2>/dev/null)"
 export BPKG_PACKAGE_DESCRIPTION="$(bpkg_package description 2>/dev/null)"
+export BPKG_PACKAGE_DEFAULT_USER="${BPKG_PACKAGE_DEFAULT_USER:-bpkg}"
 
 ## remote
-export BPKG_REMOTE="$BPKG_REMOTE"
 # shellcheck disable=SC2178
-export BPKG_REMOTES="${BPKG_REMOTE[*]}"
-export BPKG_REMOTE_RAW_PATH="$BPKG_REMOTE_RAW_PATH"
+export BPKG_REMOTE
+export BPKG_REMOTES
+export BPKG_REMOTE_RAW_PATH
 
 if test -f bpkg.json || test -f package.json; then
   declare -a BPKG_SCRIPT_SOURCES=()
