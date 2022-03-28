@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+if ! type -f bpkg-env &>/dev/null; then
+  echo "error: bpkg-env not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/env/env.sh
+  source "$(which bpkg-env)"
+fi
+
 ## Collection of shared bpkg functions
 
 ## Init local config and set environmental defaults

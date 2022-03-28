@@ -10,7 +10,7 @@ usage () {
 
 ## main
 suggest () {
-  local found paths seen
+  local found paths seen find_supports_maxdepth
   declare -a paths=()
   declare -a seen=()
   declare -a found=()
@@ -34,6 +34,12 @@ suggest () {
       fi
       ;;
   esac
+
+  if find --help 2>/dev/null | grep 'maxdepth'; then
+    find_supports_maxdepth=1
+  else
+    find_supports_maxdepth=0
+  fi
 
   ## search path
   {
@@ -63,16 +69,20 @@ suggest () {
       ## mark seen
       seen+=("$path")
 
-      ## find in path
-      if res=$(find "$path" -name "$query*" -prune -print 2>/dev/null); then
-        if [ -z "$res" ]; then
-          continue
-        fi
-        res="$(echo "$res" | tr '\n' ' ')"
-        ## add to found count
-        # shellcheck disable=SC2207
-        found+=($(echo -n "$res"))
+      if (( find_supports_maxdepth == 1 )); then
+        res=$(find "$path" -name "$query*" -prune -print -maxdepth 1 2>/dev/null | tr '\n' ' ');
+      else
+        res=$(find "$path" -name "$query*" -prune -print >/dev/null | tr '\n' ' ');
       fi
+
+      ## find in path
+      if [ -z "$res" ]; then
+        continue
+      fi
+
+      ## add to found count
+      # shellcheck disable=SC2207
+      found+=($(echo -n "$res"))
     done
   }
 

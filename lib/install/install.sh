@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
-if ! type -f bpkg-env &>/dev/null; then
-  echo "error: bpkg-env not found, aborting"
+if ! type -f bpkg-utils &>/dev/null; then
+  echo "error: bpkg-utils not found, aborting"
   exit 1
 else
   # shellcheck disable=SC2230
-  # shellcheck source=lib/env/env.sh
-  source "$(which bpkg-env)"
+  # shellcheck source=lib/utils/utils.sh
+  source "$(which bpkg-utils)"
 fi
+
+bpkg_initrc
 
 let prevent_prune=0
 
@@ -173,6 +175,7 @@ bpkg_install () {
         shift
         needs_global=1
         ;;
+
       --no-prune)
         shift
         prevent_prune=1
