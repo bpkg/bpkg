@@ -23,19 +23,12 @@ usage () {
 
 ## commands
 commands () {
-  {
-    local cmds
-
-    declare -a cmds=( $(
-      bpkg-suggest 'bpkg-' |
-      tail -n+2            |
-      sed 's/.*\/bpkg-//g' |
-      sort -u              |
-      tr '\n' ' '
-    ) )
-
-    echo "${cmds[@]}"
-  }
+  bpkg-suggest 'bpkg-' 2>/dev/null |
+    tail -n+2                      |
+    sed 's/.*\/bpkg-//g'           |
+    sort -u                        |
+    tr '\n' ' '
+  return $?
 }
 
 ## feature tests
