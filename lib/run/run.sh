@@ -130,7 +130,7 @@ bpkg_run () {
     return $?
   fi
 
-  if ! pushd .; then
+  if ! pushd . >/dev/null; then
     bpkg_error "Failed to 'pushd' to current working directory."
     return 1
   fi
@@ -146,7 +146,7 @@ bpkg_run () {
     return 1
   fi
 
-  if ! cd "$dest"; then
+  if ! cd "$dest" >/dev/null; then
     bpkg_error "Failed to change directory to package: '$dest'."
     return 1
   fi
@@ -158,7 +158,7 @@ bpkg_run () {
   cmd="$(bpkg_package commands "$1" 2>/dev/null)"
   shift
 
-  if ! popd; then
+  if ! popd >/dev/null; then
     bpkg_error "Failed to 'popd' to previous working directory."
     return 1
   fi

@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 
+if ! type -f bpkg-utils &>/dev/null; then
+  echo "error: bpkg-utils not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/utils/utils.sh
+  source "$(which bpkg-utils)"
+fi
+
 ## output usage
 usage () {
-  echo "usage: suggest [-hV] <query>"
+  echo "usage: bpkg-suggest [-h|--help] <query>"
 }
 
 count_lines () {
@@ -48,9 +57,22 @@ suggest () {
   count=$? ## count is stored in last return value
 
   if (( count > 0 )); then
-    printf >&2 "suggest: %d result(s) found\n" "$count"
+    if (( count == 1 )); then
+      {
+        echo
+        bpkg_message "green" "  suggest"  "1 result found"
+      } >&2
+    else
+      {
+        echo
+        bpkg_message "green" "  suggest"  "$count result(s) found"
+      } >&2
+    fi
   else
-    echo >&2 "suggest: Couldn't anything to match \`$query'"
+    {
+      echo
+      bpkg_message "red" "  suggest"  "Couldn't find anything to match \`$query'"
+    } >&2
     return 1
   fi
   return 0
