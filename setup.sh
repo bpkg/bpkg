@@ -9,6 +9,7 @@
 #        "               ""
 #        bash package manager
 
+VERSION=1.0.0
 REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
 TMPDIR=${TMPDIR:-/tmp}
 DEST=${DEST:-${TMPDIR}/bpkg-master}
@@ -48,7 +49,7 @@ setup () {
     test -d "${DEST}" && { echo "  warn: Already exists: '${DEST}'"; }
     rm -rf "${DEST}"
     echo "  info: Fetching latest 'bpkg'..."
-    git clone --depth=1 "${REMOTE}" "${DEST}" > /dev/null 2>&1
+    git clone --depth=1 --branch "${VERSION}" "${REMOTE}" "${DEST}" > /dev/null 2>&1
     cd "${DEST}" || exit
     echo "  info: Installing..."
     echo
