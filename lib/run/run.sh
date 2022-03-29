@@ -116,7 +116,7 @@ bpkg_run () {
 
       shift
       # shellcheck disable=SC2068
-      "$prefix" ${args[@]} $@
+      eval "$prefix" ${args[@]} $@
       return $?
     fi
   fi
@@ -191,7 +191,7 @@ bpkg_run () {
 
         shift
         # shellcheck disable=SC2068
-        "$prefix" ${args[@]} $@
+        eval "$prefix" ${args[@]} $@
       fi
 
       # shellcheck disable=SC2068
