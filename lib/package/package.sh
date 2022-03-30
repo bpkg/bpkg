@@ -51,10 +51,40 @@ expand_grep_args () {
   return 0
 }
 
+find_file () {
+  local path="$(pwd)"
+  local file="$1"
+
+  ## check if file exists at given path
+  if test -f "$file"; then
+    echo "$file"
+    return 0
+  fi
+
+  ## check if file exists joined with currrent path (cwd)
+  if test -f "$path/$file"; then
+    echo "$path/$file"
+    return 0
+  fi
+
+  ## check if file exists in paths stopping at $HOME
+  while [[ "$path" != "$HOME" && "$path" != "" ]]; do
+    if test -f "$path/$file"; then
+      echo "$path/$file"
+      return 0
+    fi
+
+    path="$(dirname "$path")"
+  done
+
+  return 1
+}
+
 ## Read a package property
 bpkg_package () {
   local cwd="$(pwd)"
-  local pkgs=("$cwd/bpkg.json"  "${cwd}/package.json")
+  ## search up for 'bpkg.json', but only in CWD for 'package.json'
+  local pkgs=("bpkg.json"  "$cwd/package.json")
   local npkgs="${#pkgs[@]}"
 
   ## parse flags
@@ -67,7 +97,7 @@ bpkg_package () {
 
   ## attempt to find JSON manifest and query it
   for (( i = 0; i < npkgs; i++ )); do
-    local pkg="${pkgs[$i]}"
+    local pkg="$(find_file "${pkgs[$i]}")"
 
     if test -f "$pkg"; then
       if [ -z "$1" ]; then
