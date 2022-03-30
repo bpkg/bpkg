@@ -9,14 +9,17 @@
 #        "               ""
 #        bash package manager
 
+VERSION="1.0.15"
+TAG=${TAG:-$VERSION}
+BRANCH=${BRANCH:-$TAG}
 REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
 TMPDIR=${TMPDIR:-/tmp}
-DEST=${DEST:-$TMPDIR/bpkg-master}
+DEST=${DEST:-$TMPDIR/bpkg-$BRANCH}
 
 ## test if command exists
 ftest () {
-  echo "  info: Checking for ${1}..."
-  if ! type -f "${1}" > /dev/null 2>&1; then
+  echo "  info: Checking for $1..."
+  if ! type -f "$1" > /dev/null 2>&1; then
     return 1
   else
     return 0
@@ -26,8 +29,8 @@ ftest () {
 ## feature tests
 features () {
   for f in "${@}"; do
-    ftest "${f}" || {
-      echo >&2 "  error: Missing \`${f}'! Make sure it exists and try again."
+    ftest "$f" || {
+      echo >&2 "  error: Missing \`$f'! Make sure it exists and try again."
       return 1
     }
   done
@@ -43,13 +46,15 @@ setup () {
   ## build
   {
     echo
-    cd "${TMPDIR}" || exit
     echo "  info: Creating temporary files..."
-    test -d "${DEST}" && { echo "  warn: Already exists: '${DEST}'"; }
-    rm -rf "${DEST}"
-    echo "  info: Fetching latest 'bpkg'..."
-    git clone --depth=1 "${REMOTE}" "${DEST}" > /dev/null 2>&1
-    cd "${DEST}" || exit
+    cd "$TMPDIR" || exit
+    test -d "$DEST" && { echo "  warn: Already exists: '$DEST'"; }
+    rm -rf "$DEST"
+
+    echo "  info: Fetching 'bpkg@$BRANCH'..."
+    git clone --depth=1 --branch "$BRANCH" "$REMOTE" "$DEST" > /dev/null 2>&1
+    cd "$DEST" || exit
+
     echo "  info: Installing..."
     echo
     make_install
