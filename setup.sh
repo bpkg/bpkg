@@ -102,17 +102,19 @@ make_install () {
 
   if [ -f "$source" ]; then
     install "$source" "$PREFIX/bin/$BIN"
-    else
-      install "$BIN" "$PREFIX/bin"
+  else
+    install "$BIN" "$PREFIX/bin"
   fi
 
   for cmd in "${CMDS[@]}"; do
-    source=$(<"$BIN-$cmd")
+    if test -f "$BIN-$cmd"; then
+      source=$(<"$BIN-$cmd")
 
-    if [ -f "$source" ]; then
-      install "$source" "$PREFIX/bin/$BIN-$cmd"
-    else
-      install "$BIN-$cmd" "$PREFIX/bin"
+      if [ -f "$source" ]; then
+        install "$source" "$PREFIX/bin/$BIN-$cmd"
+      else
+        install "$BIN-$cmd" "$PREFIX/bin"
+      fi
     fi
 
   done
@@ -124,8 +126,10 @@ make_uninstall () {
   echo "    rm: $PREFIX/bin/$BIN'"
   rm -f "$PREFIX/bin/$BIN"
   for cmd in "${CMDS[@]}"; do
-    echo "    rm: $PREFIX/bin/$BIN-$cmd'"
-    rm -f "$PREFIX/bin/$BIN-$cmd"
+    if test -f "$PREFIX/bin/$BIN-$cmd"; then
+      echo "    rm: $PREFIX/bin/$BIN-$cmd'"
+      rm -f "$PREFIX/bin/$BIN-$cmd"
+    fi
   done
   return $?
 }
@@ -136,8 +140,10 @@ make_link () {
   echo "  link: '$PWD/$BIN' -> '$PREFIX/bin/$BIN'"
   ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
   for cmd in "${CMDS[@]}"; do
-    echo "  link: '$PWD/$BIN-$cmd' -> '$PREFIX/bin/$BIN-$cmd'"
-    ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin/$BIN-$cmd"
+    if test -f "$PWD/$BIN-$cmd"; then
+      echo "  link: '$PWD/$BIN-$cmd' -> '$PREFIX/bin/$BIN-$cmd'"
+      ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin/$BIN-$cmd"
+    fi
   done
   return $?
 }
