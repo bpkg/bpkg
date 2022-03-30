@@ -96,6 +96,8 @@ bpkg_run () {
     local cmd="$(bpkg_package commands "$1" 2>/dev/null)"
 
     if [ -n "$cmd" ]; then
+      local root="$(dirname "$(bpkg_package --path)")"
+      cd "$root" || return 1
       # shellcheck disable=SC2230
       # shellcheck source=lib/env/env.sh
       source "$(which bpkg-env)"
