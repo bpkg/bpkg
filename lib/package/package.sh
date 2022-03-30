@@ -11,6 +11,7 @@ fi
 ## output usage
 usage () {
   echo "usage: bpkg-package [-h|--help]"
+  echo "   or: bpkg-package [-p|--path]"
   echo "   or: bpkg-package <prop>"
   echo "   or: bpkg-package"
 }
@@ -80,6 +81,20 @@ find_file () {
   return 1
 }
 
+bpkg_package_path () {
+  local cwd="$(pwd)"
+  ## search up for 'bpkg.json', but only in CWD for 'package.json'
+  local pkgs=("bpkg.json"  "$cwd/package.json")
+
+  for (( i = 0; i < ${#pkgs[@]}; i++ )); do
+    if find_file "${pkgs[$i]}"; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 ## Read a package property
 bpkg_package () {
   local cwd="$(pwd)"
@@ -92,6 +107,11 @@ bpkg_package () {
     -h|--help)
       usage
       return 0
+      ;;
+
+    -p|--path)
+      bpkg_package_path
+      return $?
       ;;
   esac
 
@@ -149,6 +169,7 @@ if [ -z "$BPKG_JSON" ]; then
 else
   if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
     export -f bpkg_package
+    export -f bpkg_package_path
   else
     bpkg_package "${@}"
     exit $?
