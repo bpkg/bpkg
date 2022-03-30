@@ -58,20 +58,20 @@ find_file () {
 
   ## check if file exists at given path
   if test -f "$file"; then
-    echo "$file"
+    realpath "$file"
     return 0
   fi
 
   ## check if file exists joined with currrent path (cwd)
   if test -f "$path/$file"; then
-    echo "$path/$file"
+    realpath "$path/$file"
     return 0
   fi
 
   ## check if file exists in paths stopping at $HOME
   while [[ "$path" != "$HOME" && "$path" != "" ]]; do
     if test -f "$path/$file"; then
-      echo "$path/$file"
+      realpath "$path/$file"
       return 0
     fi
 
