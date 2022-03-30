@@ -9,9 +9,20 @@ else
   source "$(which bpkg-utils)"
 fi
 
+if ! type -f bpkg-getdeps &>/dev/null; then
+  echo "error: bpkg-getdeps not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/getdeps/getdeps.sh
+  source "$(which bpkg-getdeps)"
+fi
+
 bpkg_initrc
 
 let prevent_prune=0
+let force_actions=0
+let needs_global=0
 
 ## check parameter consistency
 validate_parameters () {
@@ -25,8 +36,8 @@ validate_parameters () {
 ## outut usage
 usage () {
   echo 'usage: bpkg-install [-h|--help]'
-  echo '   or: bpkg-install [-g|--global] <package>'
-  echo '   or: bpkg-install [-g|--global] <user>/<package>'
+  echo '   or: bpkg-install [-g|--global] [-f|--force] ...<package>'
+  echo '   or: bpkg-install [-g|--global] [-f|--force] ...<user>/<package>'
 }
 
 ## format and output message
@@ -153,14 +164,14 @@ fetch () {
 
 ## Install a bash package
 bpkg_install () {
-  local pkg=''
-  local needs_global=0
+  local pkgs=()
+  local did_fail=1
 
   for opt in "$@"; do
     if [[ '-' = "${opt:0:1}" ]]; then
       continue
     fi
-    pkg="$opt"
+    pkgs+=("$opt")
     break
   done
 
@@ -174,6 +185,11 @@ bpkg_install () {
       -g|--global)
         shift
         needs_global=1
+        ;;
+
+      -f|--force)
+        shift
+        force_actions=1
         ;;
 
       --no-prune)
@@ -192,26 +208,32 @@ bpkg_install () {
   done
 
   ## ensure there is a package to install
-  if [[ -z "$pkg" ]]; then
-    usage
-    return 1
+  if (( ${#pkgs[@]} == 0 )); then
+    bpkg_getdeps
+    return $?
   fi
 
   echo
 
-  ## Check each remote in order
-  local i=0
-  for remote in "${BPKG_REMOTES[@]}"; do
-    local git_remote=${BPKG_GIT_REMOTES[$i]}
-    if bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global; then
-      return 0
-    elif [[ "$?" == '2' ]]; then
-      error 'fatal error occurred during install'
-      return 1
-    fi
-    i=$((i+1))
+  for pkg in "${pkgs[@]}"; do
+    ## Check each remote in order
+    local i=0
+    for remote in "${BPKG_REMOTES[@]}"; do
+      local git_remote=${BPKG_GIT_REMOTES[$i]}
+      if bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global; then
+        did_fail=0
+        break
+      elif [[ "$?" == '2' ]]; then
+        error 'fatal error occurred during install'
+        return 1
+      fi
+      i=$((i+1))
+    done
   done
-  error 'package not found on any remote'
+
+  if (( did_fail == 1 )); then
+    error 'package not found on any remote'
+  fi
   return 1
 }
 
@@ -473,7 +495,7 @@ bpkg_install_from_remote () {
 
     # install package dependencies
     info "Install dependencies for $name"
-    (cd "$cwd/$BPKG_PACKAGE_DEPS/$name" && bpkg getdeps)
+    (cd "$cwd/$BPKG_PACKAGE_DEPS/$name" && bpkg_getdeps)
 
     ## grab each script and place in deps directory
     for script in "${scripts[@]}"; do
@@ -487,7 +509,21 @@ bpkg_install_from_remote () {
 
           scriptname="${scriptname%.*}"
           info "$scriptname to PATH" "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
-          ln -si "$cwd/$BPKG_PACKAGE_DEPS/$name/$script" "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
+
+          if (( force_actions == 1 )); then
+            ln -sf "$cwd/$BPKG_PACKAGE_DEPS/$name/$script" "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
+          else
+            if test -f "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"; then
+              warn "'$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname' already exists. Overwrite? (yN)"
+              read -r yn
+              case $yn in
+                Yy) rm -f "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname" ;;
+                *) return 1;
+              esac
+            fi
+
+            ln -s "$cwd/$BPKG_PACKAGE_DEPS/$name/$script" "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
+          fi
           chmod u+x "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
         fi
       )
