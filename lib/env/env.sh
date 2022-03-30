@@ -19,6 +19,7 @@ BPKG_LOCAL_CONFIG_FILE="$(pwd)/.bpkgrc"
 export BPKG_DATE="$(date)"
 export BPKG_HOME="${BPKG_HOME:-$HOME}"
 export BPKG_INDEX
+export BPKG_FORCE_ACTIONS
 
 ## os
 export BPKG_OS="$(uname)"
