@@ -21,7 +21,7 @@ fi
 bpkg_initrc
 
 let prevent_prune=0
-let force_actions=0
+let force_actions=${BPKG_FORCE_ACTIONS:-0}
 let needs_global=0
 
 ## check parameter consistency
@@ -35,7 +35,8 @@ validate_parameters () {
 
 ## outut usage
 usage () {
-  echo 'usage: bpkg-install [-h|--help]'
+  echo 'usage: bpkg-install [directory]'
+  echo '   or: bpkg-install [-h|--help]'
   echo '   or: bpkg-install [-g|--global] [-f|--force] ...<package>'
   echo '   or: bpkg-install [-g|--global] [-f|--force] ...<user>/<package>'
 }
@@ -96,7 +97,6 @@ info () {
   return 0
 }
 
-
 save_remote_file () {
   local auth_param dirname path url
 
@@ -119,7 +119,6 @@ save_remote_file () {
 
   return $?
 }
-
 
 url_exists () {
   local auth_param exists status url
@@ -168,14 +167,6 @@ bpkg_install () {
   local did_fail=1
 
   for opt in "$@"; do
-    if [[ '-' = "${opt:0:1}" ]]; then
-      continue
-    fi
-    pkgs+=("$opt")
-    break
-  done
-
-  for opt in "$@"; do
     case "$opt" in
       -h|--help)
         usage
@@ -198,14 +189,18 @@ bpkg_install () {
         ;;
 
       *)
-        if [[ '-' = "${opt:0:1}" ]]; then
-          echo 1>&2 "error: Unknown argument \`$1'"
-          usage
+        if [[ '-' != "${opt:0:1}" ]]; then
+          pkgs+=("$opt")
+          shift
+        else
+          error "Unknown option \`$opt'"
           return 1
         fi
         ;;
     esac
   done
+
+  export BPKG_FORCE_ACTIONS=$force_actions
 
   ## ensure there is a package to install
   if (( ${#pkgs[@]} == 0 )); then
@@ -216,6 +211,15 @@ bpkg_install () {
   echo
 
   for pkg in "${pkgs[@]}"; do
+    if test -d "$(realpath "$pkg" 2>/dev/null)"; then
+      if ! (cd "$pkg" && bpkg_getdeps); then
+        return 1
+      fi
+
+      did_fail=0
+      continue
+    fi
+
     ## Check each remote in order
     local i=0
     for remote in "${BPKG_REMOTES[@]}"; do
@@ -233,8 +237,10 @@ bpkg_install () {
 
   if (( did_fail == 1 )); then
     error 'package not found on any remote'
+    return 1
   fi
-  return 1
+
+  return 0
 }
 
 ## try to install a package from a specific remote
