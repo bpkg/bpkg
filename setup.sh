@@ -9,7 +9,7 @@
 #        "               ""
 #        bash package manager
 
-VERSION="1.0.17"
+VERSION="1.0.18"
 TAG=${TAG:-$VERSION}
 BRANCH=${BRANCH:-$TAG}
 REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
@@ -66,7 +66,7 @@ setup () {
 ## make targets
 BIN="bpkg"
 if [ -z "$PREFIX" ]; then
-  if [ "$USER" == "root" ]; then
+  if [ "$(whoami)" == "root" ]; then
     PREFIX="/usr/local"
   else
     PREFIX="$HOME/.local"
@@ -89,6 +89,7 @@ CMDS+=("suggest")
 CMDS+=("term")
 CMDS+=("update")
 CMDS+=("utils")
+CMDS+=("realpath")
 
 make_install () {
   local source
