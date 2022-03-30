@@ -36,7 +36,9 @@ export BPKG_GIT_REMOTES
 export BPKG_PACKAGE_USER
 export BPKG_PACKAGE_NAME="$(bpkg_package name 2>/dev/null)"
 export BPKG_PACKAGE_REPO="$(bpkg_package repo 2>/dev/null)"
-export BPKG_PACKAGE_DEPS="${BPKG_PACKAGE_DEPS:-deps}"
+export BPKG_PACKAGE_PATH="$(bpkg_package_path)"
+export BPKG_PACKAGE_ROOT="$(dirname "$BPKG_PACKAGE_PATH")"
+export BPKG_PACKAGE_DEPS="$BPKG_PACKAGE_ROOT/deps"
 export BPKG_PACKAGE_VERSION="$(bpkg_package version 2>/dev/null)"
 export BPKG_PACKAGE_DESCRIPTION="$(bpkg_package description 2>/dev/null)"
 export BPKG_PACKAGE_DEFAULT_USER="${BPKG_PACKAGE_DEFAULT_USER:-bpkg}"
@@ -53,6 +55,10 @@ if test -f bpkg.json || test -f package.json; then
   BPKG_SCRIPT_SOURCES+=($(find . -name '*.zsh'))
   BPKG_SCRIPT_SOURCES+=($(find . -name '*.bash'))
   export BPKG_SCRIPT_SOURCES
+fi
+
+if test -d "$BPKG_PACKAGE_DEPS/bin"; then
+  export PATH="$BPKG_PACKAGE_DEPS/bin:$PATH"
 fi
 
 ## output usage
@@ -193,7 +199,6 @@ if [[ -f "$BPKG_LOCAL_CONFIG_FILE" ]] && [ -z "$BPKG_LOCAL_CONFIG_FILE_LOADED" ]
   source "$BPKG_LOCAL_CONFIG_FILE"
 fi
 
-## Use as lib or perform install
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_env
 else
