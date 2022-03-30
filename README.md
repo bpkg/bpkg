@@ -46,10 +46,22 @@ You can install `bpkg` from three distinct ways:
 
 Our install script is the simplest way. It takes care of everything for you, placing `bpkg` and related scripts on `/usr/local/bin`.
 
-Paste the following on your shell and you're good to go:
+You can install `bpkg` with the [`get.bpkg.sh`](https://get.bpkg.sh) endpoint:
+
+```sh
+curl -Lo - get.bpkg.sh | bash
+```
+
+Or optionally paste the following on your shell and you're good to go:
 
 ```sh
 curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh" | bash
+```
+
+or by tag/version
+
+```sh
+curl -Lo- "https://raw.githubusercontent.com/bpkg/bpkg/1.0.15/setup.sh" | bash
 ```
 
 ### 2. clib
