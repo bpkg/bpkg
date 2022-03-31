@@ -66,7 +66,7 @@ setup () {
 ## make targets
 BIN="bpkg"
 if [ -z "$PREFIX" ]; then
-  if [ "$USER" == "root" ]; then
+  if [ "$(whoami)" == "root" ]; then
     PREFIX="/usr/local"
   else
     PREFIX="$HOME/.local"
