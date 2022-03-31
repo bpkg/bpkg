@@ -46,6 +46,14 @@ usage () {
   echo '   or: bpkg-run [-s|--source] <user>/<package> [command]'
 }
 
+runner () {
+  local cmd="$1"
+  shift
+  # shellcheck disable=SC2068
+  eval "$cmd"
+  return 0
+}
+
 bpkg_run () {
   local should_emit_source=0
   local should_source=0
@@ -118,7 +126,7 @@ bpkg_run () {
 
       shift
       # shellcheck disable=SC2068
-      eval "$prefix" ${args[@]} $@
+      runner "$prefix ${args[*]}" $@
       return $?
     fi
   fi
@@ -193,7 +201,7 @@ bpkg_run () {
 
         shift
         # shellcheck disable=SC2068
-        eval "$prefix" ${args[@]} $@
+        runner "$prefix ${args[*]}" $@
       fi
 
       # shellcheck disable=SC2068
