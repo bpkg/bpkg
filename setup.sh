@@ -9,7 +9,7 @@
 #        "               ""
 #        bash package manager
 
-VERSION="1.0.21"
+VERSION="1.0.22"
 TAG=${TAG:-$VERSION}
 BRANCH=${BRANCH:-$TAG}
 REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
@@ -89,6 +89,7 @@ CMDS+=("suggest")
 CMDS+=("term")
 CMDS+=("update")
 CMDS+=("utils")
+CMDS+=("realpath")
 
 make_install () {
   local source
