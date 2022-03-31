@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+declare -a tags=($(git tag -l))
+#declare -a tags=(1.0.12)
+
+for tag in "${tags[@]}"; do
+  ## checkout current tag
+  git checkout "$tag"
+  ## checkout `setup.sh` from master branch with latest changes
+  git checkout master -- setup.sh
+  ## get current version
+  declare version="$(bpkg package version)"
+  ## version replacement regex for `sed(1)`
+  declare regex="s/VERSION=.*/VERSION=\"$version\"/g"
+  ## set versions in files
+  sed -i "$regex" bpkg.sh
+  sed -i "$regex" setup.sh
+  ## remove current tag
+  git tag -d "$tag"
+  ## amend HEAD for current tag
+  git commit -a --amend --no-edit
+  ## retag
+  git tag "$tag"
+  ## force push update
+  git push origin "$tag" -f
+done
+
+git checkout master
