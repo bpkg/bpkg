@@ -68,8 +68,8 @@ find_file () {
     return 0
   fi
 
-  ## check if file exists in paths stopping at $HOME
-  while [[ "$path" != "$HOME" && "$path" != "" ]]; do
+  ## check if file exists in paths stopping at $HOME and '/'
+  while [[ "$path" != "$HOME" && "$path" != "/" && "$path" != "" ]]; do
     if test -f "$path/$file"; then
       realpath "$path/$file"
       return 0
