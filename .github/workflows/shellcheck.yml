@@ -1,0 +1,21 @@
+on:
+  - push
+  - pull_request
+
+# Cancels all previous workflow runs for the same branch that have not yet completed.
+concurrency:
+  # The concurrency group contains the workflow name and the branch name.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - env:
+          PIPELINECOMPONENTS_GLOBASSIST: true
+        uses: pipeline-components/shellcheck@v0.10.0
+        with:
+          directory: "**/*.sh"
+          options: --format=gcc --external-sources

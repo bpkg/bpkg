@@ -1,3 +1,6 @@
+# ============================================================================ #
+# Disable specific checks
+# ---------------------------------------------------------------------------- #
 # shellcheck disable=SC2034
 
 ## Allow: To read lines rather than words, pipe/redirect to a 'while read' loop
@@ -12,5 +15,22 @@ disable=SC2207
 ## Allow: Instead of 'let expr', prefer (( expr ))
 disable=SC2219
 
-## Allow: Not following source
-disable=SC1091
+#Allow: non-standard `which` in shellcheck < 0.7.1
+disable=SC2230
+# ============================================================================ #
+
+# ============================================================================ #
+# Enable optional checks (since 0.7.0).
+# ---------------------------------------------------------------------------- #
+## Suggest adding a default case in `case` statements
+#enable=add-default-case
+
+## Suggest explicitly using -n in `[ $var ]`
+#enable=avoid-nullary-conditions
+
+## Suggest quoting variables without metacharacters
+#enable=quote-safe-variables
+
+## Suggest putting braces around all variable references
+#enable=require-variable-braces
+# ============================================================================ #

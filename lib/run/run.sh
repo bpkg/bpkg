@@ -4,7 +4,6 @@ if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
 else
-  # shellcheck disable=SC2230
   # shellcheck source=lib/utils/utils.sh
   source "$(which bpkg-utils)"
 fi
@@ -22,7 +21,6 @@ if ! type -f bpkg-install &>/dev/null; then
   echo "error: bpkg-install not found, aborting"
   exit 1
 else
-  # shellcheck disable=SC2230
   # shellcheck source=lib/install/install.sh
   source "$(which bpkg-install)"
 fi
@@ -31,7 +29,6 @@ if ! type -f bpkg-package &>/dev/null; then
   echo "error: bpkg-package not found, aborting"
   exit 1
 else
-  # shellcheck disable=SC2230
   # shellcheck source=lib/package/package.sh
   source "$(which bpkg-package)"
 fi

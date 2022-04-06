@@ -4,7 +4,6 @@ if ! type -f bpkg-run &>/dev/null; then
   echo "error: bpkg-run not found, aborting"
   exit 1
 else
-  # shellcheck disable=SC2230
   # shellcheck source=lib/run/run.sh
   source "$(which bpkg-run)"
 fi
