@@ -115,7 +115,13 @@ bpkg_run () {
 
       for (( i = 1; i < ${#parts[@]}; i++ )); do
         if [[ "${parts[$i]}" =~ \*.\* ]]; then
-          args+=($(find . -path "${parts[$i]}"))
+          local found=($(find . -path "${parts[$i]}"))
+          if (( ${#found[@]} > 0 )); then
+            args+=("${found[@]}")
+          else
+            # shellcheck disable=SC2086
+            args+=($($(which ls) ${parts[$i]} 2>/dev/null))
+          fi
         else
           args+=("${parts[$i]}")
         fi
@@ -192,7 +198,13 @@ bpkg_run () {
 
         for (( i = 1; i < ${#parts[@]}; i++ )); do
           if [[ "${parts[$i]}" =~ \*.\* ]]; then
-            args+=($(find . -wholename "${parts[$i]}"))
+            local found=($(find . -path "${parts[$i]}"))
+            if (( ${#found[@]} > 0 )); then
+              args+=("${found[@]}")
+            else
+              # shellcheck disable=SC2086
+              args+=($($(which ls) ${parts[$i]} 2>/dev/null))
+            fi
           fi
         done
 
