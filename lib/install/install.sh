@@ -491,17 +491,17 @@ bpkg_install_from_remote () {
   ## perform local install otherwise
   else
     ## copy 'bpkg.json' or 'package.json' over
-    save_remote_file "$url/$package_file" "$cwd/$BPKG_PACKAGE_DEPS/$name/$package_file" "$auth_param"
+    save_remote_file "$url/$package_file" "$BPKG_PACKAGE_DEPS/$name/$package_file" "$auth_param"
 
     ## make '$BPKG_PACKAGE_DEPS/' directory if possible
-    mkdir -p "$cwd/$BPKG_PACKAGE_DEPS/$name"
+    mkdir -p "$BPKG_PACKAGE_DEPS/$name"
 
     ## make '$BPKG_PACKAGE_DEPS/bin' directory if possible
-    mkdir -p "$cwd/$BPKG_PACKAGE_DEPS/bin"
+    mkdir -p "$BPKG_PACKAGE_DEPS/bin"
 
     # install package dependencies
     info "Install dependencies for $name"
-    (cd "$cwd/$BPKG_PACKAGE_DEPS/$name" && bpkg_getdeps)
+    (cd "$BPKG_PACKAGE_DEPS/$name" && bpkg_getdeps)
 
     ## grab each script and place in deps directory
     for script in "${scripts[@]}"; do
@@ -510,27 +510,28 @@ bpkg_install_from_remote () {
           local scriptname="$(echo "$script" | xargs basename )"
 
           info "fetch" "$url/$script"
-          info "write" "$cwd/$BPKG_PACKAGE_DEPS/$name/$script"
-          save_remote_file "$url/$script" "$cwd/$BPKG_PACKAGE_DEPS/$name/$script" "$auth_param"
+          warn "BPKG_PACKAGE_DEPS is '$BPKG_PACKAGE_DEPS'"
+          info "write" "$BPKG_PACKAGE_DEPS/$name/$script"
+          save_remote_file "$url/$script" "$BPKG_PACKAGE_DEPS/$name/$script" "$auth_param"
 
           scriptname="${scriptname%.*}"
-          info "$scriptname to PATH" "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
+          info "$scriptname to PATH" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
 
           if (( force_actions == 1 )); then
-            ln -sf "$cwd/$BPKG_PACKAGE_DEPS/$name/$script" "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
+            ln -sf "$BPKG_PACKAGE_DEPS/$name/$script" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
           else
-            if test -f "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"; then
-              warn "'$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname' already exists. Overwrite? (yN)"
+            if test -f "$BPKG_PACKAGE_DEPS/bin/$scriptname"; then
+              warn "'$BPKG_PACKAGE_DEPS/bin/$scriptname' already exists. Overwrite? (yN)"
               read -r yn
               case $yn in
-                Yy) rm -f "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname" ;;
+                Yy) rm -f "$BPKG_PACKAGE_DEPS/bin/$scriptname" ;;
                 *) return 1;
               esac
             fi
 
-            ln -s "$cwd/$BPKG_PACKAGE_DEPS/$name/$script" "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
+            ln -s "$BPKG_PACKAGE_DEPS/$name/$script" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
           fi
-          chmod u+x "$cwd/$BPKG_PACKAGE_DEPS/bin/$scriptname"
+          chmod u+x "$BPKG_PACKAGE_DEPS/bin/$scriptname"
         fi
       )
     done
@@ -541,8 +542,9 @@ bpkg_install_from_remote () {
       (
           if [[ "$file" ]];then
             info "fetch" "$url/$file"
-            info "write" "$cwd/$BPKG_PACKAGE_DEPS/$name/$file"
-            save_remote_file "$url/$file" "$cwd/$BPKG_PACKAGE_DEPS/$name/$file" "$auth_param"
+            warn "BPKG_PACKAGE_DEPS is '$BPKG_PACKAGE_DEPS'"
+            info "write" "$BPKG_PACKAGE_DEPS/$name/$file"
+            save_remote_file "$url/$file" "$BPKG_PACKAGE_DEPS/$name/$file" "$auth_param"
           fi
         )
       done
