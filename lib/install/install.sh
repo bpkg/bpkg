@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+if ! type -f bpkg-realpath &>/dev/null; then
+  echo "error: bpkg-realpath not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/realpath/realpath.sh
+  source "$(which bpkg-realpath)"
+fi
+
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
@@ -211,7 +220,7 @@ bpkg_install () {
   echo
 
   for pkg in "${pkgs[@]}"; do
-    if test -d "$(realpath "$pkg" 2>/dev/null)"; then
+    if test -d "$(bpkg_realpath "$pkg" 2>/dev/null)"; then
       if ! (cd "$pkg" && bpkg_getdeps); then
         return 1
       fi

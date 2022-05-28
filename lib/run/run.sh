@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+if ! type -f bpkg-realpath &>/dev/null; then
+  echo "error: bpkg-realpath not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/realpath/realpath.sh
+  source "$(which bpkg-realpath)"
+fi
+
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
@@ -172,7 +181,7 @@ bpkg_run () {
     if which "$name" 2>/dev/null; then
       :
     elif test -f "$1"; then
-      realpath "$1"
+      bpkg_realpath "$1"
     elif [ -n "$1" ] && which "$1" 2>/dev/null; then
       :
     fi

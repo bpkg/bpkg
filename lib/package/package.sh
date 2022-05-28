@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
 
+if ! type -f bpkg-realpath &>/dev/null; then
+  echo "error: bpkg-realpath not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/realpath/realpath.sh
+  source "$(which bpkg-realpath)"
+fi
+
 BPKG_JSON="$(which bpkg-json)"
 
 if [ -z "$BPKG_JSON" ]; then
-  BPKG_JSON="$(realpath "$0/../JSON/JSON.sh")"
+  BPKG_JSON="$(bpkg_realpath "$0/../JSON/JSON.sh")"
 else
-  BPKG_JSON="$(realpath "$BPKG_JSON")"
+  BPKG_JSON="$(bpkg_realpath "$BPKG_JSON")"
 fi
 
 ## output usage

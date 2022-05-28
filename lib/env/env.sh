@@ -9,6 +9,15 @@ else
   source "$(which bpkg-package)"
 fi
 
+if ! type -f bpkg-realpath &>/dev/null; then
+  echo "error: bpkg-realpath not found, aborting"
+  exit 1
+else
+  # shellcheck disable=SC2230
+  # shellcheck source=lib/realpath/realpath.sh
+  source "$(which bpkg-realpath)"
+fi
+
 # Include config rc file if found
 BPKG_USER_CONFIG_FILE="$HOME/.bpkgrc"
 
@@ -37,7 +46,7 @@ export BPKG_PACKAGE_USER
 export BPKG_PACKAGE_NAME="$(bpkg_package name 2>/dev/null)"
 export BPKG_PACKAGE_REPO="$(bpkg_package repo 2>/dev/null)"
 export BPKG_PACKAGE_PATH="$(bpkg_package_path)"
-export BPKG_PACKAGE_ROOT="$(realpath "$(dirname "$BPKG_PACKAGE_PATH")")"
+export BPKG_PACKAGE_ROOT="$(bpkg_realpath "$(dirname "$BPKG_PACKAGE_PATH")")"
 export BPKG_PACKAGE_DEPS="$BPKG_PACKAGE_ROOT/deps"
 export BPKG_PACKAGE_VERSION="$(bpkg_package version 2>/dev/null)"
 export BPKG_PACKAGE_DESCRIPTION="$(bpkg_package description 2>/dev/null)"
