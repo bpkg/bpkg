@@ -258,8 +258,6 @@ bpkg_install () {
 ##   1: the package was not found on the remote
 ##   2: a fatal error occurred
 bpkg_install_from_remote () {
-  local cwd
-
   local pkg=$1
   local remote=$2
   local git_remote=$3
@@ -281,8 +279,6 @@ bpkg_install_from_remote () {
   declare -a remote_parts=()
   declare -a scripts=()
   declare -a files=()
-
-  cwd=$(pwd)
 
   ## get version if available
   {

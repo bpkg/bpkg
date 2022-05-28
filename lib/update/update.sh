@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-VERSION="0.0.1"
-
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
@@ -49,10 +47,6 @@ bpkg_update_remote() {
 bpkg_update () {
   for opt in "${@}"; do
     case "$opt" in
-      -V|--version)
-        echo "${VERSION}"
-        return 0
-        ;;
       -h|--help)
         usage
         return 0

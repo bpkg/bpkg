@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-VERSION="0.1.0"
-
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
@@ -27,7 +25,7 @@ usage () {
     echo "$mesg"
     echo
   fi
-  echo "bpkg-show [-Vh]"
+  echo "bpkg-show [-h|--help]"
   echo "bpkg-show <user/package_name>"
   echo "bpkg-show readme <user/package_name>"
   echo "bpkg-show sources <user/package_name>"
@@ -40,8 +38,7 @@ usage () {
   echo "                order. This option suppresses other output and prints executable bash."
   echo
   echo "Options:"
-  echo "  --help|-h     Print this help dialogue"
-  echo "  --version|-V  Print version and exit"
+  echo "  -h,--help     Print this help dialogue"
 }
 
 show_package () {
@@ -137,10 +134,6 @@ bpkg_show () {
   local pkg=""
   for opt in "$@"; do
     case "$opt" in
-      -V|--version)
-        echo "${VERSION}"
-        return 0
-        ;;
       -h|--help)
         usage
         return 0

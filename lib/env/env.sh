@@ -18,11 +18,14 @@ else
   source "$(which bpkg-realpath)"
 fi
 
-# Include config rc file if found
-BPKG_USER_CONFIG_FILE="$HOME/.bpkgrc"
+# List of bash source files
+declare -a BPKG_PACKAGE_SOURCES=()
 
 # Include config rc file if found
-BPKG_LOCAL_CONFIG_FILE="$(pwd)/.bpkgrc"
+declare BPKG_USER_CONFIG_FILE="$HOME/.bpkgrc"
+
+# Include config rc file if found
+declare BPKG_LOCAL_CONFIG_FILE="$(pwd)/.bpkgrc"
 
 ## meta
 export BPKG_DATE="$(date)"
@@ -49,7 +52,7 @@ export BPKG_PACKAGE_PATH="$(bpkg_package_path)"
 export BPKG_PACKAGE_ROOT="$(bpkg_realpath "$(dirname "$BPKG_PACKAGE_PATH")")"
 export BPKG_PACKAGE_DEPS="$BPKG_PACKAGE_ROOT/deps"
 export BPKG_PACKAGE_VERSION="$(bpkg_package version 2>/dev/null)"
-export BPKG_PACKAGE_DESCRIPTION="$(bpkg_package description 2>/dev/null)"
+export BPKG_PACKAGE_DEPACKAGEION="$(bpkg_package description 2>/dev/null)"
 export BPKG_PACKAGE_DEFAULT_USER="${BPKG_PACKAGE_DEFAULT_USER:-bpkg}"
 
 ## remote
@@ -59,11 +62,10 @@ export BPKG_REMOTES
 export BPKG_REMOTE_RAW_PATH
 
 if test -f "$BPKG_PACKAGE_PATH"; then
-  declare -a BPKG_SCRIPT_SOURCES=()
-  BPKG_SCRIPT_SOURCES+=($(find "$BPKG_SCRIPT_ROOT" -name '*.sh' 2>/dev/null))
-  BPKG_SCRIPT_SOURCES+=($(find "$BPKG_SCRIPT_ROOT" -name '*.zsh' 2>/dev/null))
-  BPKG_SCRIPT_SOURCES+=($(find "$BPKG_SCRIPT_ROOT" -name '*.bash' 2>/dev/null))
-  export BPKG_SCRIPT_SOURCES
+  BPKG_PACKAGE_SOURCES+=($(find "$BPKG_PACKAGE_ROOT" -name '*.sh' 2>/dev/null))
+  BPKG_PACKAGE_SOURCES+=($(find "$BPKG_PACKAGE_ROOT" -name '*.zsh' 2>/dev/null))
+  BPKG_PACKAGE_SOURCES+=($(find "$BPKG_PACKAGE_ROOT" -name '*.bash' 2>/dev/null))
+  export BPKG_PACKAGE_SOURCES
 fi
 
 if test -d "$BPKG_PACKAGE_DEPS/bin"; then
@@ -81,10 +83,10 @@ example:
   $ bpkg-env BPKG_PACKAGE*
   BPKG_PACKAGE_DEPS="deps"
   BPKG_PACKAGE_NAME="bpkg"
-  BPKG_PACKAGE_DESCRIPTION="Lightweight bash package manager"
+  BPKG_PACKAGE_DEPACKAGEION="Lightweight bash package manager"
   BPKG_PACKAGE_REPO="bpkg/bpkg"
   BPKG_PACKAGE_USER="bpkg"
-  BPKG_PACKAGE_VERSION="1.0.7"
+  BPKG_PACKAGE_VERSION="1.1.0"
 USAGE
 }
 
@@ -117,7 +119,7 @@ bpkg_env () {
 
   {
     printenv
-    echo BPKG_SCRIPT_SOURCES=\""${BPKG_SCRIPT_SOURCES[*]}"\"
+    echo BPKG_PACKAGE_SOURCES=\""${BPKG_PACKAGE_SOURCES[*]}"\"
   }                      |   \
     grep '^\s*BPKG_'     |   \
     sed 's/^\s*//g'      |   \
