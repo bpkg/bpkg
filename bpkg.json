@@ -1,12 +1,12 @@
 {
   "name": "bpkg",
-  "version": "1.0.25",
+  "version": "1.1.0",
   "description": "Lightweight bash package manager",
   "global": true,
   "repo": "bpkg/bpkg",
   "install": "bash setup.sh",
   "commands": {
     "lint": "command shellcheck **/*.sh",
-    "list-sources": "echo ${BPKG_SCRIPT_SOURCES[@]} | sed 's/ /\n/g'"
+    "list-sources": "echo ${BPKG_PACKAGE_SOURCES[@]} | sed 's/ /\n/g'"
   }
 }

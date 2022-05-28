@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-VERSION="0.0.1"
-
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
@@ -13,13 +11,12 @@ fi
 bpkg_initrc
 
 usage () {
-  echo "bpkg-list [-h|--help] [-V|--version] [-d|--details]"
+  echo "bpkg-list [-h|--help] [-d|--details]"
   echo
   echo "List all known bash packages from the repo.  You first must run \`bpkg update' to sync the repo locally."
 
   echo "Options:"
   echo "  --help|-h     Print this help dialogue"
-  echo "  --version|-V  Print version and exit"
   echo "  --details|-d  More verbose output"
 }
 
@@ -27,10 +24,6 @@ bpkg_list () {
   local verbose=0
   for opt in "${@}"; do
     case "$opt" in
-      -V|--version)
-        echo "${VERSION}"
-        return 0
-        ;;
       -h|--help)
         usage
         return 0
