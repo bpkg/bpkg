@@ -57,7 +57,7 @@ runner () {
   shift
   # shellcheck disable=SC2068
   eval "$cmd"
-  return 0
+  return $?
 }
 
 bpkg_run () {
