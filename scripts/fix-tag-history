@@ -15,14 +15,17 @@ for tag in "${tags[@]}"; do
   ## set versions in files
   sed -i "$regex" bpkg.sh
   sed -i "$regex" setup.sh
-  ## remove current tag
-  git tag -d "$tag"
-  ## amend HEAD for current tag
-  git commit -a --amend --no-edit
-  ## retag
-  git tag "$tag"
-  ## force push update
-  git push origin "$tag" -f
+
+  if ! git diff --exit-code; then
+    ## remove current tag
+    git tag -d "$tag"
+    ## amend HEAD for current tag
+    git commit -a --amend --no-edit
+    ## retag
+    git tag "$tag"
+    ## force push update
+    git push origin "$tag" -f
+  fi
 done
 
 git checkout master
