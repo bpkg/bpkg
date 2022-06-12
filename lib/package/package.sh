@@ -110,6 +110,7 @@ bpkg_package () {
   ## search up for 'bpkg.json', but only in CWD for 'package.json'
   local pkgs=("bpkg.json"  "$cwd/package.json")
   local npkgs="${#pkgs[@]}"
+  local rc=1
 
   ## parse flags
   case "$1" in
@@ -132,7 +133,8 @@ bpkg_package () {
       if [ -z "$1" ]; then
         ## output all propertyies if property
         ## is ommited
-        cat < "$pkg" | "$BPKG_JSON" -b
+        cat < "$pkg" | "$BPKG_JSON" -b || return $?
+        rc=0
       else
         ## show value for a specific property
         ## in 'bpkg.json' or 'package.json'
@@ -146,26 +148,28 @@ bpkg_package () {
         IFS=$'\n' read -r -d '' -a results <<< "$(cat < "$pkg" | "$BPKG_JSON" -b | grep -E "$(expand_grep_args $@)")"
 
         if (( ${#results[@]} == 1 )); then
+          rc=0
           if (( ${#peek[@]} > 0 )); then
-            echo "${results[@]}"        |
+            echo -e "${results[@]}"        |
               awk '{ $1=""; print $0 }' | ## print value
               sed 's/^\s*//g'           | ## remove leading whitespace
               sed 's/\s*$//g'           | ## remove trailing whitespace
               sed 's/^"//g'             | ## remove leading quote from JSON value
               sed 's/"$//g'             | ## remove trailing quote from JSON value
-              sed 's/^ *//;s/ *$//'
+              sed 's/^ *//;s/ *$//' || return $?
           else
-            echo "${results[@]}"
+            echo -e "${results[@]}"
           fi
-        else
+        elif (( ${#results[@]} > 0 )); then
+          rc=0
           for (( j = 0; j < ${#results[@]}; j++ )); do
-            echo "${results[j]}"
+            echo -e "${results[j]}"
           done
         fi
         shift
       fi
 
-      return 0
+      return $rc
     fi
   done
 
