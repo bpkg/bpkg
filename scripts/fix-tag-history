@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+pushd .
+cd ~ || exit $?
+BPKG=$(which bpkg)
+popd || exit $?
+
 declare -a tags=($(git tag -l))
 #declare -a tags=(1.0.12)
 
@@ -9,7 +14,7 @@ for tag in "${tags[@]}"; do
   ## checkout `setup.sh` from master branch with latest changes
   git checkout master -- setup.sh
   ## get current version
-  declare version="$(bpkg package version)"
+  declare version="$("$BPKG" package version | tr -d '[:space:]' | tr -d '"' | sed 's/\[version\]//g')"
   ## version replacement regex for `sed(1)`
   declare regex="s/VERSION=.*/VERSION=\"$version\"/g"
   ## set versions in files
