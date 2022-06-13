@@ -12,18 +12,18 @@ rm -f "$versions"
   echo "  - push"
   echo
 
-  echo "jobs:" >> "$versions"
+  echo "jobs:"
+  echo "  verify-tags:"
+  echo "    runs-on: ubuntu-latest"
+  echo "    steps:"
+  echo "      - name: Verify Setup For Tags"
+  echo "        run: |"
 
   for tag in "${tags[@]}"; do
-    echo "  v$(echo "$tag" | tr '.' '-'):"
-    echo "    runs-on: ubuntu-latest"
-    echo "    steps:"
-    echo "      - name: Verify Setup For $tag"
-    echo "        run: |"
+    echo "          echo \"Verify $tag:\""
     echo "          curl https://raw.githubusercontent.com/bpkg/bpkg/$tag/setup.sh | bash"
     echo "          bpkg --version | grep $tag"
     echo
-    break
   done
 
 } >> "$versions"
