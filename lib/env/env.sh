@@ -52,7 +52,7 @@ export BPKG_PACKAGE_PATH="$(bpkg_package_path)"
 export BPKG_PACKAGE_ROOT="$(bpkg_realpath "$(dirname "$BPKG_PACKAGE_PATH")")"
 export BPKG_PACKAGE_DEPS="$BPKG_PACKAGE_ROOT/deps"
 export BPKG_PACKAGE_VERSION="$(bpkg_package version 2>/dev/null)"
-export BPKG_PACKAGE_DESCRIPTION"$(bpkg_package description 2>/dev/null)"
+export BPKG_PACKAGE_DESCRIPTION="$(bpkg_package description 2>/dev/null)"
 export BPKG_PACKAGE_DEFAULT_USER="${BPKG_PACKAGE_DEFAULT_USER:-bpkg}"
 
 ## remote
@@ -83,7 +83,7 @@ example:
   $ bpkg-env BPKG_PACKAGE*
   BPKG_PACKAGE_DEPS="deps"
   BPKG_PACKAGE_NAME="bpkg"
-  BPKG_PACKAGE_DESCRIPTION"Lightweight bash package manager"
+  BPKG_PACKAGE_DESCRIPTION="Lightweight bash package manager"
   BPKG_PACKAGE_REPO="bpkg/bpkg"
   BPKG_PACKAGE_USER="bpkg"
   BPKG_PACKAGE_VERSION="1.1.0"
