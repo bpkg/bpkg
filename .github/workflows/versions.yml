@@ -1,0 +1,414 @@
+name: versions
+on:
+  - pull_request
+  - push
+
+jobs:
+  v0-0-2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.0.2
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.0.2
+
+  v0-0-3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.0.3
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.0.3
+
+  v0-0-4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.0.4
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.0.4
+
+  v0-0-5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.0.5
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.0.5
+
+  v0-0-6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.0.6
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.0.6
+
+  v0-0-7:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.0.7
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.0.7
+
+  v0-0-8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.0.8
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.0.8
+
+  v0-0-9:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.0.9
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.0.9
+
+  v0-1-0:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.1.0
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.1.0
+
+  v0-2-0:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.0
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.0
+
+  v0-2-1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.1
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.1
+
+  v0-2-2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.2
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.2
+
+  v0-2-3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.3
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.3
+
+  v0-2-4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.4
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.4
+
+  v0-2-5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.5
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.5
+
+  v0-2-6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.6
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.6
+
+  v0-2-7:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.7
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.7
+
+  v0-2-8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.8
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.8
+
+  v0-2-9:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.2.9
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.2.9
+
+  v0-3-0:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.3.0
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.3.0
+
+  v0-3-1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.3.1
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.3.1
+
+  v0-3-2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 0.3.2
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 0.3.2
+
+  v1-0-0:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.0
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.0
+
+  v1-0-1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.1
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.1
+
+  v1-0-10:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.10
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.10
+
+  v1-0-11:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.11
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.11
+
+  v1-0-12:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.12
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.12
+
+  v1-0-13:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.13
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.13
+
+  v1-0-14:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.14
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.14
+
+  v1-0-15:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.15
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.15
+
+  v1-0-16:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.16
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.16
+
+  v1-0-17:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.17
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.17
+
+  v1-0-18:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.18
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.18
+
+  v1-0-19:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.19
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.19
+
+  v1-0-2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.2
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.2
+
+  v1-0-20:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.20
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.20
+
+  v1-0-21:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.21
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.21
+
+  v1-0-22:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.22
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.22
+
+  v1-0-23:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.23
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.23
+
+  v1-0-24:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.24
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.24
+
+  v1-0-25:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.25
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.25
+
+  v1-0-3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.3
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.3
+
+  v1-0-4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.4
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.4
+
+  v1-0-5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.5
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.5
+
+  v1-0-6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.6
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.6
+
+  v1-0-7:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.7
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.7
+
+  v1-0-8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.8
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.8
+
+  v1-0-9:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.0.9
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.0.9
+
+  v1-1-0:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.1.0
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.1.0
+
+  v1-1-1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.1.1
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.1.1
+
+  v1-1-2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Setup For 1.1.2
+        run: |
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          bpkg --version | grep 1.1.2
+
