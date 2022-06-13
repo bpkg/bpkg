@@ -23,6 +23,7 @@ rm -f "$versions"
     echo "          curl https://raw.githubusercontent.com/bpkg/bpkg/$tag/setup.sh | bash"
     echo "          bpkg --version | grep $tag"
     echo
+    break
   done
 
 } >> "$versions"
