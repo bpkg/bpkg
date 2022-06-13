@@ -22,7 +22,10 @@ rm -f "$versions"
   for tag in "${tags[@]}"; do
     echo "          echo \"Verify $tag:\""
     echo "          curl https://raw.githubusercontent.com/bpkg/bpkg/$tag/setup.sh | bash"
-    echo "          bpkg --version | grep $tag"
+    echo "          bpkg --version | grep $tag >/dev/null || {"
+    echo "            echo \"Failed to verify $tag\""
+    echo "            exit 1"
+    echo "          }"
     echo
   done
 

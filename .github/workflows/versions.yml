@@ -11,205 +11,358 @@ jobs:
         run: |
           echo "Verify 0.0.2:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.2/setup.sh | bash
-          bpkg --version | grep 0.0.2
+          bpkg --version | grep 0.0.2 >/dev/null || {
+            echo "Failed to verify 0.0.2"
+            exit 1
+          }
 
           echo "Verify 0.0.3:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.3/setup.sh | bash
-          bpkg --version | grep 0.0.3
+          bpkg --version | grep 0.0.3 >/dev/null || {
+            echo "Failed to verify 0.0.3"
+            exit 1
+          }
 
           echo "Verify 0.0.4:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.4/setup.sh | bash
-          bpkg --version | grep 0.0.4
+          bpkg --version | grep 0.0.4 >/dev/null || {
+            echo "Failed to verify 0.0.4"
+            exit 1
+          }
 
           echo "Verify 0.0.5:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.5/setup.sh | bash
-          bpkg --version | grep 0.0.5
+          bpkg --version | grep 0.0.5 >/dev/null || {
+            echo "Failed to verify 0.0.5"
+            exit 1
+          }
 
           echo "Verify 0.0.6:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.6/setup.sh | bash
-          bpkg --version | grep 0.0.6
+          bpkg --version | grep 0.0.6 >/dev/null || {
+            echo "Failed to verify 0.0.6"
+            exit 1
+          }
 
           echo "Verify 0.0.7:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.7/setup.sh | bash
-          bpkg --version | grep 0.0.7
+          bpkg --version | grep 0.0.7 >/dev/null || {
+            echo "Failed to verify 0.0.7"
+            exit 1
+          }
 
           echo "Verify 0.0.8:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.8/setup.sh | bash
-          bpkg --version | grep 0.0.8
+          bpkg --version | grep 0.0.8 >/dev/null || {
+            echo "Failed to verify 0.0.8"
+            exit 1
+          }
 
           echo "Verify 0.0.9:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.9/setup.sh | bash
-          bpkg --version | grep 0.0.9
+          bpkg --version | grep 0.0.9 >/dev/null || {
+            echo "Failed to verify 0.0.9"
+            exit 1
+          }
 
           echo "Verify 0.1.0:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.1.0/setup.sh | bash
-          bpkg --version | grep 0.1.0
+          bpkg --version | grep 0.1.0 >/dev/null || {
+            echo "Failed to verify 0.1.0"
+            exit 1
+          }
 
           echo "Verify 0.2.0:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.0/setup.sh | bash
-          bpkg --version | grep 0.2.0
+          bpkg --version | grep 0.2.0 >/dev/null || {
+            echo "Failed to verify 0.2.0"
+            exit 1
+          }
 
           echo "Verify 0.2.1:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.1/setup.sh | bash
-          bpkg --version | grep 0.2.1
+          bpkg --version | grep 0.2.1 >/dev/null || {
+            echo "Failed to verify 0.2.1"
+            exit 1
+          }
 
           echo "Verify 0.2.2:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.2/setup.sh | bash
-          bpkg --version | grep 0.2.2
+          bpkg --version | grep 0.2.2 >/dev/null || {
+            echo "Failed to verify 0.2.2"
+            exit 1
+          }
 
           echo "Verify 0.2.3:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.3/setup.sh | bash
-          bpkg --version | grep 0.2.3
+          bpkg --version | grep 0.2.3 >/dev/null || {
+            echo "Failed to verify 0.2.3"
+            exit 1
+          }
 
           echo "Verify 0.2.4:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.4/setup.sh | bash
-          bpkg --version | grep 0.2.4
+          bpkg --version | grep 0.2.4 >/dev/null || {
+            echo "Failed to verify 0.2.4"
+            exit 1
+          }
 
           echo "Verify 0.2.5:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.5/setup.sh | bash
-          bpkg --version | grep 0.2.5
+          bpkg --version | grep 0.2.5 >/dev/null || {
+            echo "Failed to verify 0.2.5"
+            exit 1
+          }
 
           echo "Verify 0.2.6:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.6/setup.sh | bash
-          bpkg --version | grep 0.2.6
+          bpkg --version | grep 0.2.6 >/dev/null || {
+            echo "Failed to verify 0.2.6"
+            exit 1
+          }
 
           echo "Verify 0.2.7:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.7/setup.sh | bash
-          bpkg --version | grep 0.2.7
+          bpkg --version | grep 0.2.7 >/dev/null || {
+            echo "Failed to verify 0.2.7"
+            exit 1
+          }
 
           echo "Verify 0.2.8:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.8/setup.sh | bash
-          bpkg --version | grep 0.2.8
+          bpkg --version | grep 0.2.8 >/dev/null || {
+            echo "Failed to verify 0.2.8"
+            exit 1
+          }
 
           echo "Verify 0.2.9:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.9/setup.sh | bash
-          bpkg --version | grep 0.2.9
+          bpkg --version | grep 0.2.9 >/dev/null || {
+            echo "Failed to verify 0.2.9"
+            exit 1
+          }
 
           echo "Verify 0.3.0:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.3.0/setup.sh | bash
-          bpkg --version | grep 0.3.0
+          bpkg --version | grep 0.3.0 >/dev/null || {
+            echo "Failed to verify 0.3.0"
+            exit 1
+          }
 
           echo "Verify 0.3.1:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.3.1/setup.sh | bash
-          bpkg --version | grep 0.3.1
+          bpkg --version | grep 0.3.1 >/dev/null || {
+            echo "Failed to verify 0.3.1"
+            exit 1
+          }
 
           echo "Verify 0.3.2:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/0.3.2/setup.sh | bash
-          bpkg --version | grep 0.3.2
+          bpkg --version | grep 0.3.2 >/dev/null || {
+            echo "Failed to verify 0.3.2"
+            exit 1
+          }
 
           echo "Verify 1.0.0:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.0/setup.sh | bash
-          bpkg --version | grep 1.0.0
+          bpkg --version | grep 1.0.0 >/dev/null || {
+            echo "Failed to verify 1.0.0"
+            exit 1
+          }
 
           echo "Verify 1.0.1:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.1/setup.sh | bash
-          bpkg --version | grep 1.0.1
+          bpkg --version | grep 1.0.1 >/dev/null || {
+            echo "Failed to verify 1.0.1"
+            exit 1
+          }
 
           echo "Verify 1.0.10:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.10/setup.sh | bash
-          bpkg --version | grep 1.0.10
+          bpkg --version | grep 1.0.10 >/dev/null || {
+            echo "Failed to verify 1.0.10"
+            exit 1
+          }
 
           echo "Verify 1.0.11:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.11/setup.sh | bash
-          bpkg --version | grep 1.0.11
+          bpkg --version | grep 1.0.11 >/dev/null || {
+            echo "Failed to verify 1.0.11"
+            exit 1
+          }
 
           echo "Verify 1.0.12:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.12/setup.sh | bash
-          bpkg --version | grep 1.0.12
+          bpkg --version | grep 1.0.12 >/dev/null || {
+            echo "Failed to verify 1.0.12"
+            exit 1
+          }
 
           echo "Verify 1.0.13:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.13/setup.sh | bash
-          bpkg --version | grep 1.0.13
+          bpkg --version | grep 1.0.13 >/dev/null || {
+            echo "Failed to verify 1.0.13"
+            exit 1
+          }
 
           echo "Verify 1.0.14:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.14/setup.sh | bash
-          bpkg --version | grep 1.0.14
+          bpkg --version | grep 1.0.14 >/dev/null || {
+            echo "Failed to verify 1.0.14"
+            exit 1
+          }
 
           echo "Verify 1.0.15:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.15/setup.sh | bash
-          bpkg --version | grep 1.0.15
+          bpkg --version | grep 1.0.15 >/dev/null || {
+            echo "Failed to verify 1.0.15"
+            exit 1
+          }
 
           echo "Verify 1.0.16:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.16/setup.sh | bash
-          bpkg --version | grep 1.0.16
+          bpkg --version | grep 1.0.16 >/dev/null || {
+            echo "Failed to verify 1.0.16"
+            exit 1
+          }
 
           echo "Verify 1.0.17:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.17/setup.sh | bash
-          bpkg --version | grep 1.0.17
+          bpkg --version | grep 1.0.17 >/dev/null || {
+            echo "Failed to verify 1.0.17"
+            exit 1
+          }
 
           echo "Verify 1.0.18:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.18/setup.sh | bash
-          bpkg --version | grep 1.0.18
+          bpkg --version | grep 1.0.18 >/dev/null || {
+            echo "Failed to verify 1.0.18"
+            exit 1
+          }
 
           echo "Verify 1.0.19:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.19/setup.sh | bash
-          bpkg --version | grep 1.0.19
+          bpkg --version | grep 1.0.19 >/dev/null || {
+            echo "Failed to verify 1.0.19"
+            exit 1
+          }
 
           echo "Verify 1.0.2:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.2/setup.sh | bash
-          bpkg --version | grep 1.0.2
+          bpkg --version | grep 1.0.2 >/dev/null || {
+            echo "Failed to verify 1.0.2"
+            exit 1
+          }
 
           echo "Verify 1.0.20:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.20/setup.sh | bash
-          bpkg --version | grep 1.0.20
+          bpkg --version | grep 1.0.20 >/dev/null || {
+            echo "Failed to verify 1.0.20"
+            exit 1
+          }
 
           echo "Verify 1.0.21:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.21/setup.sh | bash
-          bpkg --version | grep 1.0.21
+          bpkg --version | grep 1.0.21 >/dev/null || {
+            echo "Failed to verify 1.0.21"
+            exit 1
+          }
 
           echo "Verify 1.0.22:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.22/setup.sh | bash
-          bpkg --version | grep 1.0.22
+          bpkg --version | grep 1.0.22 >/dev/null || {
+            echo "Failed to verify 1.0.22"
+            exit 1
+          }
 
           echo "Verify 1.0.23:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.23/setup.sh | bash
-          bpkg --version | grep 1.0.23
+          bpkg --version | grep 1.0.23 >/dev/null || {
+            echo "Failed to verify 1.0.23"
+            exit 1
+          }
 
           echo "Verify 1.0.24:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.24/setup.sh | bash
-          bpkg --version | grep 1.0.24
+          bpkg --version | grep 1.0.24 >/dev/null || {
+            echo "Failed to verify 1.0.24"
+            exit 1
+          }
 
           echo "Verify 1.0.25:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.25/setup.sh | bash
-          bpkg --version | grep 1.0.25
+          bpkg --version | grep 1.0.25 >/dev/null || {
+            echo "Failed to verify 1.0.25"
+            exit 1
+          }
 
           echo "Verify 1.0.3:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.3/setup.sh | bash
-          bpkg --version | grep 1.0.3
+          bpkg --version | grep 1.0.3 >/dev/null || {
+            echo "Failed to verify 1.0.3"
+            exit 1
+          }
 
           echo "Verify 1.0.4:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.4/setup.sh | bash
-          bpkg --version | grep 1.0.4
+          bpkg --version | grep 1.0.4 >/dev/null || {
+            echo "Failed to verify 1.0.4"
+            exit 1
+          }
 
           echo "Verify 1.0.5:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.5/setup.sh | bash
-          bpkg --version | grep 1.0.5
+          bpkg --version | grep 1.0.5 >/dev/null || {
+            echo "Failed to verify 1.0.5"
+            exit 1
+          }
 
           echo "Verify 1.0.6:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.6/setup.sh | bash
-          bpkg --version | grep 1.0.6
+          bpkg --version | grep 1.0.6 >/dev/null || {
+            echo "Failed to verify 1.0.6"
+            exit 1
+          }
 
           echo "Verify 1.0.7:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.7/setup.sh | bash
-          bpkg --version | grep 1.0.7
+          bpkg --version | grep 1.0.7 >/dev/null || {
+            echo "Failed to verify 1.0.7"
+            exit 1
+          }
 
           echo "Verify 1.0.8:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.8/setup.sh | bash
-          bpkg --version | grep 1.0.8
+          bpkg --version | grep 1.0.8 >/dev/null || {
+            echo "Failed to verify 1.0.8"
+            exit 1
+          }
 
           echo "Verify 1.0.9:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.9/setup.sh | bash
-          bpkg --version | grep 1.0.9
+          bpkg --version | grep 1.0.9 >/dev/null || {
+            echo "Failed to verify 1.0.9"
+            exit 1
+          }
 
           echo "Verify 1.1.0:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
-          bpkg --version | grep 1.1.0
+          bpkg --version | grep 1.1.0 >/dev/null || {
+            echo "Failed to verify 1.1.0"
+            exit 1
+          }
 
           echo "Verify 1.1.1:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.1/setup.sh | bash
-          bpkg --version | grep 1.1.1
+          bpkg --version | grep 1.1.1 >/dev/null || {
+            echo "Failed to verify 1.1.1"
+            exit 1
+          }
 
           echo "Verify 1.1.2:"
           curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.2/setup.sh | bash
-          bpkg --version | grep 1.1.2
+          bpkg --version | grep 1.1.2 >/dev/null || {
+            echo "Failed to verify 1.1.2"
+            exit 1
+          }
 
