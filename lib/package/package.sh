@@ -150,13 +150,15 @@ bpkg_package () {
         if (( ${#results[@]} == 1 )); then
           rc=0
           if (( ${#peek[@]} > 0 )); then
-            echo -e "${results[@]}"        |
-              awk '{ $1=""; print $0 }' | ## print value
-              sed 's/^\s*//g'           | ## remove leading whitespace
-              sed 's/\s*$//g'           | ## remove trailing whitespace
-              sed 's/^"//g'             | ## remove leading quote from JSON value
-              sed 's/"$//g'             | ## remove trailing quote from JSON value
-              sed 's/^ *//;s/ *$//' || return $?
+            {
+              echo "${results[@]}"        |
+                awk '{ $1=""; print $0 }' | ## print value
+                sed 's/^\s*//g'           | ## remove leading whitespace
+                sed 's/\s*$//g'           | ## remove trailing whitespace
+                sed 's/^"//g'             | ## remove leading quote from JSON value
+                sed 's/"$//g'             | ## remove trailing quote from JSON value
+                sed 's/^ *//;s/ *$//'
+            } || return $?
           else
             echo -e "${results[@]}"
           fi
