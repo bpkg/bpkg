@@ -1,0 +1,28 @@
+name: versions
+
+on:
+   - pull_request
+   - push
+
+jobs:
+  verify-tags:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout
+        with:
+          force-depth: 0
+
+      - name: Verify setup.sh for each tag
+        run: |
+          for tag in "$(git tag -l"); do
+            echo "Verify $tag:"
+
+            curl https://raw.githubusercontent.com/bpkg/bpkg/$tag/setup.sh | bash
+            version="$(bpkg --version)"
+
+            if [ "$version" != "$tag" ]; then
+              echo "Failed to verify $tag"
+              exit 1
+            fi
+        done
