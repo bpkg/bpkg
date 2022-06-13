@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.0.2
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.2/setup.sh | bash
           bpkg --version | grep 0.0.2
 
   v0-0-3:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.0.3
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.3/setup.sh | bash
           bpkg --version | grep 0.0.3
 
   v0-0-4:
@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.0.4
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.4/setup.sh | bash
           bpkg --version | grep 0.0.4
 
   v0-0-5:
@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.0.5
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.5/setup.sh | bash
           bpkg --version | grep 0.0.5
 
   v0-0-6:
@@ -41,7 +41,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.0.6
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.6/setup.sh | bash
           bpkg --version | grep 0.0.6
 
   v0-0-7:
@@ -49,7 +49,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.0.7
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.7/setup.sh | bash
           bpkg --version | grep 0.0.7
 
   v0-0-8:
@@ -57,7 +57,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.0.8
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.8/setup.sh | bash
           bpkg --version | grep 0.0.8
 
   v0-0-9:
@@ -65,7 +65,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.0.9
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.0.9/setup.sh | bash
           bpkg --version | grep 0.0.9
 
   v0-1-0:
@@ -73,7 +73,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.1.0
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.1.0/setup.sh | bash
           bpkg --version | grep 0.1.0
 
   v0-2-0:
@@ -81,7 +81,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.0
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.0/setup.sh | bash
           bpkg --version | grep 0.2.0
 
   v0-2-1:
@@ -89,7 +89,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.1
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.1/setup.sh | bash
           bpkg --version | grep 0.2.1
 
   v0-2-2:
@@ -97,7 +97,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.2
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.2/setup.sh | bash
           bpkg --version | grep 0.2.2
 
   v0-2-3:
@@ -105,7 +105,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.3
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.3/setup.sh | bash
           bpkg --version | grep 0.2.3
 
   v0-2-4:
@@ -113,7 +113,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.4
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.4/setup.sh | bash
           bpkg --version | grep 0.2.4
 
   v0-2-5:
@@ -121,7 +121,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.5
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.5/setup.sh | bash
           bpkg --version | grep 0.2.5
 
   v0-2-6:
@@ -129,7 +129,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.6
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.6/setup.sh | bash
           bpkg --version | grep 0.2.6
 
   v0-2-7:
@@ -137,7 +137,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.7
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.7/setup.sh | bash
           bpkg --version | grep 0.2.7
 
   v0-2-8:
@@ -145,7 +145,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.8
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.8/setup.sh | bash
           bpkg --version | grep 0.2.8
 
   v0-2-9:
@@ -153,7 +153,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.2.9
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.2.9/setup.sh | bash
           bpkg --version | grep 0.2.9
 
   v0-3-0:
@@ -161,7 +161,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.3.0
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.3.0/setup.sh | bash
           bpkg --version | grep 0.3.0
 
   v0-3-1:
@@ -169,7 +169,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.3.1
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.3.1/setup.sh | bash
           bpkg --version | grep 0.3.1
 
   v0-3-2:
@@ -177,7 +177,7 @@ jobs:
     steps:
       - name: Verify Setup For 0.3.2
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/0.3.2/setup.sh | bash
           bpkg --version | grep 0.3.2
 
   v1-0-0:
@@ -185,7 +185,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.0
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.0/setup.sh | bash
           bpkg --version | grep 1.0.0
 
   v1-0-1:
@@ -193,7 +193,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.1
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.1/setup.sh | bash
           bpkg --version | grep 1.0.1
 
   v1-0-10:
@@ -201,7 +201,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.10
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.10/setup.sh | bash
           bpkg --version | grep 1.0.10
 
   v1-0-11:
@@ -209,7 +209,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.11
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.11/setup.sh | bash
           bpkg --version | grep 1.0.11
 
   v1-0-12:
@@ -217,7 +217,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.12
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.12/setup.sh | bash
           bpkg --version | grep 1.0.12
 
   v1-0-13:
@@ -225,7 +225,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.13
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.13/setup.sh | bash
           bpkg --version | grep 1.0.13
 
   v1-0-14:
@@ -233,7 +233,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.14
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.14/setup.sh | bash
           bpkg --version | grep 1.0.14
 
   v1-0-15:
@@ -241,7 +241,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.15
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.15/setup.sh | bash
           bpkg --version | grep 1.0.15
 
   v1-0-16:
@@ -249,7 +249,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.16
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.16/setup.sh | bash
           bpkg --version | grep 1.0.16
 
   v1-0-17:
@@ -257,7 +257,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.17
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.17/setup.sh | bash
           bpkg --version | grep 1.0.17
 
   v1-0-18:
@@ -265,7 +265,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.18
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.18/setup.sh | bash
           bpkg --version | grep 1.0.18
 
   v1-0-19:
@@ -273,7 +273,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.19
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.19/setup.sh | bash
           bpkg --version | grep 1.0.19
 
   v1-0-2:
@@ -281,7 +281,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.2
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.2/setup.sh | bash
           bpkg --version | grep 1.0.2
 
   v1-0-20:
@@ -289,7 +289,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.20
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.20/setup.sh | bash
           bpkg --version | grep 1.0.20
 
   v1-0-21:
@@ -297,7 +297,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.21
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.21/setup.sh | bash
           bpkg --version | grep 1.0.21
 
   v1-0-22:
@@ -305,7 +305,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.22
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.22/setup.sh | bash
           bpkg --version | grep 1.0.22
 
   v1-0-23:
@@ -313,7 +313,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.23
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.23/setup.sh | bash
           bpkg --version | grep 1.0.23
 
   v1-0-24:
@@ -321,7 +321,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.24
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.24/setup.sh | bash
           bpkg --version | grep 1.0.24
 
   v1-0-25:
@@ -329,7 +329,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.25
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.25/setup.sh | bash
           bpkg --version | grep 1.0.25
 
   v1-0-3:
@@ -337,7 +337,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.3
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.3/setup.sh | bash
           bpkg --version | grep 1.0.3
 
   v1-0-4:
@@ -345,7 +345,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.4
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.4/setup.sh | bash
           bpkg --version | grep 1.0.4
 
   v1-0-5:
@@ -353,7 +353,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.5
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.5/setup.sh | bash
           bpkg --version | grep 1.0.5
 
   v1-0-6:
@@ -361,7 +361,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.6
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.6/setup.sh | bash
           bpkg --version | grep 1.0.6
 
   v1-0-7:
@@ -369,7 +369,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.7
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.7/setup.sh | bash
           bpkg --version | grep 1.0.7
 
   v1-0-8:
@@ -377,7 +377,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.8
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.8/setup.sh | bash
           bpkg --version | grep 1.0.8
 
   v1-0-9:
@@ -385,7 +385,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.0.9
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.0.9/setup.sh | bash
           bpkg --version | grep 1.0.9
 
   v1-1-0:
@@ -401,7 +401,7 @@ jobs:
     steps:
       - name: Verify Setup For 1.1.1
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.1/setup.sh | bash
           bpkg --version | grep 1.1.1
 
   v1-1-2:
@@ -409,6 +409,6 @@ jobs:
     steps:
       - name: Verify Setup For 1.1.2
         run: |
-          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.0/setup.sh | bash
+          curl https://raw.githubusercontent.com/bpkg/bpkg/1.1.2/setup.sh | bash
           bpkg --version | grep 1.1.2
 
