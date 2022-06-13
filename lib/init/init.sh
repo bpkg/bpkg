@@ -336,7 +336,7 @@ bpkg_init () {
 
 ## export or run
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
-  export -f bpkg-init
+  export -f bpkg_init
 else
   bpkg_init "${@}"
   exit $?
