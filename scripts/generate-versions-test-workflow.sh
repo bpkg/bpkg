@@ -1,32 +1,35 @@
 #!/usr/bin/env bash
 
-declare -a tags=($(git tag -l))
+declare tags="$(git tag -l)"
 declare versions=".github/workflows/versions.yml"
 
 rm -f "$versions"
 
-{
-  echo "name: versions"
-  echo "on:"
-  echo "  - pull_request"
-  echo "  - push"
-  echo
+cat - > "$versions" <<VERSIONS
+name: versions
+ on:
+   - pull_request
+   - push
 
-  echo "jobs:"
-  echo "  verify-tags:"
-  echo "    runs-on: ubuntu-latest"
-  echo "    steps:"
-  echo "      - name: Verify Setup For Tags"
-  echo "        run: |"
+jobs:
+  verify-tags:
 
-  for tag in "${tags[@]}"; do
-    echo "          echo \"Verify $tag:\""
-    echo "          curl https://raw.githubusercontent.com/bpkg/bpkg/$tag/setup.sh | bash"
-    echo "          bpkg --version | grep $tag >/dev/null || {"
-    echo "            echo \"Failed to verify $tag\""
-    echo "            exit 1"
-    echo "          }"
-    echo
-  done
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout
+        with:
+          force-depth: 0
+      - name: Verify Setup For Tags
+        run: |
+          for tag in "\$(git tag -l"); do
+            echo "Verify \$tag:"
 
-} >> "$versions"
+            curl https://raw.githubusercontent.com/bpkg/bpkg/\$tag/setup.sh | bash
+            version="\$(bpkg --version)"
+
+            if [ "\$version" != "\$tag" ]; then
+              echo "Failed to verify \$tag"
+              exit 1
+            fi
+        done
+VERSIONS
