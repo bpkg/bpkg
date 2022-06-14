@@ -9,7 +9,7 @@
 #        "               ""
 #        bash package manager
 
-VERSION="1.1.2"
+VERSION="1.1.3"
 TAG=${TAG:-$VERSION}
 BRANCH=${BRANCH:-$TAG}
 REMOTE=${REMOTE:-https://github.com/bpkg/bpkg.git}
