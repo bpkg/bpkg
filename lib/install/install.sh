@@ -523,7 +523,7 @@ bpkg_install_from_remote () {
           info "$scriptname to PATH" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
 
           if (( force_actions == 1 )); then
-            ln -sf "$BPKG_PACKAGE_DEPS/$name/$script" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
+            ln -sf "../$name/$script" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
           else
             if test -f "$BPKG_PACKAGE_DEPS/bin/$scriptname"; then
               warn "'$BPKG_PACKAGE_DEPS/bin/$scriptname' already exists. Overwrite? (yN)"
@@ -534,7 +534,7 @@ bpkg_install_from_remote () {
               esac
             fi
 
-            ln -s "$BPKG_PACKAGE_DEPS/$name/$script" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
+            ln -s "../$name/$script" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
           fi
           chmod u+x "$BPKG_PACKAGE_DEPS/bin/$scriptname"
         fi
