@@ -15,6 +15,7 @@ You can install shell scripts globally (on `${PREFIX:-/usr/local/bin}`) or use t
 * [Usage](#usage)
 	* [Installing packages](#installing-packages)
 	* [Packages With Dependencies](#packages-with-dependencies)
+	* [Running packages with `bpkg`](#running-packages-with-bpkg)
 	* [Retrieving package info](#retrieving-package-info)
 * [Package details](#package-details)
 * [bpkg.json](#bpkgjson)
@@ -24,11 +25,14 @@ You can install shell scripts globally (on `${PREFIX:-/usr/local/bin}`) or use t
 	* [global](#global)
 	* [install](#install-1)
 	* [scripts](#scripts)
-	* [files](#files)
+	* [files (optional)](#files-optional)
 	* [dependencies (optional)](#dependencies-optional)
+	* [commands (optional)](#commands-optional)
 * [Packaging best practices](#packaging-best-practices)
 	* [Package exports](#package-exports)
 * [Sponsors](#sponsors)
+	* [Contributors](#contributors)
+	* [Backers](#backers)
 * [License](#license)
 
 <!-- END-MARKDOWN-TOC -->
@@ -240,9 +244,9 @@ This is an array of scripts that will be installed into a project.
   "scripts": ["script.sh"]
 ```
 
-### files
+### files (optional)
 
-This is an array of files that will be installed into a project.
+This is an array of non-script files that will be installed into a project.
 
 ```json
   "files": ["bar.txt", "foo.txt"]
@@ -256,6 +260,23 @@ This is a hash of dependencies. The keys are the package names, and the values a
   "dependencies": {
     "term": "0.0.1"
   }
+```
+
+### commands (optional)
+
+This is a hash of commands. The keys are the names of the commands and the values are the commands to execute in a shell.  The commands can be called from the command line with `bpkg run` followed by the command name.
+
+```json
+  "commands": {
+    "say-hello": "echo \"Hello $1\""
+  }
+```
+
+The commands are run with `eval`, which runs the command as if on the command line. Commands can contain environment variables, and supports [shell features] (including *[special parameters]* and *[shell expansions]*). Passed parameters (on the command line after the command name) can be accessed in the command by using `$@` or `$1`.
+
+```bash
+$ bpkg run say-hello "Bash Package Manager"
+Hello Bash Package Manager
 ```
 
 ## Packaging best practices
