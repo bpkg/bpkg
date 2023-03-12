@@ -30,6 +30,7 @@ fi
 bpkg_initrc
 
 let prevent_prune=0
+let install_dev=0
 let force_actions=${BPKG_FORCE_ACTIONS:-0}
 let needs_global=0
 
@@ -42,10 +43,11 @@ validate_parameters () {
   return 0
 }
 
-## outut usage
+## output usage
 usage () {
   echo 'usage: bpkg-install [directory]'
   echo '   or: bpkg-install [-h|--help]'
+  echo '   or: bpkg-install [-d|--dev]'
   echo '   or: bpkg-install [-g|--global] [-f|--force] ...<package>'
   echo '   or: bpkg-install [-g|--global] [-f|--force] ...<user>/<package>'
 }
@@ -192,6 +194,11 @@ bpkg_install () {
         force_actions=1
         ;;
 
+      -d|--dev)
+        shift
+        install_dev=1
+        ;;
+
       --no-prune)
         shift
         prevent_prune=1
@@ -211,9 +218,14 @@ bpkg_install () {
 
   export BPKG_FORCE_ACTIONS=$force_actions
 
+  BPKG_DEPS_EXEC="bpkg_getdeps"
+  if (( 1 == install_dev )); then
+    BPKG_DEPS_EXEC="${BPKG_DEPS_EXEC} --dev"
+  fi
+
   ## ensure there is a package to install
   if (( ${#pkgs[@]} == 0 )); then
-    bpkg_getdeps
+    ${BPKG_DEPS_EXEC}
     return $?
   fi
 
@@ -221,7 +233,7 @@ bpkg_install () {
 
   for pkg in "${pkgs[@]}"; do
     if test -d "$(bpkg_realpath "$pkg" 2>/dev/null)"; then
-      if ! (cd "$pkg" && bpkg_getdeps); then
+      if ! (cd "$pkg" && ${BPKG_DEPS_EXEC}); then
         return 1
       fi
 
@@ -233,7 +245,7 @@ bpkg_install () {
     local i=0
     for remote in "${BPKG_REMOTES[@]}"; do
       local git_remote=${BPKG_GIT_REMOTES[$i]}
-      if bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global; then
+      if bpkg_install_from_remote "$pkg" "$remote" "$git_remote" $needs_global $install_dev; then
         did_fail=0
         break
       elif [[ "$?" == '2' ]]; then
@@ -262,6 +274,7 @@ bpkg_install_from_remote () {
   local remote=$2
   local git_remote=$3
   local needs_global=$4
+  local install_dev=$5
 
   local url=''
   local uri=''
@@ -506,7 +519,13 @@ bpkg_install_from_remote () {
 
     # install package dependencies
     info "Install dependencies for $name"
-    (cd "$BPKG_PACKAGE_DEPS/$name" && bpkg_getdeps)
+
+    BPKG_DEPS_EXEC="bpkg_getdeps"
+    if (( 1 == install_dev )); then
+      BPKG_DEPS_EXEC="${BPKG_DEPS_EXEC} --dev"
+    fi
+
+    (cd "$BPKG_PACKAGE_DEPS/$name" && ${BPKG_DEPS_EXEC})
 
     ## grab each script and place in deps directory
     for script in "${scripts[@]}"; do
