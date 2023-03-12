@@ -348,3 +348,6 @@ See file `LICENSE` for a more detailed description of its terms.
 [clib]: https://github.com/clibs/clib
 [term]: https://github.com/bpkg/term
 [json]: http://json.org/example
+[shell features]: https://www.gnu.org/software/bash/manual/html_node/Basic-Shell-Features.html
+[special parameters]: https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html
+[shell expansions]: https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html
