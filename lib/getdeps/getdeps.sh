@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
+let install_dev=0
+
 ## output usage
 usage () {
   echo "Installs dependencies for a package."
   echo "usage: bpkg-getdeps [-h|--help]"
+  echo "   or: bpkg-getdeps [-d|--dev]"
   echo "   or: bpkg-getdeps"
 }
 
@@ -18,6 +21,11 @@ bpkg_getdeps () {
       usage
       return 0
       ;;
+
+    -d|--dev)
+      shift
+      install_dev=1
+      ;;
   esac
 
   ## ensure there is a package to read
@@ -30,9 +38,16 @@ bpkg_getdeps () {
   fi
 
   # shellcheck disable=SC2002
-  dependencies=$(cat "${pkg}" | bpkg-json -b | grep '\[\"dependencies' | sed "s/\[\"dependencies\",//" | sed "s/\"\]$(printf '\t')\"/@/" | tr -d '"')
+  dependencies=$(cat "${pkg}" | bpkg-json -b | grep '\["dependencies"' | sed "s/\[\"dependencies\",//" | sed "s/\"\]$(printf '\t')\"/@/" | tr -d '"')
   # shellcheck disable=SC2206
   dependencies=(${dependencies[@]})
+
+  if (( 1 == install_dev )); then
+    # shellcheck disable=SC2002
+    dependencies_dev=$(cat "${pkg}" | bpkg-json -b | grep '\["dependencies-dev"' | sed "s/\[\"dependencies-dev\",//" | sed "s/\"\]$(printf '\t')\"/@/" | tr -d '"')
+    # shellcheck disable=SC2206
+    dependencies=(${dependencies[@]} ${dependencies_dev[@]})
+  fi
 
   ## run bpkg install for each dependency
   for (( i = 0; i < ${#dependencies[@]} ; ++i )); do
