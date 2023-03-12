@@ -155,9 +155,9 @@ bpkg_package () {
                 awk '{ $1=""; print $0 }' | ## print value
                 sed 's/^\s*//g'           | ## remove leading whitespace
                 sed 's/\s*$//g'           | ## remove trailing whitespace
-                sed 's/^"//g'             | ## remove leading quote from JSON value
+                sed 's/^ *//;s/ *$//'     | ## clean up extra whitespace
                 sed 's/"$//g'             | ## remove trailing quote from JSON value
-                sed 's/^ *//;s/ *$//'
+                sed 's/^"//g'               ## remove leading quote from JSON value
             } || return $?
           else
             echo -e "${results[@]}"

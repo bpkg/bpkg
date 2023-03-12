@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2317
 #
 # #             #
 # #mmm   mmmm   #   m   mmmm
@@ -47,20 +48,20 @@ setup () {
   {
     echo
     echo "  info: Creating temporary files..."
-    cd "$TMPDIR" || exit
+    cd "$TMPDIR" || return $?
     test -d "$DEST" && { echo "  warn: Already exists: '$DEST'"; }
-    rm -rf "$DEST"
+    rm -rf "$DEST" || return $?
 
     echo "  info: Fetching 'bpkg@$BRANCH'..."
-    git clone --depth=1 --branch "$BRANCH" "$REMOTE" "$DEST" > /dev/null 2>&1
-    cd "$DEST" || exit
+    git clone --depth=1 --branch "$BRANCH" "$REMOTE" "$DEST" > /dev/null 2>&1 || return $?
+    cd "$DEST" || reutnr $?
 
     echo "  info: Installing..."
     echo
-    make_install
+    make_install || return $?
     echo "  info: Done!"
   } >&2
-  return $?
+  return 0
 }
 
 ## make targets
@@ -90,6 +91,19 @@ CMDS+=("term")
 CMDS+=("update")
 CMDS+=("utils")
 CMDS+=("realpath")
+
+make_uninstall () {
+  echo "  info: Uninstalling $PREFIX/bin/$BIN*"
+  echo "    rm: $PREFIX/bin/$BIN'"
+  rm -f "$PREFIX/bin/$BIN"
+  for cmd in "${CMDS[@]}"; do
+    if test -f "$PREFIX/bin/$BIN-$cmd"; then
+      echo "    rm: $PREFIX/bin/$BIN-$cmd'"
+      rm -f "$PREFIX/bin/$BIN-$cmd"
+    fi
+  done
+  return $?
+}
 
 make_install () {
   local source
@@ -122,28 +136,15 @@ make_install () {
   return $?
 }
 
-make_uninstall () {
-  echo "  info: Uninstalling $PREFIX/bin/$BIN*"
-  echo "    rm: $PREFIX/bin/$BIN'"
-  rm -f "$PREFIX/bin/$BIN"
-  for cmd in "${CMDS[@]}"; do
-    if test -f "$PREFIX/bin/$BIN-$cmd"; then
-      echo "    rm: $PREFIX/bin/$BIN-$cmd'"
-      rm -f "$PREFIX/bin/$BIN-$cmd"
-    fi
-  done
-  return $?
-}
-
 make_link () {
-  make_uninstall
+  make_uninstall || return $?
   echo "  info: Linking $PREFIX/bin/$BIN*"
   echo "  link: '$PWD/$BIN' -> '$PREFIX/bin/$BIN'"
-  ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN"
+  ln -s "$PWD/$BIN" "$PREFIX/bin/$BIN" || return $?
   for cmd in "${CMDS[@]}"; do
     if test -f "$PWD/$BIN-$cmd"; then
       echo "  link: '$PWD/$BIN-$cmd' -> '$PREFIX/bin/$BIN-$cmd'"
-      ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin/$BIN-$cmd"
+      ln -s "$PWD/$BIN-$cmd" "$PREFIX/bin/$BIN-$cmd" || return $?
     fi
   done
   return $?
