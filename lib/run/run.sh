@@ -25,9 +25,50 @@ bpkg_initrc
 ## output usage
 usage () {
   echo 'usage: bpkg-run [-h|--help]'
-  echo '   or: bpkg-run [-h|--help] [command]'
+  echo '   or: bpkg-run [-l|--list]'
   echo '   or: bpkg-run [-s|--source] <package> [command]'
   echo '   or: bpkg-run [-s|--source] <user>/<package> [command]'
+}
+
+bpkg_list_commands () {
+  local commands
+  local col_len
+  local description
+
+  commands="$(bpkg_package 2>/dev/null | grep '\["commands"' | sed 's/\["commands","\([^"]*\).*/\1/')"
+
+  col_len="$(wc -L <<< "${commands}")"
+
+  if (( ${col_len} == 0 )); then
+    bpkg_error "No commands provided in BPKG package file."
+    return 1
+  fi
+
+  for command in ${commands}; do
+    description="$(bpkg_package commands-description "${command}")"
+
+    if [ -z "${description}" ]; then
+      description="Runs the ${command} command as defined in BPKG configuration"
+    fi
+    printf "  "
+
+    bpkg_exec_exist bpkg-term &&
+      bpkg-term color cyan
+
+    printf "%-${col_len}s  " "${command}"
+
+    bpkg_exec_exist bpkg-term && {
+      bpkg-term reset
+      bpkg-term bright
+    }
+
+    printf "%s\n" "${description}"
+
+    bpkg_exec_exist bpkg-term &&
+      bpkg-term reset
+  done
+
+  return 0
 }
 
 bpkg_runner () {
@@ -51,6 +92,11 @@ bpkg_run () {
       -h|--help)
         usage
         return 0
+        ;;
+
+      -l|--list)
+        bpkg_list_commands
+        return $?
         ;;
 
       -s|--source)
