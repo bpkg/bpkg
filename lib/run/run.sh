@@ -1,46 +1,26 @@
 #!/usr/bin/env bash
 
-if ! type -f bpkg-realpath &>/dev/null; then
-  echo "error: bpkg-realpath not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/realpath/realpath.sh
-  source "$(which bpkg-realpath)"
-fi
+# shellcheck disable=SC2230 # which is non-standard. Use builtin command -v instead.
 
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
-else
-  # shellcheck source=lib/utils/utils.sh
-  source "$(which bpkg-utils)"
 fi
 
-if ! type -f bpkg-env &>/dev/null; then
-  echo "error: bpkg-env not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/env/env.sh
-  source "$(which bpkg-env)"
-fi
+# shellcheck source=lib/utils/utils.sh
+source "$(which bpkg-utils)"
 
-if ! type -f bpkg-install &>/dev/null; then
-  echo "error: bpkg-install not found, aborting"
-  exit 1
-else
-  # shellcheck source=lib/install/install.sh
+# shellcheck source=lib/realpath/realpath.sh
+bpkg_exec_or_exit bpkg-realpath &&
+  source "$(which bpkg-realpath)"
+
+# shellcheck source=lib/install/install.sh
+bpkg_exec_or_exit bpkg-install &&
   source "$(which bpkg-install)"
-fi
 
-if ! type -f bpkg-package &>/dev/null; then
-  echo "error: bpkg-package not found, aborting"
-  exit 1
-else
-  # shellcheck source=lib/package/package.sh
+# shellcheck source=lib/package/package.sh
+bpkg_exec_or_exit bpkg-package &&
   source "$(which bpkg-package)"
-fi
 
 bpkg_initrc
 

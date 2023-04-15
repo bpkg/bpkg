@@ -1,31 +1,20 @@
 #!/usr/bin/env bash
 
-if ! type -f bpkg-realpath &>/dev/null; then
-  echo "error: bpkg-realpath not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/realpath/realpath.sh
-  source "$(which bpkg-realpath)"
-fi
-
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/utils/utils.sh
-  source "$(which bpkg-utils)"
 fi
 
-if ! type -f bpkg-getdeps &>/dev/null; then
-  echo "error: bpkg-getdeps not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/getdeps/getdeps.sh
+# shellcheck source=lib/utils/utils.sh
+source "$(which bpkg-utils)"
+
+# shellcheck source=lib/realpath/realpath.sh
+bpkg_exec_or_exit bpkg-realpath &&
+  source "$(which bpkg-realpath)"
+
+# shellcheck source=lib/getdeps/getdeps.sh
+bpkg_exec_or_exit bpkg-getdeps &&
   source "$(which bpkg-getdeps)"
-fi
 
 bpkg_initrc
 

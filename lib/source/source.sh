@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
-if ! type -f bpkg-run &>/dev/null; then
-  echo "error: bpkg-run not found, aborting"
+if ! type -f bpkg-utils &>/dev/null; then
+  echo "error: bpkg-utils not found, aborting"
   exit 1
-else
-  # shellcheck source=lib/run/run.sh
-  source "$(which bpkg-run)"
 fi
+
+# shellcheck source=lib/utils/utils.sh
+source "$(which bpkg-utils)"
+
+# shellcheck source=lib/run/run.sh
+bpkg_exec_or_exit bpkg-run &&
+  source "$(which bpkg-run)"
+
 
 bpkg_source () {
   # shellcheck disable=SC2068
