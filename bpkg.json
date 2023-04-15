@@ -8,5 +8,9 @@
   "commands": {
     "lint": "command shellcheck **/*.sh",
     "list-sources": "echo ${BPKG_PACKAGE_SOURCES[@]} | sed 's/ /\n/g'"
+  },
+  "commands-description": {
+    "lint": "Execute shellcheck against all .sh files in project",
+    "list-sources": "Output package source files"
   }
 }
