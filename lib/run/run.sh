@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# shellcheck disable=SC2230 # which is non-standard. Use builtin command -v instead.
-
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
@@ -32,11 +30,11 @@ usage () {
   echo '   or: bpkg-run [-s|--source] <user>/<package> [command]'
 }
 
-runner () {
+bpkg_runner () {
   local cmd="$1"
-  shift
-  # shellcheck disable=SC2068
+
   eval "$cmd"
+
   return $?
 }
 
@@ -117,8 +115,7 @@ bpkg_run () {
       done
 
       shift
-      # shellcheck disable=SC2068
-      runner "$prefix ${args[*]}" $@
+      bpkg_runner "$prefix ${args[*]}"
       return $?
     fi
   fi
@@ -152,9 +149,9 @@ bpkg_run () {
     return 1
   fi
 
-  local pkgname="$(bpkg_package name 2>/dev/null)"
-  if [ -n "$pkgname" ]; then
-    name="$pkgname"
+  local pkg_name="$(bpkg_package name 2>/dev/null)"
+  if [ -n "$pkg_name" ]; then
+    name="$pkg_name"
   fi
 
   if (( 1 == should_emit_source )); then
@@ -198,8 +195,7 @@ bpkg_run () {
         done
 
         shift
-        # shellcheck disable=SC2068
-        runner "$prefix ${args[*]}" $@
+        bpkg_runner "$prefix ${args[*]}"
       fi
 
       # shellcheck disable=SC2068
