@@ -39,7 +39,7 @@ bpkg_list_commands () {
 
   col_len="$(wc -L <<< "${commands}")"
 
-  if (( ${col_len} == 0 )); then
+  if [ "${col_len}" -eq 0 ]; then
     bpkg_error "No commands provided in BPKG package file."
     return 1
   fi
