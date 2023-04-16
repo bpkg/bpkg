@@ -29,6 +29,7 @@ You can install shell scripts globally (on `${PREFIX:-/usr/local/bin}`) or use t
     * [dependencies (optional)](#dependencies-optional)
     * [dependencies-dev (optional)](#dependencies-dev-optional)
     * [commands (optional)](#commands-optional)
+    * [commands-description (optional)](#commands-description-optional)
 * [Packaging best practices](#packaging-best-practices)
     * [Package exports](#package-exports)
 * [Sponsors](#sponsors)
@@ -287,6 +288,16 @@ The commands are run with `eval`, which runs the command as if on the command li
 ```bash
 $ bpkg run say-hello "Bash Package Manager"
 Hello Bash Package Manager
+```
+
+### commands-description (optional)
+
+This is a hash of descriptions for configured commands.  The keys are the names of the commands and the values are the descriptions for the specified commands.  The command descriptions can be listed on the command line by providing the `-l` or `--list` flags after the `bpkg run` command.
+
+```json
+  "commands-description": {
+    "say-hello": "Output hello to provided name (ex: bpkg run say-hello John)"
+  }
 ```
 
 ## Packaging best practices
