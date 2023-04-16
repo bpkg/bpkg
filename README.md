@@ -8,33 +8,33 @@ You can install shell scripts globally (on `${PREFIX:-/usr/local/bin}`) or use t
 
 <!-- BEGIN-MARKDOWN-TOC -->
 * [Install](#install)
-	* [0. Dependencies](#0-dependencies)
-	* [1. Install script](#1-install-script)
-	* [2. clib](#2-clib)
-	* [3. Source Code](#3-source-code)
+    * [0. Dependencies](#0-dependencies)
+    * [1. Install script](#1-install-script)
+    * [2. clib](#2-clib)
+    * [3. Source Code](#3-source-code)
 * [Usage](#usage)
-	* [Installing packages](#installing-packages)
-	* [Packages With Dependencies](#packages-with-dependencies)
-	* [Running packages with `bpkg`](#running-packages-with-bpkg)
-	* [Retrieving package info](#retrieving-package-info)
+    * [Installing packages](#installing-packages)
+    * [Packages With Dependencies](#packages-with-dependencies)
+    * [Running packages with `bpkg`](#running-packages-with-bpkg)
+    * [Retrieving package info](#retrieving-package-info)
 * [Package details](#package-details)
 * [bpkg.json](#bpkgjson)
-	* [name](#name)
-	* [version (optional)](#version-optional)
-	* [description](#description)
-	* [global](#global)
-	* [install](#install-1)
-	* [scripts](#scripts)
-	* [files (optional)](#files-optional)
-	* [dependencies (optional)](#dependencies-optional)
-	* [commands (optional)](#commands-optional)
+    * [name](#name)
+    * [version (optional)](#version-optional)
+    * [description](#description)
+    * [global](#global)
+    * [install](#install-1)
+    * [scripts](#scripts)
+    * [files (optional)](#files-optional)
+    * [dependencies (optional)](#dependencies-optional)
+    * [dependencies-dev (optional)](#dependencies-dev-optional)
+    * [commands (optional)](#commands-optional)
 * [Packaging best practices](#packaging-best-practices)
-	* [Package exports](#package-exports)
+    * [Package exports](#package-exports)
 * [Sponsors](#sponsors)
-	* [Contributors](#contributors)
-	* [Backers](#backers)
+    * [Contributors](#contributors)
+    * [Backers](#backers)
 * [License](#license)
-
 <!-- END-MARKDOWN-TOC -->
 
 ## Install
@@ -258,6 +258,16 @@ This is a hash of dependencies. The keys are the package names, and the values a
 
 ```json
   "dependencies": {
+    "term": "0.0.1"
+  }
+```
+
+### dependencies-dev (optional)
+
+This is a hash of dependencies only needed during development.  Like the `dependencies` array, the keys are the package names, and the values are the version specifiers; `'master'` or a tagged release can be used as the identifier. These development dependencies are installed by adding the `-d` or `--dev` flags to the `bpkg install` command.
+
+```json
+  "dependencies-dev": {
     "term": "0.0.1"
   }
 ```
