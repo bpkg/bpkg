@@ -1,31 +1,20 @@
 #!/usr/bin/env bash
 
-if ! type -f bpkg-realpath &>/dev/null; then
-  echo "error: bpkg-realpath not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/realpath/realpath.sh
-  source "$(which bpkg-realpath)"
-fi
-
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/utils/utils.sh
-  source "$(which bpkg-utils)"
 fi
 
-if ! type -f bpkg-getdeps &>/dev/null; then
-  echo "error: bpkg-getdeps not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/getdeps/getdeps.sh
+# shellcheck source=lib/utils/utils.sh
+source "$(which bpkg-utils)"
+
+# shellcheck source=lib/realpath/realpath.sh
+bpkg_exec_or_exit bpkg-realpath &&
+  source "$(which bpkg-realpath)"
+
+# shellcheck source=lib/getdeps/getdeps.sh
+bpkg_exec_or_exit bpkg-getdeps &&
   source "$(which bpkg-getdeps)"
-fi
 
 bpkg_initrc
 
@@ -34,15 +23,6 @@ let install_dev=0
 let force_actions=${BPKG_FORCE_ACTIONS:-0}
 let needs_global=0
 
-## check parameter consistency
-validate_parameters () {
-  if [[ ${#BPKG_GIT_REMOTES[@]} -ne ${#BPKG_REMOTES[@]} ]]; then
-    error "$(printf 'BPKG_GIT_REMOTES[%d] differs in size from BPKG_REMOTES[%d] array' "${#BPKG_GIT_REMOTES[@]}" "${#BPKG_REMOTES[@]}")"
-    return 1
-  fi
-  return 0
-}
-
 ## output usage
 usage () {
   echo 'usage: bpkg-install [directory]'
@@ -50,62 +30,6 @@ usage () {
   echo '   or: bpkg-install [-d|--dev]'
   echo '   or: bpkg-install [-g|--global] [-f|--force] ...<package>'
   echo '   or: bpkg-install [-g|--global] [-f|--force] ...<user>/<package>'
-}
-
-## format and output message
-message () {
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term color "$1"
-  fi
-
-  shift
-  echo -n "    $1"
-  shift
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-  fi
-
-  printf ': '
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-    bpkg-term bright
-  fi
-
-  printf "%s\n" "$@"
-
-  if type -f bpkg-term > /dev/null 2>&1; then
-    bpkg-term reset
-  fi
-}
-
-## output error
-error () {
-  message 'red' 'error' "$@" >&2
-
-  return 0
-}
-
-## output warning
-warn () {
-  message 'yellow' 'warn' "$@" >&2
-
-  return 0
-}
-
-## output info
-info () {
-  local title='info'
-
-  if (( "$#" > 1 )); then
-    title="$1"
-    shift
-  fi
-
-  message 'cyan' "$title" "$@"
-
-  return 0
 }
 
 save_remote_file () {
@@ -209,7 +133,7 @@ bpkg_install () {
           pkgs+=("$opt")
           shift
         else
-          error "Unknown option \`$opt'"
+          bpkg_error "Unknown option \`$opt'"
           return 1
         fi
         ;;
@@ -249,7 +173,7 @@ bpkg_install () {
         did_fail=0
         break
       elif [[ "$?" == '2' ]]; then
-        error 'fatal error occurred during install'
+        bpkg_error 'fatal error occurred during install'
         return 1
       fi
       i=$((i+1))
@@ -257,7 +181,7 @@ bpkg_install () {
   done
 
   if (( did_fail == 1 )); then
-    error 'package not found on any remote'
+    bpkg_error 'package not found on any remote'
     return 1
   fi
 
@@ -309,7 +233,7 @@ bpkg_install_from_remote () {
     name="${pkg_parts[0]}"
     version="${pkg_parts[1]}"
   else
-    error 'Error parsing package version'
+    bpkg_error 'Error parsing package version'
     return 1
   fi
 
@@ -329,7 +253,7 @@ bpkg_install_from_remote () {
     user="${pkg_parts[0]}"
     name="${pkg_parts[1]}"
   else
-    error 'Unable to determine package name'
+    bpkg_error 'Unable to determine package name'
     return 1
   fi
 
@@ -340,7 +264,7 @@ bpkg_install_from_remote () {
 
   ## check to see if remote is raw with oauth (GHE)
   if [[ "${remote:0:10}" == "raw-oauth|" ]]; then
-    info 'Using OAUTH basic with content requests'
+    bpkg_info 'Using OAUTH basic with content requests'
     OLDIFS="$IFS"
     IFS="'|'"
     local remote_parts=("$remote")
@@ -360,7 +284,7 @@ bpkg_install_from_remote () {
 
   ## clean up extra slashes in uri
   uri=${uri/\/\///}
-  info "Install $uri from remote $remote [$git_remote]"
+  bpkg_info "Install $uri from remote $remote [$git_remote]"
 
   ## Ensure remote is reachable
   ## If a remote is totally down, this will be considered a fatal
@@ -368,7 +292,7 @@ bpkg_install_from_remote () {
   ## from the broken remote.
   {
     if ! url_exists "$remote" "$auth_param"; then
-      error "Remote unreachable: $remote"
+      bpkg_error "Remote unreachable: $remote"
       return 2
     fi
   }
@@ -392,7 +316,7 @@ bpkg_install_from_remote () {
   if (( 0 == has_pkg_json )); then
     ## check to see if there's a Makefile. If not, this is not a valid package
     if ! url_exists "$url/Makefile?$nonce" "$auth_param"; then
-      warn "Makefile not found, skipping remote: $url"
+      bpkg_warn "Makefile not found, skipping remote: $url"
       return 1
     fi
   fi
@@ -462,8 +386,8 @@ bpkg_install_from_remote () {
     fi
 
     if [[ -z "$build" ]]; then
-      warn 'Missing build script'
-      warn 'Trying "make install"...'
+      bpkg_warn 'Missing build script'
+      bpkg_warn 'Trying "make install"...'
       build='make install'
     fi
 
@@ -483,7 +407,7 @@ bpkg_install_from_remote () {
       ( (( 0 == prevent_prune )) && rm -rf "$name-$version")
 
       ## shallow clone
-      info "Cloning $repo_url to $(pwd)/$name-$version"
+      bpkg_info "Cloning $repo_url to $(pwd)/$name-$version"
       (test -d "$name-$version" || git clone "$repo_url" "$name-$version" 2>/dev/null) && (
           ## move into directory
           cd "$name-$version" && (
@@ -495,7 +419,7 @@ bpkg_install_from_remote () {
           )
 
           ## build
-          info "Performing install: \`$build'"
+          bpkg_info "Performing install: \`$build'"
           mkdir -p "$PREFIX"/{bin,lib}
           build_output=$(eval "$build")
           echo "$build_output"
@@ -518,7 +442,7 @@ bpkg_install_from_remote () {
     mkdir -p "$BPKG_PACKAGE_DEPS/bin"
 
     # install package dependencies
-    info "Install dependencies for $name"
+    bpkg_info "Install dependencies for $name"
 
     BPKG_DEPS_EXEC="bpkg_getdeps"
     if (( 1 == install_dev )); then
@@ -533,19 +457,19 @@ bpkg_install_from_remote () {
         if [[ "$script" ]];then
           local scriptname="$(echo "$script" | xargs basename )"
 
-          info "fetch" "$url/$script"
-          warn "BPKG_PACKAGE_DEPS is '$BPKG_PACKAGE_DEPS'"
-          info "write" "$BPKG_PACKAGE_DEPS/$name/$script"
+          bpkg_info "fetch" "$url/$script"
+          bpkg_warn "BPKG_PACKAGE_DEPS is '$BPKG_PACKAGE_DEPS'"
+          bpkg_info "write" "$BPKG_PACKAGE_DEPS/$name/$script"
           save_remote_file "$url/$script" "$BPKG_PACKAGE_DEPS/$name/$script" "$auth_param"
 
           scriptname="${scriptname%.*}"
-          info "$scriptname to PATH" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
+          bpkg_info "$scriptname to PATH" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
 
           if (( force_actions == 1 )); then
             ln -sf "../$name/$script" "$BPKG_PACKAGE_DEPS/bin/$scriptname"
           else
             if test -f "$BPKG_PACKAGE_DEPS/bin/$scriptname"; then
-              warn "'$BPKG_PACKAGE_DEPS/bin/$scriptname' already exists. Overwrite? (yN)"
+              bpkg_warn "'$BPKG_PACKAGE_DEPS/bin/$scriptname' already exists. Overwrite? (yN)"
               read -r yn
               case $yn in
                 Yy) rm -f "$BPKG_PACKAGE_DEPS/bin/$scriptname" ;;
@@ -565,9 +489,9 @@ bpkg_install_from_remote () {
       for file in "${files[@]}"; do
       (
           if [[ "$file" ]];then
-            info "fetch" "$url/$file"
-            warn "BPKG_PACKAGE_DEPS is '$BPKG_PACKAGE_DEPS'"
-            info "write" "$BPKG_PACKAGE_DEPS/$name/$file"
+            bpkg_info "fetch" "$url/$file"
+            bpkg_warn "BPKG_PACKAGE_DEPS is '$BPKG_PACKAGE_DEPS'"
+            bpkg_info "write" "$BPKG_PACKAGE_DEPS/$name/$file"
             save_remote_file "$url/$file" "$BPKG_PACKAGE_DEPS/$name/$file" "$auth_param"
           fi
         )
@@ -580,7 +504,7 @@ bpkg_install_from_remote () {
 ## Use as lib or perform install
 if [[ ${BASH_SOURCE[0]} != "$0" ]]; then
   export -f bpkg_install
-elif validate_parameters; then
+elif bpkg_validate; then
   bpkg_install "$@"
   exit $?
 else

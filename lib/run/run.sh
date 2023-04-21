@@ -1,62 +1,81 @@
 #!/usr/bin/env bash
 
-if ! type -f bpkg-realpath &>/dev/null; then
-  echo "error: bpkg-realpath not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/realpath/realpath.sh
-  source "$(which bpkg-realpath)"
-fi
-
 if ! type -f bpkg-utils &>/dev/null; then
   echo "error: bpkg-utils not found, aborting"
   exit 1
-else
-  # shellcheck source=lib/utils/utils.sh
-  source "$(which bpkg-utils)"
 fi
 
-if ! type -f bpkg-env &>/dev/null; then
-  echo "error: bpkg-env not found, aborting"
-  exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/env/env.sh
-  source "$(which bpkg-env)"
-fi
+# shellcheck source=lib/utils/utils.sh
+source "$(which bpkg-utils)"
 
-if ! type -f bpkg-install &>/dev/null; then
-  echo "error: bpkg-install not found, aborting"
-  exit 1
-else
-  # shellcheck source=lib/install/install.sh
+# shellcheck source=lib/realpath/realpath.sh
+bpkg_exec_or_exit bpkg-realpath &&
+  source "$(which bpkg-realpath)"
+
+# shellcheck source=lib/install/install.sh
+bpkg_exec_or_exit bpkg-install &&
   source "$(which bpkg-install)"
-fi
 
-if ! type -f bpkg-package &>/dev/null; then
-  echo "error: bpkg-package not found, aborting"
-  exit 1
-else
-  # shellcheck source=lib/package/package.sh
+# shellcheck source=lib/package/package.sh
+bpkg_exec_or_exit bpkg-package &&
   source "$(which bpkg-package)"
-fi
 
 bpkg_initrc
 
 ## output usage
 usage () {
   echo 'usage: bpkg-run [-h|--help]'
-  echo '   or: bpkg-run [-h|--help] [command]'
+  echo '   or: bpkg-run [-l|--list]'
   echo '   or: bpkg-run [-s|--source] <package> [command]'
   echo '   or: bpkg-run [-s|--source] <user>/<package> [command]'
 }
 
-runner () {
+bpkg_list_commands () {
+  local commands
+  local col_len
+  local description
+
+  commands="$(bpkg_package 2>/dev/null | grep '\["commands"' | sed 's/\["commands","\([^"]*\).*/\1/')"
+
+  col_len="$(wc -L <<< "${commands}")"
+
+  if [ "${col_len}" -eq 0 ]; then
+    bpkg_error "No commands provided in BPKG package file."
+    return 1
+  fi
+
+  for command in ${commands}; do
+    description="$(bpkg_package commands-description "${command}")"
+
+    if [ -z "${description}" ]; then
+      description="Runs the ${command} command as defined in BPKG configuration"
+    fi
+    printf "  "
+
+    bpkg_exec_exist bpkg-term &&
+      bpkg-term color cyan
+
+    printf "%-${col_len}s  " "${command}"
+
+    bpkg_exec_exist bpkg-term && {
+      bpkg-term reset
+      bpkg-term bright
+    }
+
+    printf "%s\n" "${description}"
+
+    bpkg_exec_exist bpkg-term &&
+      bpkg-term reset
+  done
+
+  return 0
+}
+
+bpkg_runner () {
   local cmd="$1"
-  shift
-  # shellcheck disable=SC2068
+
   eval "$cmd"
+
   return $?
 }
 
@@ -73,6 +92,11 @@ bpkg_run () {
       -h|--help)
         usage
         return 0
+        ;;
+
+      -l|--list)
+        bpkg_list_commands
+        return $?
         ;;
 
       -s|--source)
@@ -137,8 +161,7 @@ bpkg_run () {
       done
 
       shift
-      # shellcheck disable=SC2068
-      runner "$prefix ${args[*]}" $@
+      bpkg_runner "$prefix ${args[*]}"
       return $?
     fi
   fi
@@ -172,9 +195,9 @@ bpkg_run () {
     return 1
   fi
 
-  local pkgname="$(bpkg_package name 2>/dev/null)"
-  if [ -n "$pkgname" ]; then
-    name="$pkgname"
+  local pkg_name="$(bpkg_package name 2>/dev/null)"
+  if [ -n "$pkg_name" ]; then
+    name="$pkg_name"
   fi
 
   if (( 1 == should_emit_source )); then
@@ -218,8 +241,7 @@ bpkg_run () {
         done
 
         shift
-        # shellcheck disable=SC2068
-        runner "$prefix ${args[*]}" $@
+        bpkg_runner "$prefix ${args[*]}"
       fi
 
       # shellcheck disable=SC2068

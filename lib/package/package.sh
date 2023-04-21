@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 
-if ! type -f bpkg-realpath &>/dev/null; then
-  echo "error: bpkg-realpath not found, aborting"
+if ! type -f bpkg-utils &>/dev/null; then
+  echo "error: bpkg-utils not found, aborting"
   exit 1
-else
-  # shellcheck disable=SC2230
-  # shellcheck source=lib/realpath/realpath.sh
-  source "$(which bpkg-realpath)"
 fi
+
+# shellcheck source=lib/utils/utils.sh
+source "$(which bpkg-utils)"
+
+# shellcheck source=lib/realpath/realpath.sh
+bpkg_exec_or_exit bpkg-realpath &&
+  source "$(which bpkg-realpath)"
 
 BPKG_JSON="$(which bpkg-json)"
 
