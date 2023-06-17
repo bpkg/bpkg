@@ -73,6 +73,7 @@ bpkg_list_commands () {
 
 bpkg_runner () {
   local cmd="$1"
+  shift
 
   eval "$cmd"
 
@@ -161,7 +162,7 @@ bpkg_run () {
       done
 
       shift
-      bpkg_runner "$prefix ${args[*]}"
+      bpkg_runner "$prefix ${args[*]}" "$@"
       return $?
     fi
   fi
@@ -241,7 +242,7 @@ bpkg_run () {
         done
 
         shift
-        bpkg_runner "$prefix ${args[*]}"
+        bpkg_runner "$prefix ${args[*]}" "$@"
       fi
 
       # shellcheck disable=SC2068
