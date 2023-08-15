@@ -164,7 +164,7 @@ bpkg_install () {
       did_fail=0
       continue
     fi
-
+    
     ## Check each remote in order
     local i=0
     for remote in "${BPKG_REMOTES[@]}"; do
@@ -381,8 +381,9 @@ bpkg_install_from_remote () {
   if (( 1 == needs_global )); then
     if (( has_pkg_json > 0 )); then
       ## install bin if needed
-      build="$(echo -n "$json" | bpkg-json -b | grep '\["install"\]' | awk '{$1=""; print $0 }' | tr -d '\"')"
-      build="$(echo -n "$build" | sed -e 's/^ *//' -e 's/ *$//')"
+      build="$(echo -n "$json" | bpkg-json -b -f='"install"')"
+      build=${build#\"}
+      build=${build%\"}
     fi
 
     if [[ -z "$build" ]]; then
