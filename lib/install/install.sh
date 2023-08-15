@@ -180,6 +180,11 @@ bpkg_install () {
     done
   done
 
+  if ((${#pkgs[@]} == 0)); then
+    bpkg_error 'no packages supplied'
+    return 1
+  fi
+
   if (( did_fail == 1 )); then
     bpkg_error 'package not found on any remote'
     return 1
