@@ -52,7 +52,12 @@ setup () {
     rm -rf "$DEST"
 
     echo "  info: Fetching 'bpkg@$BRANCH'..."
-    git clone --depth=1 --branch "$BRANCH" "$REMOTE" "$DEST" > /dev/null 2>&1
+    if ! output=$(git clone --depth=1 --branch "$BRANCH" "$REMOTE" "$DEST" 2>&1); then
+      printf '%s\n' "  error: Failed to clone repository." >&2
+      printf '%s\n' "GIT ERROR OUTPUT:"
+      printf '%s\n' "$output"
+      exit 1
+    fi
     cd "$DEST" || exit
 
     echo "  info: Installing..."
