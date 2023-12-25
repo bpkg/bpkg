@@ -75,6 +75,14 @@ bpkg_runner () {
   local cmd="$1"
   shift
 
+  if [ "${cmd:0:1}" = "\"" ]; then
+    cmd="${cmd:1}"
+  fi
+
+  if [ "${cmd:-1}" = "\"" ]; then
+    cmd="${cmd:0:${#cmd}-1}"
+  fi
+
   eval "$cmd"
 
   return $?
