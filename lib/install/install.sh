@@ -161,7 +161,7 @@ bpkg_install () {
 
   for pkg in "${pkgs[@]}"; do
     if test -d "$(bpkg_realpath "$pkg" 2>/dev/null)"; then
-      pushd . 2>/dev/null || return 1
+      pushd . >/dev/null || return 1
       cd "$pkg" || return 1
 
       pwd
@@ -172,11 +172,17 @@ bpkg_install () {
       ## handle global install on a given local directory path
       if (( needs_global )); then
         if test -f "bpkg.json"; then
-          json="$(cat bpkg.json)"
+          json="$(cat bpkg.json 2>/dev/null)"
         elif test -f "package.json"; then
-          json="$(cat bpkg.json)"
+          json="$(cat package.json 2>/dev/null)"
         else
-          popd 2>/dev/null || return 1
+          popd >/dev/null || return 1
+          bpkg_warn 'Unable to determine bpkg.json'
+          return 1
+        fi
+
+        if [ -z "$json" ]; then
+          popd >/dev/null || return 1
           bpkg_warn 'Unable to determine bpkg.json'
           return 1
         fi
@@ -211,7 +217,7 @@ bpkg_install () {
         echo "$build_output"
       fi
 
-      popd 2>/dev/null || return 1
+      popd >/dev/null || return 1
       continue
     fi
 
