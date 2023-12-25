@@ -155,16 +155,66 @@ bpkg_install () {
 
   echo
 
+  local build_output=""
+  local build=""
+  local json=""
+
   for pkg in "${pkgs[@]}"; do
     if test -d "$(bpkg_realpath "$pkg" 2>/dev/null)"; then
-      if ! (cd "$pkg" && ${BPKG_DEPS_EXEC}); then
-        return 1
-      fi
+      pushd . 2>/dev/null || return 1
+      cd "$pkg" || return 1
+
+      pwd
+      ${BPKG_DEPS_EXEC} || return 1
 
       did_fail=0
+
+      ## handle global install on a given local directory path
+      if (( needs_global )); then
+        if test -f "bpkg.json"; then
+          json="$(cat bpkg.json)"
+        elif test -f "package.json"; then
+          json="$(cat bpkg.json)"
+        else
+          popd 2>/dev/null || return 1
+          bpkg_warn 'Unable to determine bpkg.json'
+          return 1
+        fi
+
+        ## install bin if needed
+        build="$(echo -n "$json" | bpkg-json -b -f='"install"')"
+        build=${build#\"}
+        build=${build%\"}
+
+        if [[ -z "$build" ]]; then
+          bpkg_warn 'Missing build script'
+          bpkg_warn 'Trying "make install"...'
+          build='make install'
+        fi
+      fi
+
+      if [ -z "$PREFIX" ]; then
+        if [ "$USER" == "root" ]; then
+          PREFIX="/usr/local"
+        else
+          PREFIX="$HOME/.local"
+        fi
+
+        build="env PREFIX=$PREFIX $build"
+      fi
+
+      if [ -n "$build" ]; then
+        ## build
+        bpkg_info "Performing install: \`$build'"
+        mkdir -p "$PREFIX"/{bin,lib}
+        build_output=$(eval "$build")
+        echo "$build_output"
+      fi
+
+      popd 2>/dev/null || return 1
       continue
     fi
-    
+
     ## Check each remote in order
     local i=0
     for remote in "${BPKG_REMOTES[@]}"; do
