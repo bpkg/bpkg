@@ -16,6 +16,10 @@ bpkg_exec_or_exit bpkg-realpath &&
 bpkg_exec_or_exit bpkg-getdeps &&
   source "$(which bpkg-getdeps)"
 
+# shellcheck source=lib/utils/url.sh
+bpkg_exec_or_exit bpkg-url &&
+  source "$(which bpkg-url)"
+
 bpkg_initrc
 
 let prevent_prune=0
@@ -284,7 +288,7 @@ bpkg_install_from_remote () {
       git_remote=${git_remote/https:\/\//https:\/\/$token:x-oauth-basic@}
     fi
   else
-    uri="/$user/$name/$version"
+    uri=$(bpkg_resolve_uri "$git_remote" "$user" "$name" "$version")
   fi
 
   ## clean up extra slashes in uri

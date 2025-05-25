@@ -173,6 +173,46 @@ bpkg package
 ["install"]     "make install"
 ```
 
+### Configuration
+
+Github and Gitlab bash repositories have builtin support but in case other git repository needs to be searched for add the next lines to `$HOME/.bpkgrc` configuration file using the BPKG_REMOTES for raw file access and BPKG_GIT_REMOTES for git access
+
+```
+BPKG_REMOTES=("https://raw.githubusercontent.com")
+BPKG_REMOTES+=("https://gitlab.com")
+BPKG_REMOTES+=("https://my-git-raw-access.com")
+
+BPKG_GIT_REMOTES=("https://github.com")
+BPKG_GIT_REMOTES+=("https://gitlab.com")
+BPKG_GIT_REMOTES+=("https://my-git.com")
+```
+
+### Using other git repositories
+
+`bpkg` resolves Github and Gitlab URL to find the package to install but 
+when a different git hosting service is used a method to resolve the right
+URL must be provided. To do so define a function named `bpkg_resolve_uri_pathspec`
+in the `$HOME/.bpkgrc` configuration file and let it do your git service resolution
+
+```bash
+    bpkg_resolve_uri_pathspec() {
+      local git_remote=$1
+      local user=$2
+      local name=$3
+      local version=$4
+
+      if [[ "$git_remote" == https://my-hosted-git*  ]]; then
+        echo "$version/$user/-/my-branch/$name"
+        return 0
+      else
+
+      return 1
+    }
+```
+
+Returning 0 signals that the URl have been resolved, other value means no resolution
+and let's `bpkg` resolve it for you
+
 ## Package details
 
 Here we lay down some info on the structure of a package.

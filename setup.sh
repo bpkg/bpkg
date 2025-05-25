@@ -94,6 +94,7 @@ CMDS+=("suggest")
 CMDS+=("term")
 CMDS+=("update")
 CMDS+=("utils")
+CMDS+=("url")
 CMDS+=("realpath")
 
 make_install () {
